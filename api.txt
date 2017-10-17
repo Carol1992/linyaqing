@@ -1,35 +1,217 @@
 baseUrl = 'http://localhost:3000'
 support methods: post, get(有些考虑到参数较多，故不支持get)
+response 的结构：
+{
+	success: true/false,
+	code: 0/1/2/3/4/5/...,// 0代表成功，其他数字结合desc理解
+	desc: ''/'用户名或密码错误'/'参数错误'/,
+	data: {
+		// 数组或对象或字符串
+	}
+}
 
 1. 关键字搜索
 url: '/search'
 post: data:{keyword='keyword'}
 get: ?keyword='keyword'
+{
+	success: true,
+	code: 0,
+	desc: '',
+	data: {
+		basic_info: {
+			photos: 100,
+			collections:20,
+			users: 20
+		},
+		lists: [
+			{
+				image_id: '',
+				image_md5: '',
+				owner: {
+					name: '',
+					id: '',
+					image_md5: ''
+				},
+				liked: 200
+			}
+		]
+	}
+}
 
 2. 获取最热图片列表
 url: '/getList/trending'
+{
+	success: true,
+	code: 0,
+	desc: '',
+	data: {
+		lists: [
+			{
+				image_id: '',
+				image_md5: '',
+				owner: {
+					name: '',
+					id: '',
+					image_md5: ''
+				},
+				liked: 200
+			}
+		]
+	}
+}
 
 3. 获取最新图片列表
 url: '/getList/new'
+{
+	success: true,
+	code: 0,
+	desc: '',
+	data: {
+		lists: [
+			{
+				image_id: '',
+				image_md5: '',
+				owner: {
+					name: '',
+					id: '',
+					image_md5: ''
+				},
+				liked: 200
+			}
+		]
+	}
+}
 
 4. 已登录用户，获取其所关注的作者的图片列表
 url: '/getList/following'
 post: data: {token: '用户的token'}
 get: ?token='用户的token'
+{
+	success: true,
+	code: 0,
+	desc: '',
+	data: {
+		lists: [
+			{
+				image_id: '',
+				image_md5: '',
+				owner: {
+					name: '',
+					id: '',
+					image_md5: ''
+				},
+				liked: 200
+			}
+		]
+	}
+}
 
 5. 获取所有图片集
 url: '/getCollection/all'
+{
+	success: true,
+	code: 0,
+	desc: '',
+	data: {
+		lists: [
+			{
+				image_id: '',
+				image_md5: '',
+				owner: {
+					name: '',
+					id: '',
+					image_md5: ''
+				},
+				created_time: '',
+				collection_name: '',
+				collection_id: '',
+				collection_photo_nums: 100
+			}
+		]
+	}
+}
 
 6. 获取所有画展图片集
 url: 'getCollection/curated'
+{
+	success: true,
+	code: 0,
+	desc: '',
+	data: {
+		lists: [
+			{
+				image_id: '',
+				image_md5: '',
+				owner: {
+					name: '',
+					id: '',
+					image_md5: ''
+				},
+				created_time: '',
+				collection_name: '',
+				collection_id: '',
+				collection_photo_nums: 100
+			}
+		]
+	}
+}
 
 7. 获取所有专题图片集
 url: 'getCollection/featured'
+{
+	success: true,
+	code: 0,
+	desc: '',
+	data: {
+		lists: [
+			{
+				image_id: '',
+				image_md5: '',
+				owner: {
+					name: '',
+					id: '',
+					image_md5: ''
+				},
+				created_time: '',
+				collection_name: '',
+				collection_id: '',
+				collection_photo_nums: 100
+			}
+		]
+	}
+}
 
 8. 获取用户自己的图片集
 url: 'getUserCollection/all'
 post: data: {token: '用户的token'}
 get: ?token='用户的token'
+{
+	success: true,
+	code: 0,
+	desc: '',
+	data: {
+		basic_info: {
+			photos: 100,
+			collections:20,
+			liked: 20
+		},
+		lists: [
+			{
+				image_id: '',
+				image_md5: '',
+				owner: {
+					name: '',
+					id: '',
+					image_md5: ''
+				},
+				collection_name: '',
+				collection_id: '',
+				collection_photo_nums: 100
+			}
+		]
+	}
+}
 
 9. 用户上传图片
 url: 'uploadUserPhoto/new'
@@ -55,6 +237,7 @@ post: data: {
 	},
 	collabs: [] // 数组内是用户所选择的合作者的id
 }
+
 
 10. 用户修改个人资料
 url: 'updateUserAccount/info'
@@ -86,12 +269,33 @@ post: data: {
 	 facebook:1 // 0表示没有关联，1表示关联了
 }
 
-13. 
-
-14. 用户删除账户
+13. 用户删除账户
 url: 'updateUserAccount/delete'
 post: data: {token:'token'}
 get:?token=token
+
+14. 获取用户连接的应用(开发者模式)
+url: 'getUserApplication'
+post: data: {token:'token'}
+get:?token=token
+response: {
+	success: true,
+	code: 0, // 0代表成功，其他数字结合desc理解
+	desc: '获取应用列表成功'/'用户名或密码错误'/'参数错误'/,
+	data: {
+		// 数组或对象或字符串
+		[
+			{
+				app_id: '',
+				app_name: '',
+				created_time: '',
+				callback_url: '',
+				status: '',
+				hourly_rate_limit: ''
+			}
+		]
+	}
+}
 
 15. 用户删除图片
 url: 'deleteUserPhoto'
@@ -103,4 +307,31 @@ url: 'updateUserEmailSettings'
 post: data: {
 	token: 'token',
 	settings: [] // 将设置为true的id放入数组
+}
+
+17. 用户注册成为developer
+url: 'registerAsDeveloper'
+post: data: {
+	url: '',
+	description: ''
+}
+
+18. developer用户添加新的应用
+url: 'addNewApp',
+post: data: {
+	token:'token',
+	app_name: '',
+	app_desc: '',
+	redirect_url:'',
+	permissions: [] // 将确定选项的id放入数组中
+}
+
+19. 打标签页面的图片
+url: 'getUntagedPhoto'
+
+20. 更新打标签页面图片的tag
+url: 'updatePhotoTag',
+post: data: {
+	photo_id: '',
+	tag: '' // 以逗号分隔
 }

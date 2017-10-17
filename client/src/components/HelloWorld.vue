@@ -21,12 +21,36 @@
 </template>
 
 <script>
+import $ from 'jquery'
+import axios from 'axios'
 export default {
   name: 'HelloWorld',
   data () {
     return {
       msg: 'Welcome to Your Vue.js App'
     }
+  },
+  methods: {
+    getNews () {
+      axios({
+        method: 'post',
+        url: '/api/news',
+        data: {}
+      })
+      .then(function (res) {
+        console.log(res)
+      })
+      .catch(function (err) {
+        console.log(err)
+      })
+    },
+    testJquery () {
+      console.log($('h1'))
+    }
+  },
+  mounted () {
+    // this.testJquery()
+    this.getNews()
   }
 }
 </script>

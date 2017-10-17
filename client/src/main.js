@@ -5,15 +5,21 @@ import App from './App'
 import router from './router'
 import Vuex from 'vuex'
 import axios from 'axios'
+import VueAxios from 'vue-axios'
 import iView from 'iview'
 import '../my-theme/index.less'
 
 Vue.config.debug = true // debug
-Vue.use(axios)
+Vue.use(VueAxios, axios)
 Vue.use(Vuex)
 Vue.use(iView)
 
 Vue.config.productionTip = false
+
+// 引入mockjs
+require('./mock.js')
+const faker = require('faker')
+faker.locale = 'zh_CN'
 
 router.beforeEach((to, from, next) => {
   if (to.meta.requireAuth) {  // 判断该路由是否需要登录权限

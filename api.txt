@@ -1,0 +1,106 @@
+baseUrl = 'http://localhost:3000'
+support methods: post, get(有些考虑到参数较多，故不支持get)
+
+1. 关键字搜索
+url: '/search'
+post: data:{keyword='keyword'}
+get: ?keyword='keyword'
+
+2. 获取最热图片列表
+url: '/getList/trending'
+
+3. 获取最新图片列表
+url: '/getList/new'
+
+4. 已登录用户，获取其所关注的作者的图片列表
+url: '/getList/following'
+post: data: {token: '用户的token'}
+get: ?token='用户的token'
+
+5. 获取所有图片集
+url: '/getCollection/all'
+
+6. 获取所有画展图片集
+url: 'getCollection/curated'
+
+7. 获取所有专题图片集
+url: 'getCollection/featured'
+
+8. 获取用户自己的图片集
+url: 'getUserCollection/all'
+post: data: {token: '用户的token'}
+get: ?token='用户的token'
+
+9. 用户上传图片
+url: 'uploadUserPhoto/new'
+post: data: {
+	token: '用户的token',
+	image: '', // 给我图片的md5
+	tags: '', // 多个tag用逗号(,)分隔
+	exif: {
+		make: '',
+		model: '',
+		focalLength: '',
+		aperture: '',
+		iso: '',
+		shutterSpeed: ''
+	},
+	story: {
+		title: '',
+		story: ''
+	},
+	location: {
+		address: '',
+		display: true // false则不展示location
+	},
+	collabs: [] // 数组内是用户所选择的合作者的id
+}
+
+10. 用户修改个人资料
+url: 'updateUserAccount/info'
+post: data: {
+	token: '用户的token',
+	image: '', //以md5的格式
+	firstName: '',
+	lastName: '',
+	email: '',
+	userName: '',
+	personal_site: '',
+	instagram: '',
+	twitter: '',
+	location: '',
+	bio: ''
+}
+
+11. 用户修改密码
+url: 'updateUserAccount/password'
+post: data: {
+	token: '',
+	password: '' // 将加密后的密码发给我
+}
+
+12. 用户关联其他社交账户
+url: 'updateUserAccount/social'
+post: data: {
+	 twitter:0,
+	 facebook:1 // 0表示没有关联，1表示关联了
+}
+
+13. 
+
+14. 用户删除账户
+url: 'updateUserAccount/delete'
+post: data: {token:'token'}
+get:?token=token
+
+15. 用户删除图片
+url: 'deleteUserPhoto'
+post: data: {token:'token', image_id: '图片的id'}
+get: ?token='token'&image_id='image_id'
+
+16. 用户修改邮件设置
+url: 'updateUserEmailSettings'
+post: data: {
+	token: 'token',
+	settings: [] // 将设置为true的id放入数组
+}

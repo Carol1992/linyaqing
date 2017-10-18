@@ -3,7 +3,7 @@ support methods: post, get(有些考虑到参数较多，故不支持get)
 response 的结构：
 {
 	success: true/false,
-	code: 0/1/2/3/4/5/...,// 0代表成功，其他数字结合desc理解
+	code: 0/1,// 0代表成功，1代表错误，错误原因结合desc理解
 	desc: ''/'用户名或密码错误'/'参数错误'/,
 	data: {
 		// 数组或对象或字符串
@@ -237,7 +237,14 @@ post: data: {
 	},
 	collabs: [] // 数组内是用户所选择的合作者的id
 }
-
+response: {
+	success: true,
+	code: 0, // 0代表成功，其他数字结合desc理解
+	desc: '',
+	data: {
+		
+	}
+}
 
 10. 用户修改个人资料
 url: 'updateUserAccount/info'
@@ -254,12 +261,24 @@ post: data: {
 	location: '',
 	bio: ''
 }
+response: {
+	success: true,
+	code: 0, // 0代表成功，其他数字结合desc理解
+	desc: '',
+	data: {}
+}
 
 11. 用户修改密码
 url: 'updateUserAccount/password'
 post: data: {
 	token: '',
 	password: '' // 将加密后的密码发给我
+}
+response: {
+	success: true,
+	code: 0, // 0代表成功，其他数字结合desc理解
+	desc: '',
+	data: {}
 }
 
 12. 用户关联其他社交账户
@@ -268,11 +287,23 @@ post: data: {
 	 twitter:0,
 	 facebook:1 // 0表示没有关联，1表示关联了
 }
+response: {
+	success: true,
+	code: 0, // 0代表成功，其他数字结合desc理解
+	desc: '',
+	data: {}
+}
 
 13. 用户删除账户
 url: 'updateUserAccount/delete'
 post: data: {token:'token'}
 get:?token=token
+response: {
+	success: true,
+	code: 0, // 0代表成功，其他数字结合desc理解
+	desc: '',
+	data: {}
+}
 
 14. 获取用户连接的应用(开发者模式)
 url: 'getUserApplication'
@@ -283,7 +314,6 @@ response: {
 	code: 0, // 0代表成功，其他数字结合desc理解
 	desc: '获取应用列表成功'/'用户名或密码错误'/'参数错误'/,
 	data: {
-		// 数组或对象或字符串
 		[
 			{
 				app_id: '',
@@ -301,6 +331,12 @@ response: {
 url: 'deleteUserPhoto'
 post: data: {token:'token', image_id: '图片的id'}
 get: ?token='token'&image_id='image_id'
+response: {
+	success: true,
+	code: 0, // 0代表成功，其他数字结合desc理解
+	desc: '删除成功',
+	data: {}
+}
 
 16. 用户修改邮件设置
 url: 'updateUserEmailSettings'
@@ -308,12 +344,24 @@ post: data: {
 	token: 'token',
 	settings: [] // 将设置为true的id放入数组
 }
+response: {
+	success: true,
+	code: 0, // 0代表成功，其他数字结合desc理解
+	desc: '',
+	data: {}
+}
 
 17. 用户注册成为developer
 url: 'registerAsDeveloper'
 post: data: {
 	url: '',
 	description: ''
+}
+response: {
+	success: true,
+	code: 0, // 0代表成功，其他数字结合desc理解
+	desc: '',
+	data: {}
 }
 
 18. developer用户添加新的应用
@@ -325,13 +373,416 @@ post: data: {
 	redirect_url:'',
 	permissions: [] // 将确定选项的id放入数组中
 }
+response: {
+	success: true,
+	code: 0, // 0代表成功，其他数字结合desc理解
+	desc: '',
+	data: {}
+}
 
 19. 打标签页面的图片
 url: 'getUntagedPhoto'
+response: {
+	success: true,
+	code: 0, // 0代表成功，其他数字结合desc理解
+	desc: '',
+	data: {
+		photo_id: '',
+		photo_md5: ''
+	}
+}
 
 20. 更新打标签页面图片的tag
 url: 'updatePhotoTag',
 post: data: {
 	photo_id: '',
 	tag: '' // 以逗号分隔
+}
+response: {
+	success: true,
+	code: 0, // 0代表成功，其他数字结合desc理解
+	desc: '',
+	data: {}
+}
+
+20. 用户上传图片到zimg服务器
+url: 'uploadPhotoToZimg'
+post: {
+	data: formdata(图片文件)
+	processData: false
+	contentType: false
+}
+response: {
+	success: true,
+	code: 0, // 0代表成功，其他数字结合desc理解
+	desc: '',
+	data: {
+		image_md5: ''
+	}
+}
+
+21. 获取store中的最新产品列表
+url: 'getProducts/new'
+response: {
+	success: true,
+	code: 0, // 0代表成功，其他数字结合desc理解
+	desc: '',
+	data: {
+		product_id: '',
+		product_md5: '',
+		product_name: '',
+		creater_name: '',
+		product_price: '',
+		profits_share: true/false
+	}
+}
+
+22. 获取store中的最热产品列表
+url: 'getProducts/hot'
+response: {
+	success: true,
+	code: 0, // 0代表成功，其他数字结合desc理解
+	desc: '',
+	data: {
+		product_id: '',
+		product_md5: '',
+		product_name: '',
+		creater_name: '',
+		product_price: '',
+		profits_share: true/false
+	}
+}
+
+23. 获取store中所有产品列表
+url: 'getProducts/all'
+response: {
+	success: true,
+	code: 0, // 0代表成功，其他数字结合desc理解
+	desc: '',
+	data: {
+		product_id: '',
+		product_md5: '',
+		product_name: '',
+		creater_name: '',
+		product_price: '',
+		profits_share: true/false
+	}
+}
+
+24. 获取store中自营的产品列表
+url: 'getProducts/self'
+response: {
+	success: true,
+	code: 0, // 0代表成功，其他数字结合desc理解
+	desc: '',
+	data: {
+		product_id: '',
+		product_md5: '',
+		product_name: '',
+		creater_name: '',
+		product_price: '',
+		profits_share: true/false
+	}
+}
+
+25. 获取store中友情赞助的产品列表
+url: 'getProducts/friends'
+response: {
+	success: true,
+	code: 0, // 0代表成功，其他数字结合desc理解
+	desc: '',
+	data: {
+		product_id: '',
+		product_md5: '',
+		product_name: '',
+		creater_name: '',
+		product_price: '',
+		profits_share: true/false
+	}
+}
+
+26. 用户将商品加入购物车
+url: 'addToCart'
+post: data: {
+	token: '', // 如果是非登录用户将商品放入购物车，则用localStorage在本地记住就好
+	product_id: ''
+}
+
+27. 用户获取购物车中的所有商品列表
+url: 'getProductsInCart'
+post: data: {
+	token: ''
+}
+response: {
+	success: true,
+	code: 0, // 0代表成功，其他数字结合desc理解
+	desc: '',
+	data: {
+		product_id: '',
+		product_md5: '',
+		product_name: '',
+		creater_name: '',
+		product_price: '',
+		profits_share: true/false,
+		product_quantity: ''
+	}
+}
+
+27-1. 获取单件商品的具体信息
+url: 'getProductDetails'
+post: data: {
+	product_id:''
+}
+get: ?product_id=''
+response: {
+	success: true,
+	code: 0, // 0代表成功，其他数字结合desc理解
+	desc: '',
+	data: {
+		product_id: '',
+		product_md5: '',
+		product_name: '',
+		creater_name: '',
+		product_price: '',
+		profits_share: true/false,
+		product_desc: '',
+		product_measurement: {
+			XS: {
+				bodyLength: 27,
+				chest:20,
+				sleeve:34
+			},
+			S: {
+				bodyLength: 27,
+				chest:20,
+				sleeve:34
+			},
+			M: {
+				bodyLength: 27,
+				chest:20,
+				sleeve:34
+			},
+			L:{
+				bodyLength: 27,
+				chest:20,
+				sleeve:34
+			},
+			XL:{
+				bodyLength: 27,
+				chest:20,
+				sleeve:34
+			}
+		},
+		product_pics_md5: [], //5张图片的md5
+		product_pics_and_desc: [
+			{
+				md5: '',
+				desc: ''
+			}
+		] //正文中每张图片及其对应的文字
+	}
+}
+
+27-2. 用户提交订单步骤1
+url: 'submitOrder/step1'
+post: data: {
+	customer_email:'',
+	shipping_address: {
+		firstName:'',
+		lastName:'',
+		company: '',
+		address: '',
+		apt:'',
+		city: '',
+		country: '',
+		province: '',
+		postal_code: '',
+		phone:''
+	}
+}
+response: {
+	success: true,
+	code: 0, // 0代表成功，其他数字结合desc理解
+	desc: '',
+	data: {
+		shipping_price: ''
+	}
+}
+
+27-3. 用户提交订单步骤2
+url: 'submitOrder/step2'
+post: data: {
+	card_num: '',
+	name_on_card: '',
+	mm/yy:'',
+	cvv:'',
+	rememberMe:true/false
+}
+response: {
+	success: true,
+	code: 0, // 0代表成功，其他数字结合desc理解
+	desc: '',
+	data: {
+		customer_info: {
+			firstName:'',
+			lastName:'',
+			email: '',
+			phone: ''
+		},
+		logistics_info: {
+			from: '',
+			to: '',
+			shipping_price: '',
+			estimate_shipping_days: '',
+		},
+		products_info:{
+			basic_info: {
+				total_quantity: '',
+				total_price: ''
+			},
+			products_list:[
+				{
+					name: '',
+					price: '',
+					quantity: ''
+				}
+			]
+		}
+	}
+}
+
+28. 新用户邮件注册
+url: 'addNewUser'
+post: data: {
+	firstName: '',
+	lastName: '',
+	userName: '',
+	email: '',
+	password: '' // 加密后传过来
+}
+response: {
+	success: true,
+	code: 0, // 0代表成功，其他数字结合desc理解
+	desc: '',
+	data: {
+		token: '',
+		user_id: '',
+		user_name: '',
+		user_email: '',
+		first_name: '',
+		last_name: '',
+		image_md5: '',
+		personal_site: '',
+		instagram: '',
+		twitter: '',
+		location: '',
+		bio: ''
+	}
+}
+29. 新用户facebook注册
+url: 'addNewUser/facebook'
+
+30. 老用户登录
+url:'login'
+post: data: {
+	email: '',
+	password: '' //加密后传过来
+}
+response: {
+	success: true,
+	code: 0, // 0代表成功，其他数字结合desc理解
+	desc: '',
+	data: {
+		user_info: {
+			token: '',
+			user_id: '',
+			user_name: '',
+			user_email: '',
+			first_name: '',
+			last_name: '',
+			image_md5: '',
+			personal_site: '',
+			instagram: '',
+			twitter: '',
+			location: '',
+			bio: ''
+		}
+	}
+}
+
+31. 获取密码加密的密钥(使用RSA非对称)加密
+url: 'getRsaKey'
+response: {
+	success: true,
+	code: 0, // 0代表成功，其他数字结合desc理解
+	desc: '',
+	data: {
+		key: '',
+		modules: ''
+	}
+}
+
+32. 老用户facebook登录
+url:'login/facebook'
+
+33. 获取所有类别的图片集列表
+url: 'getCategories/all'
+response: {
+	success: true,
+	code: 0, // 0代表成功，其他数字结合desc理解
+	desc: '',
+	data: {
+		[
+			{
+				image_md5: '',
+				category_name: '',
+				category_id: ''
+			}
+		]
+	}
+}
+
+34. 更新用户选择关注的类别图片集
+url: 'updateUserCategories'
+post: data: {
+	token: '',
+	categories: [] //用户选择的图片集的id
+}
+response: {
+	success: true,
+	code: 0, // 0代表成功，其他数字结合desc理解
+	desc: '',
+	data: {
+		
+	}
+}
+
+35. 获取推荐给用户的摄影师列表
+url: 'getPhotographers/all'
+response: {
+	success: true,
+	code: 0, // 0代表成功，其他数字结合desc理解
+	desc: '',
+	data: {
+		basic_info: {
+			user_id: '',
+			user_name: '',
+			user_ins: '',
+			user_image_md5: ''
+		}
+	}
+}
+
+36. 更新用户选择关注的摄像师列表
+url:'updatePhotographers'
+post: data: {
+	photographers: [] //将摄像师的id放入数组传给我
+}
+response: {
+	success: true,
+	code: 0, // 0代表成功，其他数字结合desc理解
+	desc: '',
+	data: {
+		
+	}
 }

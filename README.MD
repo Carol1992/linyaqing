@@ -8,3 +8,4 @@
 8. 保证服务的正常运行，包括前端交互、业务数据操作、服务器稳定性和访问速度、数据库安全等方面
 9. 未登录用户：new/trending模块、 featured/curated模块、store模块
 10. 登录用户：new/trending/following模块、featured/curated/mine模块、store模块、开发者模块、标注模块、用户资料编辑模块
+11. 图片存储方案：购买阿里云ECS云服务器，安装和启动zimg服务器，将图片存放在该服务器(40G/330元/年)；熟悉阿里云的OSS对象存储API接口，将图片存储在OSS中(目前有40G，有效期是2年)，之后还要去购买可以运行NodeJS的服务器。 =>图片存储在OSS，但是ECS云服务器还是要买

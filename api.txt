@@ -233,7 +233,7 @@ post: data: {
 	},
 	location: {
 		address: '',
-		display: true // false则不展示location
+		display: 0 // 1则不展示location
 	},
 	collabs: [] // 数组内是用户所选择的合作者的id
 }

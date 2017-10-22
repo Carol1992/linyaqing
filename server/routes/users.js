@@ -1,5 +1,13 @@
-let {express, router, connection, formater} = require('./common');
+//let {express, router, connection, formater} = require('./common');
+var express = require('express');
+var router = express.Router();
+var formater = require('../database/format')
+var connection = require('../database/connection');
 let crypto = require('crypto');
+let jwt = require('jsonwebtoken');
+let verify_token= require('./verify_token');
+// 连接数据库
+connection.connect();
 // 用户注册
 router.post('/register', function(req, res, next) {
 	let _user = req.body;
@@ -13,16 +21,13 @@ router.post('/register', function(req, res, next) {
 		password : _user.password
 	}
 	if(!post.user_name) {
-		res.json(formater({code:'1', desc:'用户名不能为空！'}));
-		return;
+		return res.json(formater({code:'1', desc:'用户名不能为空！'}));
 	}
 	if(!post.email) {
-		res.json(formater({code:'1', desc:'邮件不能为空！'}));
-		return;
+		return res.json(formater({code:'1', desc:'邮件不能为空！'}));
 	}
 	if(!post.password) {
-		res.json(formater({code:'1', desc:'密码不能为空'}));
-		return;
+		return res.json(formater({code:'1', desc:'密码不能为空'}));
 	} else {
 		post.password = md5.update(post.password).digest("hex")
 	}
@@ -62,12 +67,10 @@ router.post('/login', function(req, res, next) {
 		password : _user.password
 	}
 	if(!post.email) {
-		res.json(formater({code:'1', desc:'邮件不能为空！'}));
-		return;
+		return res.json(formater({code:'1', desc:'邮件不能为空！'}));
 	}
 	if(!post.password) {
-		res.json(formater({code:'1', desc:'密码不能为空'}));
-		return;
+		return res.json(formater({code:'1', desc:'密码不能为空'}));
 	}
 	connection.query('SELECT * FROM users WHERE email = ?', post.email, function(error, results, fields) {
 		if (error) {
@@ -82,6 +85,7 @@ router.post('/login', function(req, res, next) {
 		  	}
 		  	if(post.password === results[0].password) {
 		  		// 登录成功返回该用户的token，之后需要用到权限的地方都要带上token到后台查询
+		  		results[0].token = jwt.sign({data: results[0]}, 'secret', { expiresIn: '24h' });
 		  		res.json(formater({code:'0', desc:'登录成功！', data:results[0]}))
 		  	} else {
 		  		res.json(formater({code:'1', desc:'密码错误！'}))
@@ -94,19 +98,20 @@ router.post('/login', function(req, res, next) {
 	});
 });
 // 修改用户信息
-router.post('/updateUserAccount/info', (req, res, next) => {
-
+router.post('/updateUserAccount/info', verify_token, (req, res, next) => {
+	console.log(req);
+	res.json({test: 'test'});
 });
 // 修改用户密码
-router.post('/updateUserAccount/password', (req, res, next) => {
+router.post('/updateUserAccount/password', verify_token, (req, res, next) => {
 
 });
 // 修改用户关联账户
-router.post('/updateUserAccount/social', (req, res, next) => {
+router.post('/updateUserAccount/social', verify_token, (req, res, next) => {
 
 });
 // 删除账户
-router.post('/updateUserAccount/delete', (req, res, next) => {
+router.post('/updateUserAccount/delete', verify_token, (req, res, next) => {
 
 });
 

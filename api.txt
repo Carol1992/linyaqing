@@ -183,7 +183,7 @@ url: 'getCollection/featured'
 }
 
 8. 获取用户自己的图片集
-url: 'getUserCollection/all'
+url: 'getCollection/user'
 post: data: {token: '用户的token'}
 get: ?token='用户的token'
 {
@@ -652,7 +652,7 @@ response: {
 }
 
 28. 新用户邮件注册
-url: 'addNewUser'
+url: 'register'
 post: data: {
 	firstName: '',
 	lastName: '',
@@ -680,7 +680,7 @@ response: {
 	}
 }
 29. 新用户facebook注册
-url: 'addNewUser/facebook'
+url: 'register/facebook'
 
 30. 老用户登录
 url:'login'
@@ -710,7 +710,7 @@ response: {
 	}
 }
 
-31. 获取密码加密的密钥(使用RSA非对称)加密
+31. 获取密码加密的密钥(使用crypto非对称)加密
 url: 'getRsaKey'
 response: {
 	success: true,

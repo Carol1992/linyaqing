@@ -4,7 +4,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 //  用户注册、登录、修改信息的接口路由
-var register = require('./routes/register') 
+var users = require('./routes/users');
 
 var app = express();
 app.use(logger('dev'));
@@ -12,7 +12,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 // 用户注册、登录、修改信息的接口路由
-app.use('/register', register)
+app.use(users);
 
 // error handler
 app.use(function(err, req, res, next) {
@@ -22,7 +22,8 @@ app.use(function(err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  res.render('error');
+  console.log(err);
+  //res.render('error');
 });
 
 module.exports = app;

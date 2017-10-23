@@ -14,7 +14,7 @@ module.exports = function(req, res, next) {
       } else {
         // 如果没问题就把解码后的信息保存到请求中，供后面的路由使用
         req.api_user = decoded;
-        console.dir(req.api_user);
+        console.log('_user_id: ', req.api_user.data.user_id);
         next();
       }
     });

@@ -10,7 +10,6 @@ let verify_token= require('./verify_token');
 router.post('/register', function(req, res, next) {
 	let _user = req.body;
 	let md5 = crypto.createHash("md5");
-	console.log('/post data:\n', _user);
 	let post = {
 		first_name : _user.first_name,
 		last_name : _user.last_name,
@@ -49,20 +48,19 @@ router.post('/register', function(req, res, next) {
 								res.json(formater({code:'0', data:results[0]}))
 							}
 						};
-						query(query_str3.sql, query_str3.data, query_str3.handler);
+						query(query_str3.sql, query_str3.data, query_str3.handler, res);
 					}
 				};
-				query(query_str2.sql, query_str2.data, query_str2.handler);
+				query(query_str2.sql, query_str2.data, query_str2.handler, res);
 			}
 		}
 	};
-	query(query_str.sql, query_str.data, query_str.handler);
+	query(query_str.sql, query_str.data, query_str.handler, res);
 });
 // 用户登录
 router.post('/login', function(req, res, next) {
 	let _user = req.body;
 	let md5 = crypto.createHash("md5");
-	console.log('post data:\n', _user);
 	let post = {
 		email : _user.email,
 		password : _user.password
@@ -91,21 +89,20 @@ router.post('/login', function(req, res, next) {
 				  	}
 					}
 				};
-				query(query_str2.sql, query_str2.data, query_str2.handler);
+				query(query_str2.sql, query_str2.data, query_str2.handler, res);
 			} else {
 				console.log('user not existed.')
 				res.json(formater({code:'1', desc:'该邮箱尚未注册，请先注册！'}));
 			}
 		}
 	};
-	query(query_str.sql, query_str.data, query_str.handler);
+	query(query_str.sql, query_str.data, query_str.handler, res);
 });
 // 修改用户信息
 router.post('/updateUserAccount/info', verify_token, (req, res, next) => {
-	console.log('post data:\n', req);
 	let _user = req.body;
 	let post = { 
-		user_id: _user.user_id,
+		user_id: req.api_user.data.user_id,
 		image_md5: _user.image_md5,
 		first_name: _user.first_name,
 		last_name: _user.last_name,
@@ -136,17 +133,15 @@ router.post('/updateUserAccount/info', verify_token, (req, res, next) => {
 	 	res.json(formater({code:'0', desc:'修改成功！'}))
 	 }
 	};
-	query(query_str.sql, query_str.data, query_str.handler);
+	query(query_str.sql, query_str.data, query_str.handler, res);
 });
 // 修改用户密码
 router.post('/updateUserAccount/password', verify_token, (req, res, next) => {
-	console.log('post data:\n', req);
 	let _user = req.body;
 	let post = {
-		user_id: _user.user_id,
+		user_id: req.api_user.data.user_id,
 		password: _user.password
 	};
-	if(!post.user_id) return res.json(formater({code:'1', desc:'用户id为空！'}));
 	if(!post.password) return res.json(formater({code:'1', desc:'密码不能为空！'}));
 	let query_str = {
 		sql: 'SELECT * FROM users WHERE user_id = ?',
@@ -157,25 +152,40 @@ router.post('/updateUserAccount/password', verify_token, (req, res, next) => {
 					sql: 'UPDATE users SET password = ? WHERE user_id = ?',
 				  data: [post.password, post.user_id],
 				  handler: (results) => {
-				  	res.json(formater({code:'0', desc:'修改成功！'}))
+				  	res.json(formater({code:'0', desc:'修改成功！'}));
 				  }
 				};
-				query(query_str2.sql, query_str2.data, query_str2.handler);
+				query(query_str2.sql, query_str2.data, query_str2.handler, res);
 	  	} else {
-	  		console.log('user not existed.')
+	  		console.log('user not existed.');
 				res.json(formater({code:'1', desc:'该用户不存在！'}));
 	  	}
 	  }
 	};
-	query(query_str.sql, query_str.data, query_str.handler);
+	query(query_str.sql, query_str.data, query_str.handler, res);
 });
 // 修改用户关联账户
 router.post('/updateUserAccount/social', verify_token, (req, res, next) => {
-	
+
 });
 // 删除账户
 router.post('/updateUserAccount/delete', verify_token, (req, res, next) => {
-
+	let post = {
+		user_id: req.api_user.data.user_id
+	};
+	let query_str = {
+		sql: 'DELETE FROM users WHERE user_id = ?',
+	  data: [post.user_id],
+	  handler: (results) => {
+	  	if(results.affectedRows === 1) {
+	  		res.json(formater({code:'0', desc:'删除成功！'}));
+	  	} else {
+	  		console.log('user not existed.');
+	  		res.json(formater({code:'1', desc:'该用户不存在！'}));
+	  	}
+	  }
+	};
+	query(query_str.sql, query_str.data, query_str.handler, res);
 });
 
 module.exports = router;

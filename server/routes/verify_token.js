@@ -9,6 +9,7 @@ module.exports = function(req, res, next) {
     // 确认token
     jwt.verify(token, 'secret', function(err, decoded) {
       if (err) {
+        console.log('token信息错误');
         return res.status(403).send({code:'1', desc:'token信息错误！'});
       } else {
         // 如果没问题就把解码后的信息保存到请求中，供后面的路由使用
@@ -19,6 +20,7 @@ module.exports = function(req, res, next) {
     });
   } else {
     // 如果没有token，则返回错误
+    console.log('没有提供token信息');
     return res.status(403).send({code:'1', desc:'没有提供token！'});
   }
 };

@@ -1,9 +1,7 @@
-//let {express, router, connection, formater} = require('./common');
 let express = require('express');
 let router = express.Router();
 let formater = require('../database/format');
-let connection = require('../database/connection');
-let query = require('../database/query');
+let query = require('../database/connection');
 let crypto = require('crypto');
 let jwt = require('jsonwebtoken');
 let verify_token= require('./verify_token');
@@ -29,34 +27,26 @@ router.post('/register', function(req, res, next) {
 	} else {
 		//post.password = md5.update(post.password).digest("hex")
 	}
-	let query_str = {
-		sql: 'SELECT * FROM users WHERE email = ?',
-		data: post.email,
-		handler: (results) => {
-			if(results.length > 0) {
+	query('SELECT * FROM users WHERE email = ?', [post.email])
+		.then(function(data) {
+			console.log(data);
+			if(data.results.length > 0) {
 				console.log('user existed, insert failed.')
-				res.json(formater({code:'1', desc:'使用该邮件注册的用户已经存在'}))
+				return res.json(formater({code:'1', desc:'使用该邮件注册的用户已经存在'}));
 			} else {
-				let query_str2 = {
-					sql: 'INSERT INTO users SET ?',
-					data: post,
-					handler: (results) => {
-						console.log('insert user:\n', post);
-						let query_str3 = {
-							sql: 'SELECT * FROM users WHERE email = ?',
-							data: post.email,
-							handler: (results) => {
-								res.json(formater({code:'0', data:results[0]}))
-							}
-						};
-						query(query_str3.sql, query_str3.data, query_str3.handler, res);
-					}
-				};
-				query(query_str2.sql, query_str2.data, query_str2.handler, res);
+				query('INSERT INTO users SET ?', [post])
+					.then(function() {
+						query('SELECT * FROM users WHERE email = ?', [post.email])
+							.then(function(data) {
+								res.json(formater({code:'0', data:data.results[0]}));
+							})
+					})
 			}
-		}
-	};
-	query(query_str.sql, query_str.data, query_str.handler, res);
+		})
+		.catch(function(error) {
+			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+			throw error;
+		});
 });
 // 用户登录
 router.post('/login', function(req, res, next) {
@@ -72,32 +62,24 @@ router.post('/login', function(req, res, next) {
 	if(!post.password) {
 		return res.json(formater({code:'1', desc:'密码不能为空'}));
 	}
-	let query_str = {
-		sql: 'SELECT * FROM users WHERE email = ?',
-		data: post.email,
-		handler: (results) => {
-			if(results.length > 0) {
-				let query_str2 = {
-					sql: 'SELECT * FROM users WHERE email = ?',
-					data: post.email,
-					handler: (results) => {
-						if(post.password === results[0].password) {
-				  		// 登录成功返回该用户的token，之后需要用到权限的地方都要带上token到后台查询
-				  		results[0].token = jwt.sign({data: results[0]}, 'secret', { expiresIn: '24h' });
-				  		res.json(formater({code:'0', desc:'登录成功！', data:results[0]}))
-				  	} else {
-				  		res.json(formater({code:'1', desc:'密码错误！'}))
-				  	}
-					}
-				};
-				query(query_str2.sql, query_str2.data, query_str2.handler, res);
-			} else {
+	query('SELECT * FROM users WHERE email = ?', [post.email])
+		.then(function(data) {
+			if(data.results.length === 0) {
 				console.log('user not existed.')
-				res.json(formater({code:'1', desc:'该邮箱尚未注册，请先注册！'}));
+				return res.json(formater({code:'1', desc:'该邮箱尚未注册，请先注册！'}));
 			}
-		}
-	};
-	query(query_str.sql, query_str.data, query_str.handler, res);
+			if(post.password === data.results[0].password) {
+	  		// 登录成功返回该用户的token，之后需要用到权限的地方都要带上token到后台查询
+	  		data.results[0].token = jwt.sign({data: data.results[0]}, 'secret', { expiresIn: '24h' });
+	  		res.json(formater({code:'0', desc:'登录成功！', data:data.results[0]}))
+	  	} else {
+	  		res.json(formater({code:'1', desc:'密码错误！'}))
+	  	}
+		})
+		.catch(function(error) {
+			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+			throw error;
+		});
 });
 // 修改用户信息
 router.post('/updateUserAccount/info', verify_token, (req, res, next) => {
@@ -126,49 +108,41 @@ router.post('/updateUserAccount/info', verify_token, (req, res, next) => {
 	}
 	// 拿province，city，town去查库确定对应的code，然后存入users表
 	// 这里有一个异步执行的坑，执行最后一个query的时候town还未更新为town_code.
-	if(post.town) {
-		let query_str = {
-			sql: 'SELECT id AS town_id FROM sa_region WHERE name LIKE "' + post.town + '%"' + 'AND type = 2',
-		  handler: (results) => {
-		  	if(results.length > 0) {
-		  		post.town = results[0].town_id;
-		  	}
+	query('SELECT id FROM sa_region WHERE name LIKE "' + post.town + '%"' + 'AND type = 2', '')
+		.then(function(data) {
+			if(data.results.length === 1) {
+		  	post.town = data.results[0].id;
 		  }
-		};
-		query(query_str.sql, '', query_str.handler, res);
-	}
-	if(post.city) {
-		let query_str = {
-			sql: 'SELECT id AS city_id FROM sa_region WHERE name LIKE "' + post.city + '%"' + 'AND type = 1',
-		  handler: (results) => {
-		  	if(results.length > 0) {
-		  		post.city = results[0].city_id;
-		  	}
-		  }
-		};
-		query(query_str.sql, '', query_str.handler, res);
-	}
-	if(post.province) {
-		let query_str = {
-			sql: 'SELECT id AS province_id FROM sa_region WHERE name LIKE "' + post.town + '%"' + 'AND type = 2',
-		  handler: (results) => {
-		  	if(results.length > 0) {
-		  		post.province = results[0].province_id;
-		  	}
-		  }
-		};
-		query(query_str.sql, '', query_str.handler, res);
-	}
-	let query_str = {
-		sql: 'UPDATE users SET image_md5=?, first_name=?, last_name=?, email=?, user_name=?,' +
-	 'personal_site=?, instagram=?, twitter=?, location=?, bio=?, province_code=?, city_code=?, town_code=? WHERE user_id=?',
-	 data: [post.image_md5, post.first_name, post.last_name, post.email, post.user_name, post.personal_site,
-	 post.instagram, post.twitter, post.location, post.bio, post.province, post.city, post.town, post.user_id],
-	 handler: () => {
-	 	res.json(formater({code:'0', desc:'修改成功！'}))
-	 }
-	};
-	query(query_str.sql, query_str.data, query_str.handler, res);
+		})
+		.then(function() {
+			query('SELECT id FROM sa_region WHERE name LIKE "' + post.city + '%"' + 'AND type = 1', '')
+				.then(function(data) {
+					if(data.results.length === 1) {
+			  		post.city = data.results[0].id;
+			  	}
+				})
+				.then(function() {
+					query('SELECT id FROM sa_region WHERE name LIKE "' + post.province + '%"' + 'AND type = 0', '')
+						.then(function(data) {
+							if(data.results.length === 1) {
+					  		post.province = data.results[0].id;
+					  	}
+						})
+						.then(function() {
+							query('UPDATE users SET image_md5=?, first_name=?, last_name=?, email=?, user_name=?,' +
+							 'personal_site=?, instagram=?, twitter=?, location=?, bio=?, province_code=?, city_code=?, town_code=? WHERE user_id=?', 
+							 [post.image_md5, post.first_name, post.last_name, post.email, post.user_name, post.personal_site,
+					 			post.instagram, post.twitter, post.location, post.bio, post.province, post.city, post.town, post.user_id])
+							.then(function(data) {
+								res.json(formater({code:'0', desc:'修改成功！'}))
+							})
+						})
+				})
+		})
+		.catch(function(error) {
+			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+			throw error;
+		});
 });
 // 修改用户密码
 router.post('/updateUserAccount/password', verify_token, (req, res, next) => {
@@ -178,26 +152,23 @@ router.post('/updateUserAccount/password', verify_token, (req, res, next) => {
 		password: _user.password
 	};
 	if(!post.password) return res.json(formater({code:'1', desc:'密码不能为空！'}));
-	let query_str = {
-		sql: 'SELECT * FROM users WHERE user_id = ?',
-	  data: [post.user_id],
-	  handler: (results) => {
-	  	if(results.length > 0) {
-	  		let query_str2 = {
-					sql: 'UPDATE users SET password = ? WHERE user_id = ?',
-				  data: [post.password, post.user_id],
-				  handler: (results) => {
-				  	res.json(formater({code:'0', desc:'修改成功！'}));
-				  }
-				};
-				query(query_str2.sql, query_str2.data, query_str2.handler, res);
-	  	} else {
-	  		console.log('user not existed.');
-				res.json(formater({code:'1', desc:'该用户不存在！'}));
-	  	}
-	  }
-	};
-	query(query_str.sql, query_str.data, query_str.handler, res);
+	query('SELECT * FROM users WHERE user_id = ?', [post.user_id])
+		.then(function(data) {
+			if(data.results.length === 0) {
+				console.log('user not existed.');
+				return res.json(formater({code:'1', desc:'该用户不存在！'}));
+			}
+		})
+		.then(function() {
+			query('UPDATE users SET password = ? WHERE user_id = ?', [post.password, post.user_id])
+				.then(function(data) {
+					res.json(formater({code:'0', desc:'修改成功！'}));
+				})
+		})
+		.catch(function(error) {
+			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+			throw error;
+		});
 });
 // 修改用户关联账户
 router.post('/updateUserAccount/social', verify_token, (req, res, next) => {
@@ -208,19 +179,19 @@ router.post('/updateUserAccount/delete', verify_token, (req, res, next) => {
 	let post = {
 		user_id: req.api_user.data.user_id
 	};
-	let query_str = {
-		sql: 'DELETE FROM users WHERE user_id = ?',
-	  data: [post.user_id],
-	  handler: (results) => {
-	  	if(results.affectedRows === 1) {
+	query('DELETE FROM users WHERE user_id = ?', [post.user_id])
+		.then(function(data) {
+			if(data.results.affectedRows === 1) {
 	  		res.json(formater({code:'0', desc:'删除成功！'}));
 	  	} else {
 	  		console.log('user not existed.');
 	  		res.json(formater({code:'1', desc:'该用户不存在！'}));
 	  	}
-	  }
-	};
-	query(query_str.sql, query_str.data, query_str.handler, res);
+		})
+		.catch(function(error) {
+			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+			throw error;
+		});
 });
 
 router.post('/getUserApplication', verify_token, (req, res, next) => {

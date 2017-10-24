@@ -2,6 +2,7 @@
 let express = require('express');
 let router = express.Router();
 let formater = require('../database/format');
+let connection = require('../database/connection');
 let query = require('../database/query');
 let crypto = require('crypto');
 let jwt = require('jsonwebtoken');
@@ -26,7 +27,7 @@ router.post('/register', function(req, res, next) {
 	if(!post.password) {
 		return res.json(formater({code:'1', desc:'密码不能为空'}));
 	} else {
-		post.password = md5.update(post.password).digest("hex")
+		//post.password = md5.update(post.password).digest("hex")
 	}
 	let query_str = {
 		sql: 'SELECT * FROM users WHERE email = ?',
@@ -101,7 +102,7 @@ router.post('/login', function(req, res, next) {
 // 修改用户信息
 router.post('/updateUserAccount/info', verify_token, (req, res, next) => {
 	let _user = req.body;
-	let post = { 
+	let post = {
 		user_id: req.api_user.data.user_id,
 		image_md5: _user.image_md5,
 		first_name: _user.first_name,
@@ -116,7 +117,7 @@ router.post('/updateUserAccount/info', verify_token, (req, res, next) => {
 		province: _user.province,
 		city: _user.city,
 		town: _user.town
-	}
+	};
 	if(!post.user_name) {
 		return res.json(formater({code:'1', desc:'用户名不能为空！'}));
 	}
@@ -124,11 +125,45 @@ router.post('/updateUserAccount/info', verify_token, (req, res, next) => {
 		return res.json(formater({code:'1', desc:'邮件不能为空！'}));
 	}
 	// 拿province，city，town去查库确定对应的code，然后存入users表
+	// 这里有一个异步执行的坑，执行最后一个query的时候town还未更新为town_code.
+	if(post.town) {
+		let query_str = {
+			sql: 'SELECT id AS town_id FROM sa_region WHERE name LIKE "' + post.town + '%"' + 'AND type = 2',
+		  handler: (results) => {
+		  	if(results.length > 0) {
+		  		post.town = results[0].town_id;
+		  	}
+		  }
+		};
+		query(query_str.sql, '', query_str.handler, res);
+	}
+	if(post.city) {
+		let query_str = {
+			sql: 'SELECT id AS city_id FROM sa_region WHERE name LIKE "' + post.city + '%"' + 'AND type = 1',
+		  handler: (results) => {
+		  	if(results.length > 0) {
+		  		post.city = results[0].city_id;
+		  	}
+		  }
+		};
+		query(query_str.sql, '', query_str.handler, res);
+	}
+	if(post.province) {
+		let query_str = {
+			sql: 'SELECT id AS province_id FROM sa_region WHERE name LIKE "' + post.town + '%"' + 'AND type = 2',
+		  handler: (results) => {
+		  	if(results.length > 0) {
+		  		post.province = results[0].province_id;
+		  	}
+		  }
+		};
+		query(query_str.sql, '', query_str.handler, res);
+	}
 	let query_str = {
 		sql: 'UPDATE users SET image_md5=?, first_name=?, last_name=?, email=?, user_name=?,' +
 	 'personal_site=?, instagram=?, twitter=?, location=?, bio=?, province_code=?, city_code=?, town_code=? WHERE user_id=?',
 	 data: [post.image_md5, post.first_name, post.last_name, post.email, post.user_name, post.personal_site,
-	 post.instagram, post.twitter, post.location, post.bio, '', '', '', post.user_id],
+	 post.instagram, post.twitter, post.location, post.bio, post.province, post.city, post.town, post.user_id],
 	 handler: () => {
 	 	res.json(formater({code:'0', desc:'修改成功！'}))
 	 }
@@ -188,4 +223,53 @@ router.post('/updateUserAccount/delete', verify_token, (req, res, next) => {
 	query(query_str.sql, query_str.data, query_str.handler, res);
 });
 
+router.post('/getUserApplication', verify_token, (req, res, next) => {
+
+});
+
+router.post('/deleteUserPhoto', verify_token, (req, res, next) => {
+
+});
+
+router.post('/updateUserEmailSettings', verify_token, (req, res, next) => {
+
+});
+
+router.post('/registerAsDeveloper', verify_token, (req, res, next) => {
+
+});
+
+router.post('/addNewApp', verify_token, (req, res, next) => {
+
+});
+
+router.post('/getUntagedPhoto', verify_token, (req, res, next) => {
+
+});
+
+router.post('/updatePhotoTag', verify_token, (req, res, next) => {
+
+});
+
+router.post('/uploadPhotoToZimg', verify_token, (req, res, next) => {
+
+});
+
+router.post('/getCategories/all', verify_token, (req, res, next) => {
+
+});
+
+router.post('/updateUserCategories', verify_token, (req, res, next) => {
+
+});
+
+router.post('/getPhotographers/all', verify_token, (req, res, next) => {
+
+});
+
+router.post('/updatePhotographers', verify_token, (req, res, next) => {
+
+});
 module.exports = router;
+
+

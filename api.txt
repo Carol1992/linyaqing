@@ -713,18 +713,6 @@ response: {
 	}
 }
 
-31. 获取密码加密的密钥(使用crypto非对称)加密
-url: 'getRsaKey'
-response: {
-	success: true,
-	code: 0, // 0代表成功，其他数字结合desc理解
-	desc: '',
-	data: {
-		key: '',
-		modules: ''
-	}
-}
-
 32. 老用户facebook登录
 url:'login/facebook'
 

@@ -4,7 +4,7 @@ SET FOREIGN_KEY_CHECKS=0;
 -- Table structure for `region`
 -- ----------------------------
 use linyaqing;
-DROP TABLE IF EXISTS `region`;
+DROP TABLE IF EXISTS `sa_region`;
 CREATE TABLE `sa_region` (
   `id` mediumint(6) unsigned NOT NULL DEFAULT '0' COMMENT 'id',
   `pid` mediumint(6) unsigned NOT NULL DEFAULT '0' COMMENT '上级id',

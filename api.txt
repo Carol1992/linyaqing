@@ -235,7 +235,7 @@ post: data: {
 		address: '',
 		display: 0 // 1则不展示location
 	},
-	collabs: [] // 数组内是用户所选择的合作者的id
+	collabs: '' // id 之间用逗号隔开
 }
 response: {
 	success: true,
@@ -342,10 +342,10 @@ response: {
 }
 
 16. 用户修改邮件设置
-url: 'updateUserEmailSettings'
+url: 'updateUserAccount/developer'
 post: data: {
 	token: 'token',
-	settings: [] // 将设置为true的id放入数组
+	settings: '1,2' // 设置为true的id，之间用逗号隔开
 }
 response: {
 	success: true,
@@ -355,8 +355,9 @@ response: {
 }
 
 17. 用户注册成为developer
-url: 'registerAsDeveloper'
+url: 'updateUserAccount/developer'
 post: data: {
+	token: '',
 	url: '',
 	description: ''
 }
@@ -374,7 +375,7 @@ post: data: {
 	app_name: '',
 	app_desc: '',
 	redirect_url:'',
-	permissions: [] // 将确定选项的id放入数组中
+	permissions: '1,2' // id 之间用逗号隔开
 }
 response: {
 	success: true,
@@ -767,7 +768,7 @@ response: {
 36. 更新用户选择关注的摄像师列表
 url:'updatePhotographers'
 post: data: {
-	photographers: [] //将摄像师的id放入数组传给我
+	photographers: '' //id 之间用逗号隔开
 }
 response: {
 	success: true,

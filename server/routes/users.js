@@ -15,7 +15,7 @@ router.post('/register', function(req, res, next) {
 		user_name : _user.user_name,
 		email : _user.email,
 		password : _user.password
-	}
+	};
 	if(!post.user_name) {
 		return res.json(formater({code:'1', desc:'用户名不能为空哦！'}));
 	}
@@ -29,7 +29,6 @@ router.post('/register', function(req, res, next) {
 	}
 	query('SELECT * FROM users WHERE email = ?', [post.email])
 		.then(function(data) {
-			console.log(data);
 			if(data.results.length > 0) {
 				console.log('user existed, insert failed.')
 				return res.json(formater({code:'1', desc:'使用该邮件注册的用户已经存在'}));
@@ -170,10 +169,6 @@ router.post('/updateUserAccount/password', verify_token, (req, res, next) => {
 			throw error;
 		});
 });
-// 修改用户关联账户
-router.post('/updateUserAccount/social', verify_token, (req, res, next) => {
-
-});
 // 删除账户
 router.post('/updateUserAccount/delete', verify_token, (req, res, next) => {
 	let post = {
@@ -193,20 +188,51 @@ router.post('/updateUserAccount/delete', verify_token, (req, res, next) => {
 			throw error;
 		});
 });
+// 修改邮件设置
+router.post('/updateUserAccount/emailSettings', verify_token, (req, res, next) => {
+	let _user = req.body;
+	let user_id = req.api_user.data.user_id;
+	let post = {
+		email_settings: _user.email_settings
+	};
+	query('UPDATE users SET email_settings = ? WHERE user_id = ?', [post.email_settings, user_id])
+		.then(function(data) {
+			res.json(formater({code:'0', desc:'邮件设置成功！'}));
+		})
+});
+// 用户注册成为developer
+router.post('/updateUserAccount/developer', verify_token, (req, res, next) => {
+	let _user = req.body;
+	let user_id = req.api_user.data.user_id;
+	let post = {
+		url: _user.url,
+		description: _user.description
+	};
+	query('SELECT is_developer FROM users WHERE user_id = ?', [user_id])
+		.then(function(data) {
+			if(data.results[0].is_developer === '0') {
+				console.log('already register as a developer.');
+				return res.json(formater({code:'1', desc:'该用户已经注册为开发者！'}));
+			} else {
+				query('UPDATE users SET is_developer = ?, dev_url = ?, dev_desc = ? WHERE user_id = ?', ['0', post.url, post.description, user_id])
+					.then(function() {
+						res.json(formater({code:'0', desc:'开发者注册成功！'}));
+					})
+			}
+		})
+});
 
+// todo: 修改用户关联账户
+router.post('/updateUserAccount/social', verify_token, (req, res, next) => {
+	
+});
+
+// 获取用户连接的应用
 router.post('/getUserApplication', verify_token, (req, res, next) => {
 
 });
 
 router.post('/deleteUserPhoto', verify_token, (req, res, next) => {
-
-});
-
-router.post('/updateUserEmailSettings', verify_token, (req, res, next) => {
-
-});
-
-router.post('/registerAsDeveloper', verify_token, (req, res, next) => {
 
 });
 

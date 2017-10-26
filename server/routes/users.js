@@ -199,6 +199,10 @@ router.post('/updateUserAccount/emailSettings', verify_token, (req, res, next) =
 		.then(function(data) {
 			res.json(formater({code:'0', desc:'邮件设置成功！'}));
 		})
+		.catch(function(error) {
+			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+			throw error;
+		});
 });
 // 用户注册成为developer
 router.post('/updateUserAccount/developer', verify_token, (req, res, next) => {
@@ -220,6 +224,10 @@ router.post('/updateUserAccount/developer', verify_token, (req, res, next) => {
 					})
 			}
 		})
+		.catch(function(error) {
+			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+			throw error;
+		});
 });
 
 // todo: 修改用户关联账户
@@ -229,23 +237,91 @@ router.post('/updateUserAccount/social', verify_token, (req, res, next) => {
 
 // 获取用户连接的应用
 router.post('/getUserApplication', verify_token, (req, res, next) => {
-
+	let _user = req.body;
+	let user_id = req.api_user.data.user_id;
+	query('SELECT * FROM applications WHERE user_id = ?', [user_id])
+		.then(function(data) {
+			res.json(formater({code:'0', data:data.results[0]}))
+		})
+		.catch(function(error) {
+			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+			throw error;
+		});
 });
 
 router.post('/deleteUserPhoto', verify_token, (req, res, next) => {
-
+	let _user = req.body;
+	let user_id = req.api_user.data.user_id;
+	let post = {
+		image_id: _user.image_id
+	};
+	if(!post.image_id) {
+		return res.json(formater({code:'0', desc:'请提供所要删除图片的id！'}));
+	}
+	query('DELETE FROM images WHERE image_id = ?', [post.image_id])
+		then(function(data) {
+			res.json(formater({code:'0', desc:'图片删除成功！'}));
+		})
+		.catch(function(error) {
+			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+			throw error;
+		});
 });
 
 router.post('/addNewApp', verify_token, (req, res, next) => {
-
+	let _user = req.body;
+	let post = {
+		user_id: req.api_user.data.user_id,
+		app_name: _user.app_name,
+		app_desc: _user.app_desc,
+		callback_url: _user.callback_url,
+		permissions: _user.permissions // id 之间用逗号隔开
+	};
+	query('SELECT is_developer FROM users WHERE user_id = ?', [post.user_id])
+		.then(function(data) {
+			if(data.results[0].is_developer === '1') {
+				return res.json(formater({code:'0', desc:'该用户不是开发者，无法添加应用！'}));
+			}
+			query('INSERT INTO applications SET ?', [post])
+				.then(function(data) {
+					res.json(formater({code:'0', desc:'添加应用成功！', data: data.results[0]}));
+				})
+		})
+		.catch(function(error) {
+			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+			throw error;
+		});
 });
 
-router.post('/getUntagedPhoto', verify_token, (req, res, next) => {
-
+router.post('/getUntagedPhoto', (req, res, next) => {
+	query('SELECT * FROM images WHERE enough_tags = "1"  LIMIT 1', '')
+		.then(function(data) {
+			res.json(formater({code:'0', data: data.results[0]}));
+		})
+		.catch(function(error) {
+			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+			throw error;
+		});
 });
 
-router.post('/updatePhotoTag', verify_token, (req, res, next) => {
-
+router.post('/updatePhotoTag', (req, res, next) => {
+	let _user = req.body;
+	let post = {
+		image_id: _user.image_id,
+		tag: _user.tag // 以逗号分隔
+	};
+	query('SELECT image_tags FROM images WHERE image_id = ?', [post.image_id])
+		.then(function(data) {
+			let new_tags = data.results[0].image_tags + ',' + post.tag;
+			query('UPDATE images SET image_tags = ?', [new_tags])
+				.then(function() {
+					res.json(formater({code:'0', desc:'标签更新成功！'}));
+				})
+		})
+		.catch(function(error) {
+			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+			throw error;
+		});
 });
 
 router.post('/uploadPhotoToZimg', verify_token, (req, res, next) => {
@@ -260,12 +336,40 @@ router.post('/updateUserCategories', verify_token, (req, res, next) => {
 
 });
 
-router.post('/getPhotographers/all', verify_token, (req, res, next) => {
-
+router.post('/getPhotographers', (req, res, next) => {
+	let recommends = [];
+	let q1 = query('SELECT user_id, total(followers) FROM relationships GROUP BY user_id ORDER BY total(followers) DESC LIMIT 25', '');
+	let q2 = query('SELECT user_id, liked FROM images ORDER BY liked DESC LIMIT 25', '');
+	Promise.all([q1, q2]).then(values => {
+		let rows = values[0].concate(values[1]);
+		if(rows > 0) {
+			for(let row of rows) {
+				recommends.push(row.user_id);
+			}
+		}
+		let jsons = [];
+		for(let r of recommends) {
+			query('SELECT user_id, user_name, image_md5, instagram FROM user WHERE user_id = ?', r)
+				.then(function(data) {
+					jsons.push(data.results[0]);
+				})
+		}
+		res.json(formater({code:'0', data: jsons}));
+	})
+	.catch(function(error) {
+			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+			throw error;
+		});
 });
-
+// 用户刚注册的时候推荐关注的摄影师，todo:用户后续关注的摄影师如何添加
 router.post('/updatePhotographers', verify_token, (req, res, next) => {
-
+	let _user = req.body;
+	let user_id = req.api_user.data.user_id;
+	let followings = req.body.followings.split(',');
+	for(let f in followings) {
+		query('INSERT INTO relationships SET', [{user_id: user_id, follower_id: f}]);
+	}
+	res.json(formater({code:'0', desc:'更新成功！'}))
 });
 module.exports = router;
 

@@ -391,15 +391,15 @@ response: {
 	code: 0, // 0代表成功，其他数字结合desc理解
 	desc: '',
 	data: {
-		photo_id: '',
-		photo_md5: ''
+		image_id: '',
+		image_md5: ''
 	}
 }
 
 20. 更新打标签页面图片的tag
 url: 'updatePhotoTag',
 post: data: {
-	photo_id: '',
+	image_id: '',
 	tag: '' // 以逗号分隔
 }
 response: {
@@ -750,25 +750,29 @@ response: {
 }
 
 35. 获取推荐给用户的摄影师列表
-url: 'getPhotographers/all'
+url: 'getPhotographers'
 response: {
 	success: true,
 	code: 0, // 0代表成功，其他数字结合desc理解
 	desc: '',
 	data: {
-		basic_info: {
+	[
+		{
 			user_id: '',
 			user_name: '',
-			user_ins: '',
-			user_image_md5: ''
+			instagram: '',
+			image_md5: '',
+			followers: ''
 		}
+	]
 	}
 }
 
 36. 更新用户选择关注的摄像师列表
 url:'updatePhotographers'
 post: data: {
-	photographers: '' //id 之间用逗号隔开
+	token:'',
+	followings: '' //id 之间用逗号隔开
 }
 response: {
 	success: true,

@@ -27,7 +27,6 @@ module.exports=function(sql, data){
 	          resolve({"err":err, "results":results, "fields":fields});
 	        });
       	}
-        
       }
     });
   });

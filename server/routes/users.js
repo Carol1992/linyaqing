@@ -230,11 +230,6 @@ router.post('/updateUserAccount/developer', verify_token, (req, res, next) => {
 		});
 });
 
-// todo: 修改用户关联账户
-router.post('/updateUserAccount/social', verify_token, (req, res, next) => {
-	
-});
-
 // 获取用户连接的应用
 router.post('/getUserApplication', verify_token, (req, res, next) => {
 	let _user = req.body;
@@ -248,7 +243,7 @@ router.post('/getUserApplication', verify_token, (req, res, next) => {
 			throw error;
 		});
 });
-
+// 删除用户图片
 router.post('/deleteUserPhoto', verify_token, (req, res, next) => {
 	let _user = req.body;
 	let user_id = req.api_user.data.user_id;
@@ -267,7 +262,7 @@ router.post('/deleteUserPhoto', verify_token, (req, res, next) => {
 			throw error;
 		});
 });
-
+// 用户添加应用
 router.post('/addNewApp', verify_token, (req, res, next) => {
 	let _user = req.body;
 	let post = {
@@ -292,7 +287,7 @@ router.post('/addNewApp', verify_token, (req, res, next) => {
 			throw error;
 		});
 });
-
+// 获取给用户标注的图片
 router.post('/getUntagedPhoto', (req, res, next) => {
 	query('SELECT * FROM images WHERE enough_tags = "1"  LIMIT 1', '')
 		.then(function(data) {
@@ -303,7 +298,7 @@ router.post('/getUntagedPhoto', (req, res, next) => {
 			throw error;
 		});
 });
-
+// 提交用户对图片的标注结果
 router.post('/updatePhotoTag', (req, res, next) => {
 	let _user = req.body;
 	let post = {
@@ -324,44 +319,26 @@ router.post('/updatePhotoTag', (req, res, next) => {
 		});
 });
 
-router.post('/uploadPhotoToZimg', verify_token, (req, res, next) => {
-
-});
-
-router.post('/getCategories/all', verify_token, (req, res, next) => {
-
-});
-
-router.post('/updateUserCategories', verify_token, (req, res, next) => {
-
-});
-
+// 获取推荐的摄影师
 router.post('/getPhotographers', (req, res, next) => {
 	let recommends = [];
-	let q1 = query('SELECT user_id, total(followers) FROM relationships GROUP BY user_id ORDER BY total(followers) DESC LIMIT 25', '');
+	let q1 = query('SELECT user_id, count(followers) FROM relationships GROUP BY user_id ORDER BY count(followers) DESC LIMIT 25', '');
 	let q2 = query('SELECT user_id, liked FROM images ORDER BY liked DESC LIMIT 25', '');
 	Promise.all([q1, q2]).then(values => {
-		let rows = values[0].concate(values[1]);
-		if(rows > 0) {
-			for(let row of rows) {
-				recommends.push(row.user_id);
-			}
-		}
+		let a = values[0];
+		let b = values[1];
 		let jsons = [];
-		for(let r of recommends) {
-			query('SELECT user_id, user_name, image_md5, instagram FROM user WHERE user_id = ?', r)
+		query('SELECT users.user_id, users.user_name, users.image_md5, users.instagram, a.count(followers) FROM users, a WHERE a.user_id = users.user_id', '')
 				.then(function(data) {
-					jsons.push(data.results[0]);
+					res.json(formater({code:'0', data: data.results}));
 				})
-		}
-		res.json(formater({code:'0', data: jsons}));
 	})
 	.catch(function(error) {
 			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
 			throw error;
 		});
 });
-// 用户刚注册的时候推荐关注的摄影师，todo:用户后续关注的摄影师如何添加
+// 更新用户关注的摄影师
 router.post('/updatePhotographers', verify_token, (req, res, next) => {
 	let _user = req.body;
 	let user_id = req.api_user.data.user_id;
@@ -370,6 +347,123 @@ router.post('/updatePhotographers', verify_token, (req, res, next) => {
 		query('INSERT INTO relationships SET', [{user_id: user_id, follower_id: f}]);
 	}
 	res.json(formater({code:'0', desc:'更新成功！'}))
+});
+// 关键字搜索
+router.post('/search', (req, res, next) => {
+	let _user = req.body;
+	let keyword = _user.keyword;
+	let q1 = query('SELECT COUNT(DISTINCT user_id) AS all_users, COUNT(DISTINCT image_id) AS all_images, ' + 
+		'COUNT(DISTINCT collection_id) AS all_collections ' + 
+		'FROM images WHERE image_tags LIKE "' + keyword + '%"', '');
+	let q2 = query('SELECT images.image_id, images.image_md5, images.liked, users.user_id, users.name, ' + 
+		'users.image_md5 FROM images, users WHERE images.user_id = users.user_id');
+	Promise.all([q1, q2]).then(values => {
+		let response = {
+			basic_info: {
+				photos: values[0].all_images,
+				collections: values[0].all_collections,
+				users: values[0].all_users
+			},
+			lists: values[1]
+		};
+		res.json(formater({code:'0', data:response}));
+	})
+	.catch(function(error) {
+			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+			throw error;
+		});
+});
+
+// todo: 修改用户关联账户
+router.post('/updateUserAccount/social', verify_token, (req, res, next) => {
+	
+});
+
+router.post('/uploadPhotoToZimg', verify_token, (req, res, next) => {
+
+});
+
+router.post('/getCategories/all', (req, res, next) => {
+
+});
+
+router.post('/updateUserCategories', verify_token, (req, res, next) => {
+
+});
+
+// 获取最新图片列表
+router.post('/getList/new', (req, res, next) => {
+
+});
+
+// 已登录用户，获取其所关注的作者的图片列表
+router.post('/getList/following', verify_token, (req, res, next) => {
+
+});
+
+// 获取所有图片集
+router.post('/getCollection/all', (req, res, next) => {
+
+});
+
+// 获取所有画展图片
+router.post('/getCollection/curated', (req, res, next) => {
+
+});
+
+// 获取所有专题图片集
+router.post('/getCollection/featured', (req, res, next) => {
+
+});
+
+// 获取用户自己的图片集
+router.post('/getCollection/user', verify_token, (req, res, next) => {
+
+});
+
+// 用户上传图片
+router.post('/uploadUserPhoto/new', verify_token, (req, res, next) => {
+
+});
+// 获取store中的最新产品列表
+router.post('/getProducts/new', (req, res, next) => {
+
+});
+// 获取store中的最热产品列表
+router.post('/getProducts/hot', (req, res, next) => {
+
+});
+// 获取store中所有产品列表
+router.post('/getProducts/all', (req, res, next) => {
+
+});
+// 获取store中自营的产品列表
+router.post('/getProducts/self', (req, res, next) => {
+
+});
+// 获取store中友情赞助的产品列表
+router.post('/getProducts/friends', (req, res, next) => {
+
+});
+// 登录用户将商品加入购物车
+router.post('/addToCart', verify_token, (req, res, next) => {
+
+});
+// 登录用户获取购物车中的所有商品列表
+router.post('/getProductsInCart', verify_token, (req, res, next) => {
+
+});
+// 获取单件商品的具体信息
+router.post('/getProductDetails', (req, res, next) => {
+
+});
+// 用户提交订单步骤1
+router.post('/submitOrder/step1', verify_token, (req, res, next) => {
+
+});
+// 用户提交订单步骤2
+router.post('/submitOrder/step12', verify_token, (req, res, next) => {
+
 });
 module.exports = router;
 

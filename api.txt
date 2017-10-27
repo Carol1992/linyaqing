@@ -12,7 +12,7 @@ response 的结构：
 
 1. 关键字搜索
 url: '/search'
-post: data:{keyword='keyword'}
+post: data:{keyword:'keyword'}
 get: ?keyword='keyword'
 {
 	success: true,

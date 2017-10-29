@@ -111,6 +111,8 @@ router.post('/updateUserAccount/info', verify_token, (req, res, next) => {
 		.then(function(data) {
 			if(data.results.length === 1) {
 		  	post.town = data.results[0].id;
+		  } else {
+		  	post.town = '';
 		  }
 		})
 		.then(function() {
@@ -118,6 +120,8 @@ router.post('/updateUserAccount/info', verify_token, (req, res, next) => {
 				.then(function(data) {
 					if(data.results.length === 1) {
 			  		post.city = data.results[0].id;
+			  	} else {
+			  		post.city = '';
 			  	}
 				})
 				.then(function() {
@@ -125,6 +129,8 @@ router.post('/updateUserAccount/info', verify_token, (req, res, next) => {
 						.then(function(data) {
 							if(data.results.length === 1) {
 					  		post.province = data.results[0].id;
+					  	} else {
+					  		post.province = '';
 					  	}
 						})
 						.then(function() {
@@ -169,7 +175,7 @@ router.post('/updateUserAccount/password', verify_token, (req, res, next) => {
 			throw error;
 		});
 });
-// 删除账户
+// 删除账户, 用户存储在其他表格的信息，如添加的应用、邮件设置、关注的category和摄像师等资料，是否也需要删除？？？
 router.post('/updateUserAccount/delete', verify_token, (req, res, next) => {
 	let post = {
 		user_id: req.api_user.data.user_id
@@ -269,9 +275,9 @@ router.post('/addNewApp', verify_token, (req, res, next) => {
 		user_id: req.api_user.data.user_id,
 		app_name: _user.app_name,
 		app_desc: _user.app_desc,
-		callback_url: _user.callback_url,
-		permissions: _user.permissions // id 之间用逗号隔开
+		callback_url: _user.callback_url
 	};
+	let permissions = _user.permissions.split(',');
 	query('SELECT is_developer FROM users WHERE user_id = ?', [post.user_id])
 		.then(function(data) {
 			if(data.results[0].is_developer === '1') {
@@ -279,7 +285,16 @@ router.post('/addNewApp', verify_token, (req, res, next) => {
 			}
 			query('INSERT INTO applications SET ?', [post])
 				.then(function(data) {
-					res.json(formater({code:'0', desc:'添加应用成功！', data: data.results[0]}));
+					let inserted_id = data.results.insertId;
+					let app_pers = [];
+					for(let per of permissions) {
+						let app_per = [inserted_id, per];
+						app_pers.push(app_per);
+					}
+					query('INSERT INTO app_permission(app_id, permission_id) VALUES ?', [app_pers])
+						.then(function(){
+							res.json(formater({code:'0', desc:'添加应用成功！'}));
+						})
 				})
 		})
 		.catch(function(error) {
@@ -374,19 +389,19 @@ router.post('/search', (req, res, next) => {
 		});
 });
 
-// todo: 修改用户关联账户
+// 修改用户关联账户
 router.post('/updateUserAccount/social', verify_token, (req, res, next) => {
 	
 });
-
+// 上传图片到服务器
 router.post('/uploadPhotoToZimg', verify_token, (req, res, next) => {
 
 });
-
+// 获取所有类别
 router.post('/getCategories/all', (req, res, next) => {
 
 });
-
+// 更新用户类别
 router.post('/updateUserCategories', verify_token, (req, res, next) => {
 
 });
@@ -465,6 +480,7 @@ router.post('/submitOrder/step1', verify_token, (req, res, next) => {
 router.post('/submitOrder/step12', verify_token, (req, res, next) => {
 
 });
+
 module.exports = router;
 
 

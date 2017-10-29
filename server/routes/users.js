@@ -111,8 +111,6 @@ router.post('/updateUserAccount/info', verify_token, (req, res, next) => {
 		.then(function(data) {
 			if(data.results.length === 1) {
 		  	post.town = data.results[0].id;
-		  } else {
-		  	post.town = '';
 		  }
 		})
 		.then(function() {
@@ -120,8 +118,6 @@ router.post('/updateUserAccount/info', verify_token, (req, res, next) => {
 				.then(function(data) {
 					if(data.results.length === 1) {
 			  		post.city = data.results[0].id;
-			  	} else {
-			  		post.city = '';
 			  	}
 				})
 				.then(function() {
@@ -129,8 +125,6 @@ router.post('/updateUserAccount/info', verify_token, (req, res, next) => {
 						.then(function(data) {
 							if(data.results.length === 1) {
 					  		post.province = data.results[0].id;
-					  	} else {
-					  		post.province = '';
 					  	}
 						})
 						.then(function() {
@@ -175,7 +169,8 @@ router.post('/updateUserAccount/password', verify_token, (req, res, next) => {
 			throw error;
 		});
 });
-// 删除账户, 用户存储在其他表格的信息，如添加的应用、邮件设置、关注的category和摄像师等资料，是否也需要删除？？？
+// 删除账户, 用户存储在其他表格的信息，如添加的应用、邮件设置、关注的category和摄像师等资料，也需要删除。外键的删除规则
+// 设置为层叠(cascade)
 router.post('/updateUserAccount/delete', verify_token, (req, res, next) => {
 	let post = {
 		user_id: req.api_user.data.user_id
@@ -198,12 +193,18 @@ router.post('/updateUserAccount/delete', verify_token, (req, res, next) => {
 router.post('/updateUserAccount/emailSettings', verify_token, (req, res, next) => {
 	let _user = req.body;
 	let user_id = req.api_user.data.user_id;
-	let post = {
-		email_settings: _user.email_settings
-	};
-	query('UPDATE users SET email_settings = ? WHERE user_id = ?', [post.email_settings, user_id])
-		.then(function(data) {
-			res.json(formater({code:'0', desc:'邮件设置成功！'}));
+	let settings = _user.email_settings.split(',');
+	let user_settings = [];
+	for(let setting of settings) {
+		let s = [user_id, setting];
+		user_settings.push(s);
+	}
+	query('DELETE FROM user_email WHERE user_id = ?', [user_id])
+		.then(function() {
+			query('INSERT INTO user_email(user_id, settings_id) VALUES ?', [user_settings])
+				.then(function(data) {
+					res.json(formater({code:'0', desc:'邮件设置成功！'}));
+				})
 		})
 		.catch(function(error) {
 			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
@@ -235,16 +236,28 @@ router.post('/updateUserAccount/developer', verify_token, (req, res, next) => {
 			throw error;
 		});
 });
-
 // 获取用户连接的应用
 router.post('/getUserApplication', verify_token, (req, res, next) => {
 	let _user = req.body;
 	let user_id = req.api_user.data.user_id;
-	query('SELECT * FROM applications WHERE user_id = ?', [user_id])
-		.then(function(data) {
-			res.json(formater({code:'0', data:data.results[0]}))
-		})
-		.catch(function(error) {
+	let pageNo = _user.pageNo || 1;
+	let pageSize = _user.pageSize || 50;
+	let _left = (pageNo - 1) * pageSize;
+	let q1 = query('SELECT COUNT(*) AS totalPage FROM applications WHERE user_id = ?', [user_id]);
+	Promise.all([q1]).then(values => {
+		query('SELECT * FROM (SELECT * FROM applications WHERE user_id = ?) a LIMIT ?,?', [user_id, _left, pageSize])
+			.then(data => {
+				console.log(data)
+				let new_data = {
+					pageNo: pageNo,
+					pageSize: pageSize,
+					totalPage: Math.ceil(values[0].results[0].totalPage / pageSize),
+					lists: data.results
+				};
+				res.json(formater({code:'0', data:new_data}));
+			})
+	})
+	.catch(function(error) {
 			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
 			throw error;
 		});
@@ -333,7 +346,6 @@ router.post('/updatePhotoTag', (req, res, next) => {
 			throw error;
 		});
 });
-
 // 获取推荐的摄影师
 router.post('/getPhotographers', (req, res, next) => {
 	let recommends = [];
@@ -357,11 +369,23 @@ router.post('/getPhotographers', (req, res, next) => {
 router.post('/updatePhotographers', verify_token, (req, res, next) => {
 	let _user = req.body;
 	let user_id = req.api_user.data.user_id;
-	let followings = req.body.followings.split(',');
-	for(let f in followings) {
-		query('INSERT INTO relationships SET', [{user_id: user_id, follower_id: f}]);
+	let settings = req.body.followings.split(',');
+	let user_setting = [];
+	for(let setting of settings) {
+		let s = [user_id, setting];
+		user_settings.push(s);
 	}
-	res.json(formater({code:'0', desc:'更新成功！'}))
+	query('DELETE FROM relationships WHERE user_id = ?', [user_id])
+		.then(function() {
+			query('INSERT IGNORE INTO relationships(user_id, follower_id) VALUES ?', [user_settings])
+				.then(function(data) {
+					res.json(formater({code:'0', desc:'摄影师列表更新成功！'}));
+				})
+		})
+		.catch(function(error) {
+			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+			throw error;
+		});
 });
 // 关键字搜索
 router.post('/search', (req, res, next) => {
@@ -388,58 +412,206 @@ router.post('/search', (req, res, next) => {
 			throw error;
 		});
 });
-
-// 修改用户关联账户
-router.post('/updateUserAccount/social', verify_token, (req, res, next) => {
-	
-});
 // 上传图片到服务器
 router.post('/uploadPhotoToZimg', verify_token, (req, res, next) => {
 
 });
 // 获取所有类别
 router.post('/getCategories/all', (req, res, next) => {
-
+	query('SELECT * FROM categories', '')
+		.then(function(data) {
+			res.json(formater({code:'0', data: data.results}));
+		})
+	.catch(function(error) {
+			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+			throw error;
+		});
 });
 // 更新用户类别
 router.post('/updateUserCategories', verify_token, (req, res, next) => {
-
+	let _user = req.body;
+	let user_id = req.api_user.data.user_id;
+	let settings = _user.categories.split(',');
+	let user_setting = [];
+	for(let setting of settings) {
+		let s = [user_id, setting];
+		user_settings.push(s);
+	}
+	query('DELETE FROM user_category WHERE user_id = ?', [user_id])
+		.then(function() {
+			query('INSERT INTO user_category(user_id, category_id) VALUES ?', [user_settings])
+				.then(function(data) {
+					res.json(formater({code:'0', desc:'用户关注的类别更新成功！'}));
+				})
+		})
+		.catch(function(error) {
+			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+			throw error;
+		});
 });
 
 // 获取最新图片列表
 router.post('/getList/new', (req, res, next) => {
-
+	let _user = req.body;
+	let pageNo = _user.pageNo || 1;
+	let pageSize = _user.pageSize || 50;
+	let _left = (pageNo - 1) * pageSize;
+	let q1 = query('SELECT COUNT(*) AS totalPage FROM images', '');
+	let q2 = query('SELECT TOP ? * FROM images WHERE image_id NOT IN (SELECT TOP ? iamge_id FROM images ORDER BY created_time)' + 
+		'ORDER BY created_time', [pageSize, _left]);
+	Promise.all([q1, q2]).then(values => {
+		let new_data = {
+				pageNo: pageNo,
+				pageSize: pageSize,
+				totalPage: values[0].totalPage,
+				lists: values[1]
+			};
+			res.json(formater({code:'0', data:new_data}))
+	})
+	.catch(function(error) {
+			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+			throw error;
+		});
 });
-
+ 
 // 已登录用户，获取其所关注的作者的图片列表
 router.post('/getList/following', verify_token, (req, res, next) => {
-
+	let _user = req.body;
+	let user_id = req.api_user.data.user_id;
+	let pageNo = _user.pageNo || 1;
+	let pageSize = _user.pageSize || 50;
+	let _left = (pageNo - 1) * pageSize;
+	let q1 = query('SELECT COUNT(*) AS totalPage FROM images WHERE user_id IN (SELECT follower_id FROM relationships WHERE user_id = ?)', [user_id]);
+	let q2 = query('SELECT TOP ? * FROM images WHERE user_id NOT IN (SELECT TOP ? follower_id FROM relationships WHERE user_id = ?)', [pageSize, _left, user_id]);
+	Promise.all([q1, q2]).then(values => {
+		let new_data = {
+				pageNo: pageNo,
+				pageSize: pageSize,
+				totalPage: values[0],
+				lists: values[1]
+			};
+			res.json(formater({code:'0', data:new_data}));
+	})
+	.catch(function(error) {
+			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+			throw error;
+		});
 });
 
 // 获取所有图片集
 router.post('/getCollection/all', (req, res, next) => {
-
-});
-
-// 获取所有画展图片
-router.post('/getCollection/curated', (req, res, next) => {
-
-});
-
-// 获取所有专题图片集
-router.post('/getCollection/featured', (req, res, next) => {
-
+	let _user = req.body;
+	let pageNo = _user.pageNo || 1;
+	let pageSize = _user.pageSize || 50;
+	let _left = (pageNo - 1) * pageSize;
+	let q1 = query('SELECT * FROM collections');
+	let q2 = query('SELECT TOP ? * FROM collections WHERE collection_id NOT IN '+ 
+		'(SELECT TOP ? collection_id FROM collections)', [pageSize, _left]);
+	Promise.all([q1, q2]).then(values => {
+		let new_data = {
+			pageNo: pageNo,
+			pageSize: pageSize,
+			totalPage: values[0],
+			lists: values[1]
+		};
+		res.json(formater({code:'0', data:new_data}));
+	})
+	.catch(function(error) {
+			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+			throw error;
+	});
 });
 
 // 获取用户自己的图片集
 router.post('/getCollection/user', verify_token, (req, res, next) => {
+	let user_id = req.api_user.data.user_id;
+	let pageNo = _user.pageNo || 1;
+	let pageSize = _user.pageSize || 50;
+	let _left = (pageNo - 1) * pageSize;
+	let q1 = query('SELECT * FROM collections WHERE user_id = ?', [user_id]);
+	let q2 = query('SELECT TOP ? * FROM collections WHERE collection_id NOT IN (SELECT TOP ? collection_id FROM collections WHERE user_id = ?)', [pageSize, _left, user_id]);
+	Promise.all([q1, q2]).then(values => {
+		let new_data = {
+			pageNo: pageNo,
+			pageSize: pageSize,
+			totalPage: values[0],
+			lists: values[1]
+		};
+		res.json(formater({code:'0', data:new_data}));
+	})
+	.catch(function(error) {
+			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+			throw error;
+	});
+});
 
+// 获取每个图片集里面的图片
+router.post('/getCollection/one', (req, res, next) => {
+	let _user = req.body;
+	let user_id = req.api_user.data.user_id;
+	let collection_id = _user.collection_id;
+	let pageNo = _user.pageNo || 1;
+	let pageSize = _user.pageSize || 50;
+	let _left = (pageNo - 1) * pageSize;
+	let q1 = query('SELECT * FROM images WHERE collection_id = ?', [collection_id]);
+	let q2 = query('SELECT TOP ? * FROM images WHERE image_id NOT IN (SELECT TOP ? image_id FROM images WHERE collection_id = ?)', [pageSize, _left, user_id]);
+	Promise.all([q1, q2]).then(values => {
+		let new_data = {
+			pageNo: pageNo,
+			pageSize: pageSize,
+			totalPage: values[0],
+			lists: values[1]
+		};
+		res.json(formater({code:'0', data:new_data}));
+	})
+	.catch(function(error) {
+			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+			throw error;
+	});
 });
 
 // 用户上传图片
-router.post('/uploadUserPhoto/new', verify_token, (req, res, next) => {
-
+router.post('/uploadUserPhoto', verify_token, (req, res, next) => {
+	let _user = req.body;
+	let user_id = req.api_user.data.user_id;
+	let post = {
+		image_md5: _user.image_md5,
+		image_tags: _user.image_tags,
+		make: _user.make,
+		model: _user.model,
+		focalLength: _user.focalLength,
+		aperture: _user.aperture,
+		iso: _user.iso,
+		shutterSpeed: _user.shutterSpeed,
+		title: _user.title,
+		story: _user.story,
+		address: _user.address,
+		display: _user.display,
+		collection_id: _user.collection_id
+	};
+	if(!post.collection_id) {
+		query('INSERT INTO collections SET user_id = ?, collection_image_md5 = ?', [user_id, post.image_md5]).
+			then(data => {
+				console.log(data)
+				post.collection_id = data.results.insertId;
+			})
+	}
+	query('SELECT collection_id FROM collections WHERE collection_id = ?', [post.collection_id])
+		.then(data => {
+			if(data.results.length === 0) {
+				return res.json(formater({code:'0', desc:'插入失败，该id对应的图片集不存在！'}));
+			}
+			query('INSERT INTO images SET ?', [post])
+				.then(values => {
+					res.json(formater({code:'0', desc:'图片上传成功！'}));
+				})
+		})
+		.catch(function(error) {
+			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+			throw error;
+	});
 });
+
 // 获取store中的最新产品列表
 router.post('/getProducts/new', (req, res, next) => {
 

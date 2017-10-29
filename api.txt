@@ -217,8 +217,8 @@ get: ?token='用户的token'
 url: 'uploadUserPhoto/new'
 post: data: {
 	token: '用户的token',
-	image: '', // 给我图片的md5
-	tags: '', // 多个tag用逗号(,)分隔
+	image_md5: '', // 给我图片的md5
+	image_tags: '', // 多个tag用逗号(,)分隔
 	exif: {
 		make: '',
 		model: '',
@@ -235,7 +235,7 @@ post: data: {
 		address: '',
 		display: 0 // 1则不展示location
 	},
-	collabs: '' // id 之间用逗号隔开
+	collection_id: '' // id 之间用逗号隔开
 }
 response: {
 	success: true,
@@ -310,8 +310,8 @@ response: {
 
 14. 获取用户连接的应用(开发者模式)
 url: 'getUserApplication'
-post: data: {token:'token'}
-get:?token=token
+post: data: {token:'token', pageNo:1, pageSize:10}
+get:?token=token&pageNo=1&pageSize=10
 response: {
 	success: true,
 	code: 0, // 0代表成功，其他数字结合desc理解

@@ -25,7 +25,7 @@ router.post('/register', function(req, res, next) {
 	if(!post.password) {
 		return res.json(formater({code:'1', desc:'密码不能为空'}));
 	} else {
-		//post.password = md5.update(post.password).digest("hex")
+		post.password = md5.update(post.password).digest("hex")
 	}
 	query('SELECT * FROM users WHERE email = ?', [post.email])
 		.then(function(data) {

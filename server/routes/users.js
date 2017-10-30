@@ -1,10 +1,24 @@
 let express = require('express');
 let router = express.Router();
+// 连接到数据库
 let formater = require('../database/format');
 let query = require('../database/connection');
+// 密码加密
 let crypto = require('crypto');
+// 登录用户token管理
 let jwt = require('jsonwebtoken');
 let verify_token= require('./verify_token');
+// 阿里云OSS
+var co = require('co');
+var OSS = require('ali-oss');
+var client = new OSS({
+  region: 'oss-cn-beijing',
+  accessKeyId: 'LTAIwPMitAtsf3Zu',
+  accessKeySecret: 'h2PVOlE9nHXfe4JHI1CXBwGTGm9dnq'
+});
+// 处理表单上传
+var formidable = require('formidable');
+var util = require('util');
 // 用户注册
 router.post('/register', function(req, res, next) {
 	let _user = req.body;
@@ -639,8 +653,42 @@ router.post('/uploadUserPhoto', verify_token, (req, res, next) => {
 	}
 });
 // 上传图片到服务器
-router.post('/uploadPhotoToZimg', verify_token, (req, res, next) => {
-
+router.post('/uploadPhotoToAliyun', verify_token, (req, res, next) => {
+	let ext = req.headers["content-type"].split("/")[1];
+	let _user = req.body;
+	let user_id = req.api_user.data.user_id;
+	var chunks = [];
+	var size = 0;
+	req.on('data' , function(chunk){
+	    chunks.push(chunk);
+	    size += chunk.length;
+	});
+	req.on("end",function(){
+	    var buffer = Buffer.concat(chunks, size);
+	    co(function* () {
+				// 获取bucket列表
+			  var result = yield client.listBuckets();
+			  var buckets = result.buckets;
+			  // 获取第一个bucket内的文件列表
+			  client.useBucket(buckets[0].name);
+			  var result2 = yield client.list({
+			    'max-keys': 5
+			  });
+		  	var lists = result2.objects;
+		  	// 上传图片
+		  	var result3 = yield client.put(new Date().getTime() + '.' + ext, buffer);
+		  	var url = result3.url;
+		  	// 下载文件
+		  	// var result4 = yield client.get('object-key', 'local file');
+		  	// console.log(result4);
+		  	// 删除文件
+		  	// var result4 = yield client.delete('object-key');
+		  	// console.log(result4);
+			  res.json(formater({code:'0', desc:'hi', data:{buckets:buckets, lists:lists, url:url}}));
+			}).catch(function (err) {
+			  console.log(err);
+			});
+	});
 });
 
 // 获取store中的最新产品列表

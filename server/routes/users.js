@@ -9,12 +9,13 @@ let crypto = require('crypto');
 let jwt = require('jsonwebtoken');
 let verify_token= require('./verify_token');
 // 阿里云OSS
+var secret = require('./secret');
 var co = require('co');
 var OSS = require('ali-oss');
 var client = new OSS({
-  region: 'oss-cn-beijing',
-  accessKeyId: 'LTAIwPMitAtsf3Zu',
-  accessKeySecret: 'h2PVOlE9nHXfe4JHI1CXBwGTGm9dnq'
+  region: secret.region,
+  accessKeyId: secret.accessKeyId,
+  accessKeySecret: secret.accessKeySecret
 });
 // 处理表单上传
 var formidable = require('formidable');
@@ -679,8 +680,9 @@ router.post('/uploadPhotoToAliyun', verify_token, (req, res, next) => {
 		  	var result3 = yield client.put(new Date().getTime() + '.' + ext, buffer);
 		  	var url = result3.url;
 		  	// 下载文件
-		  	// var result4 = yield client.get('object-key', 'local file');
-		  	// console.log(result4);
+		  	//var result4 = yield client.get('1509406172995.jpeg', '');
+		  	//var url2 = client.signatureUrl('1509406172995.jpeg');
+		  	//console.log(result4);
 		  	// 删除文件
 		  	// var result4 = yield client.delete('object-key');
 		  	// console.log(result4);

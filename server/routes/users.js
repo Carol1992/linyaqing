@@ -120,43 +120,54 @@ router.post('/updateUserAccount/info', verify_token, (req, res, next) => {
 	if(!post.email) {
 		return res.json(formater({code:'1', desc:'邮件不能为空！'}));
 	}
-	// 拿province，city，town去查库确定对应的code，然后存入users表
-	// 这里有一个异步执行的坑，执行最后一个query的时候town还未更新为town_code.
-	query('SELECT id FROM sa_region WHERE name LIKE "' + post.town + '%"' + 'AND type = 2', '')
+	query('UPDATE users SET image_md5=?, first_name=?, last_name=?, email=?, user_name=?,' +
+		 'personal_site=?, instagram=?, twitter=?, location=?, bio=?, province_code=?, city_code=?, town_code=? WHERE user_id=?', 
+		 [post.image_md5, post.first_name, post.last_name, post.email, post.user_name, post.personal_site,
+				post.instagram, post.twitter, post.location, post.bio, post.province, post.city, post.town, post.user_id])
 		.then(function(data) {
-			if(data.results.length === 1) {
-		  	post.town = data.results[0].id;
-		  }
-		})
-		.then(function() {
-			query('SELECT id FROM sa_region WHERE name LIKE "' + post.city + '%"' + 'AND type = 1', '')
-				.then(function(data) {
-					if(data.results.length === 1) {
-			  		post.city = data.results[0].id;
-			  	}
-				})
-				.then(function() {
-					query('SELECT id FROM sa_region WHERE name LIKE "' + post.province + '%"' + 'AND type = 0', '')
-						.then(function(data) {
-							if(data.results.length === 1) {
-					  		post.province = data.results[0].id;
-					  	}
-						})
-						.then(function() {
-							query('UPDATE users SET image_md5=?, first_name=?, last_name=?, email=?, user_name=?,' +
-							 'personal_site=?, instagram=?, twitter=?, location=?, bio=?, province_code=?, city_code=?, town_code=? WHERE user_id=?', 
-							 [post.image_md5, post.first_name, post.last_name, post.email, post.user_name, post.personal_site,
-					 			post.instagram, post.twitter, post.location, post.bio, post.province, post.city, post.town, post.user_id])
-							.then(function(data) {
-								res.json(formater({code:'0', desc:'修改成功！'}))
-							})
-						})
-				})
+			res.json(formater({code:'0', desc:'修改成功！'}))
 		})
 		.catch(function(error) {
 			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
 			throw error;
 		});
+	// 拿province，city，town去查库确定对应的code，然后存入users表
+	// 这里有一个异步执行的坑，执行最后一个query的时候town还未更新为town_code.
+	// query('SELECT id FROM sa_region WHERE name LIKE "' + post.town + '%"' + 'AND type = 2', '')
+	// 	.then(function(data) {
+	// 		if(data.results.length === 1) {
+	// 	  	post.town = data.results[0].id;
+	// 	  }
+	// 	})
+	// 	.then(function() {
+	// 		query('SELECT id FROM sa_region WHERE name LIKE "' + post.city + '%"' + 'AND type = 1', '')
+	// 			.then(function(data) {
+	// 				if(data.results.length === 1) {
+	// 		  		post.city = data.results[0].id;
+	// 		  	}
+	// 			})
+	// 			.then(function() {
+	// 				query('SELECT id FROM sa_region WHERE name LIKE "' + post.province + '%"' + 'AND type = 0', '')
+	// 					.then(function(data) {
+	// 						if(data.results.length === 1) {
+	// 				  		post.province = data.results[0].id;
+	// 				  	}
+	// 					})
+	// 					.then(function() {
+	// 						query('UPDATE users SET image_md5=?, first_name=?, last_name=?, email=?, user_name=?,' +
+	// 						 'personal_site=?, instagram=?, twitter=?, location=?, bio=?, province_code=?, city_code=?, town_code=? WHERE user_id=?', 
+	// 						 [post.image_md5, post.first_name, post.last_name, post.email, post.user_name, post.personal_site,
+	// 				 			post.instagram, post.twitter, post.location, post.bio, post.province, post.city, post.town, post.user_id])
+	// 						.then(function(data) {
+	// 							res.json(formater({code:'0', desc:'修改成功！'}))
+	// 						})
+	// 					})
+	// 			})
+	// 	})
+	// 	.catch(function(error) {
+	// 		res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+	// 		throw error;
+	// 	});
 });
 // 修改用户密码
 router.post('/updateUserAccount/password', verify_token, (req, res, next) => {
@@ -655,9 +666,13 @@ router.post('/uploadUserPhoto', verify_token, (req, res, next) => {
 });
 // 上传图片到服务器
 router.post('/uploadPhotoToAliyun', verify_token, (req, res, next) => {
+	if(req.headers['content-length'] === '0') {
+		return res.json(formater({code:'0', desc:'没有选择图片！'}));
+	}
 	let ext = req.headers["content-type"].split("/")[1];
-	let _user = req.body;
-	let user_id = req.api_user.data.user_id;
+	if(ext !== 'jpeg' && ext !== 'png' && ext !== 'gif') {
+		return res.json(formater({code:'0', desc:'图片格式不符合，只支持jpg/png/gif格式！'}));
+	}
 	var chunks = [];
 	var size = 0;
 	req.on('data' , function(chunk){

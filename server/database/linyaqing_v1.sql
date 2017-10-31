@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50719
 File Encoding         : 65001
 
-Date: 2017-10-30 18:09:48
+Date: 2017-10-31 13:04:58
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -231,7 +231,7 @@ CREATE TABLE `images` (
   KEY `user_id` (`user_id`),
   CONSTRAINT `images_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `images_ibfk_2` FOREIGN KEY (`collection_id`) REFERENCES `collections` (`collection_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8 COMMENT='单张图片';
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8 COMMENT='单张图片';
 
 -- ----------------------------
 -- Records of images
@@ -247,6 +247,7 @@ INSERT INTO `images` VALUES ('14', 'sssssssssssssssssss', '2', null, 'bird, nice
 INSERT INTO `images` VALUES ('15', 'sssssssssssssssssss', '2', null, 'bird, nice', '1', null, null, null, null, null, null, null, null, null, null, null, '19', null);
 INSERT INTO `images` VALUES ('16', 'sssssssssssssssssss', '2', null, 'bird, nice', '1', null, null, null, null, null, null, null, null, null, null, null, '19', null);
 INSERT INTO `images` VALUES ('17', 'sssssssssssssssssss', '2', null, 'bird, nice', '1', null, null, null, null, null, null, null, null, null, null, null, '19', null);
+INSERT INTO `images` VALUES ('18', 'http://my-image-carol.oss-cn-beijing.aliyuncs.com/1509421924159.jpeg', '3', null, 'bird, nice', '1', null, null, null, null, null, null, null, null, null, null, null, '19', null);
 
 -- ----------------------------
 -- Table structure for `inventories`
@@ -370,22 +371,6 @@ INSERT INTO `relationships` VALUES ('2', '3', null);
 INSERT INTO `relationships` VALUES ('2', '4', null);
 INSERT INTO `relationships` VALUES ('3', '1', null);
 INSERT INTO `relationships` VALUES ('3', '4', null);
-
--- ----------------------------
--- Table structure for `sa_region`
--- ----------------------------
-DROP TABLE IF EXISTS `sa_region`;
-CREATE TABLE `sa_region` (
-  `id` mediumint(6) unsigned NOT NULL DEFAULT '0',
-  `pid` mediumint(6) unsigned NOT NULL DEFAULT '0' COMMENT '上级id',
-  `name` varchar(100) NOT NULL DEFAULT '',
-  `type` tinyint(1) NOT NULL DEFAULT '0' COMMENT '类型：0-省，1-市，2-县',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- ----------------------------
--- Records of sa_region
--- ----------------------------
 
 -- ----------------------------
 -- Table structure for `users`

@@ -131,43 +131,6 @@ router.post('/updateUserAccount/info', verify_token, (req, res, next) => {
 			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
 			throw error;
 		});
-	// 拿province，city，town去查库确定对应的code，然后存入users表
-	// 这里有一个异步执行的坑，执行最后一个query的时候town还未更新为town_code.
-	// query('SELECT id FROM sa_region WHERE name LIKE "' + post.town + '%"' + 'AND type = 2', '')
-	// 	.then(function(data) {
-	// 		if(data.results.length === 1) {
-	// 	  	post.town = data.results[0].id;
-	// 	  }
-	// 	})
-	// 	.then(function() {
-	// 		query('SELECT id FROM sa_region WHERE name LIKE "' + post.city + '%"' + 'AND type = 1', '')
-	// 			.then(function(data) {
-	// 				if(data.results.length === 1) {
-	// 		  		post.city = data.results[0].id;
-	// 		  	}
-	// 			})
-	// 			.then(function() {
-	// 				query('SELECT id FROM sa_region WHERE name LIKE "' + post.province + '%"' + 'AND type = 0', '')
-	// 					.then(function(data) {
-	// 						if(data.results.length === 1) {
-	// 				  		post.province = data.results[0].id;
-	// 				  	}
-	// 					})
-	// 					.then(function() {
-	// 						query('UPDATE users SET image_md5=?, first_name=?, last_name=?, email=?, user_name=?,' +
-	// 						 'personal_site=?, instagram=?, twitter=?, location=?, bio=?, province_code=?, city_code=?, town_code=? WHERE user_id=?', 
-	// 						 [post.image_md5, post.first_name, post.last_name, post.email, post.user_name, post.personal_site,
-	// 				 			post.instagram, post.twitter, post.location, post.bio, post.province, post.city, post.town, post.user_id])
-	// 						.then(function(data) {
-	// 							res.json(formater({code:'0', desc:'修改成功！'}))
-	// 						})
-	// 					})
-	// 			})
-	// 	})
-	// 	.catch(function(error) {
-	// 		res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
-	// 		throw error;
-	// 	});
 });
 // 修改用户密码
 router.post('/updateUserAccount/password', verify_token, (req, res, next) => {
@@ -683,14 +646,13 @@ router.post('/uploadPhotoToAliyun', verify_token, (req, res, next) => {
 	    var buffer = Buffer.concat(chunks, size);
 	    co(function* () {
 				// 获取bucket列表
-			  var result = yield client.listBuckets();
-			  var buckets = result.buckets;
-			  // 获取第一个bucket内的文件列表
-			  client.useBucket(buckets[0].name);
-			  var result2 = yield client.list({
-			    'max-keys': 5
-			  });
-		  	var lists = result2.objects;
+			  // var result = yield client.listBuckets();
+			  // var buckets = result.buckets;
+			  client.useBucket('my-image-carol');
+			  // var result2 = yield client.list({
+			  //   'max-keys': 5
+			  // });
+		  	// var lists = result2.objects;
 		  	// 上传图片
 		  	var result3 = yield client.put(new Date().getTime() + '.' + ext, buffer);
 		  	var url = result3.url;
@@ -701,7 +663,35 @@ router.post('/uploadPhotoToAliyun', verify_token, (req, res, next) => {
 		  	// 删除文件
 		  	// var result4 = yield client.delete('object-key');
 		  	// console.log(result4);
-			  res.json(formater({code:'0', desc:'hi', data:{buckets:buckets, lists:lists, url:url}}));
+			  res.json(formater({code:'0', desc:'hi', data:{url:url}}));
+			}).catch(function (err) {
+			  console.log(err);
+			});
+	});
+});
+// 上传商品图片到服务器
+router.post('/uploadProductImageToAliyun', verify_token, (req, res, next) => {
+	if(req.headers['content-length'] === '0') {
+		return res.json(formater({code:'0', desc:'没有选择图片！'}));
+	}
+	let ext = req.headers["content-type"].split("/")[1];
+	if(ext !== 'jpeg' && ext !== 'png' && ext !== 'gif') {
+		return res.json(formater({code:'0', desc:'图片格式不符合，只支持jpg/png/gif格式！'}));
+	}
+	var chunks = [];
+	var size = 0;
+	req.on('data' , function(chunk){
+	    chunks.push(chunk);
+	    size += chunk.length;
+	});
+	req.on("end",function(){
+	    var buffer = Buffer.concat(chunks, size);
+	    co(function* () {
+			  client.useBucket('linyaqing-store');
+		  	// 上传图片
+		  	var result3 = yield client.put(new Date().getTime() + '.' + ext, buffer);
+		  	var url = result3.url;
+			  res.json(formater({code:'0', desc:'hi', data:{url:url}}));
 			}).catch(function (err) {
 			  console.log(err);
 			});
@@ -724,10 +714,6 @@ router.post('/getProducts/all', (req, res, next) => {
 router.post('/getProducts/self', (req, res, next) => {
 
 });
-// 获取store中友情赞助的产品列表
-router.post('/getProducts/friends', (req, res, next) => {
-
-});
 // 登录用户将商品加入购物车
 router.post('/addToCart', verify_token, (req, res, next) => {
 
@@ -738,6 +724,14 @@ router.post('/getProductsInCart', verify_token, (req, res, next) => {
 });
 // 获取单件商品的具体信息
 router.post('/getProductDetails', (req, res, next) => {
+
+});
+// 登录用户添加商品
+router.post('/uploadProducts/user', verify_token,(req, res, next) => {
+
+});
+// admin添加商品:自营
+router.post('/uploadProducts/admin', verify_token,(req, res, next) => {
 
 });
 // 用户提交订单步骤1

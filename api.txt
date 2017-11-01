@@ -132,56 +132,6 @@ url: '/getCollection/all'
 	}
 }
 
-6. 获取所有画展图片集
-url: 'getCollection/curated'
-{
-	success: true,
-	code: 0,
-	desc: '',
-	data: {
-		lists: [
-			{
-				image_id: '',
-				image_md5: '',
-				owner: {
-					name: '',
-					id: '',
-					image_md5: ''
-				},
-				created_time: '',
-				collection_name: '',
-				collection_id: '',
-				collection_photo_nums: 100
-			}
-		]
-	}
-}
-
-7. 获取所有专题图片集
-url: 'getCollection/featured'
-{
-	success: true,
-	code: 0,
-	desc: '',
-	data: {
-		lists: [
-			{
-				image_id: '',
-				image_md5: '',
-				owner: {
-					name: '',
-					id: '',
-					image_md5: ''
-				},
-				created_time: '',
-				collection_name: '',
-				collection_id: '',
-				collection_photo_nums: 100
-			}
-		]
-	}
-}
-
 8. 获取用户自己的图片集
 url: 'getCollection/user'
 post: data: {token: '用户的token'}
@@ -276,19 +226,6 @@ url: 'updateUserAccount/password'
 post: data: {
 	token: '',
 	password: '' // 将加密后的密码发给我
-}
-response: {
-	success: true,
-	code: 0, // 0代表成功，其他数字结合desc理解
-	desc: '',
-	data: {}
-}
-
-12. 用户关联其他社交账户
-url: 'updateUserAccount/social'
-post: data: {
-	 twitter:0,
-	 facebook:1 // 0表示没有关联，1表示关联了
 }
 response: {
 	success: true,
@@ -409,8 +346,8 @@ response: {
 	data: {}
 }
 
-20. 用户上传图片到zimg服务器
-url: 'uploadPhotoToZimg'
+20. 用户上传图片到阿里云服务器/上传商品图片到阿里云服务器
+url: 'uploadPhotoToAliyun' / 'uploadProductImageToAliyun'
 post: {
 	data: formdata(图片文件)
 	processData: false
@@ -424,6 +361,7 @@ response: {
 		image_md5: ''
 	}
 }
+
 
 21. 获取store中的最新产品列表
 url: 'getProducts/new'
@@ -475,22 +413,6 @@ response: {
 
 24. 获取store中自营的产品列表
 url: 'getProducts/self'
-response: {
-	success: true,
-	code: 0, // 0代表成功，其他数字结合desc理解
-	desc: '',
-	data: {
-		product_id: '',
-		product_md5: '',
-		product_name: '',
-		creater_name: '',
-		product_price: '',
-		profits_share: true/false
-	}
-}
-
-25. 获取store中友情赞助的产品列表
-url: 'getProducts/friends'
 response: {
 	success: true,
 	code: 0, // 0代表成功，其他数字结合desc理解
@@ -588,7 +510,7 @@ response: {
 }
 
 27-2. 用户提交订单步骤1
-url: 'submitOrder/step1'
+url: 'placeOrder'
 post: data: {
 	customer_email:'',
 	shipping_address: {
@@ -603,24 +525,6 @@ post: data: {
 		postal_code: '',
 		phone:''
 	}
-}
-response: {
-	success: true,
-	code: 0, // 0代表成功，其他数字结合desc理解
-	desc: '',
-	data: {
-		shipping_price: ''
-	}
-}
-
-27-3. 用户提交订单步骤2
-url: 'submitOrder/step2'
-post: data: {
-	card_num: '',
-	name_on_card: '',
-	mm/yy:'',
-	cvv:'',
-	rememberMe:true/false
 }
 response: {
 	success: true,
@@ -683,8 +587,6 @@ response: {
 		bio: ''
 	}
 }
-29. 新用户facebook注册
-url: 'register/facebook'
 
 30. 老用户登录
 url:'login'
@@ -713,9 +615,6 @@ response: {
 		}
 	}
 }
-
-32. 老用户facebook登录
-url:'login/facebook'
 
 33. 获取所有类别的图片集列表
 url: 'getCategories/all'
@@ -777,6 +676,103 @@ post: data: {
 response: {
 	success: true,
 	code: 0, // 0代表成功，其他数字结合desc理解
+	desc: '',
+	data: {
+		
+	}
+}
+
+37. 修改用户收货地址
+url: '/updateUserAccount/delivery'
+post: data: {
+	token: '',
+	delivery_id:'',//不传或为空则默认为新建收货地址，有则为更改该条收货信息
+	delivery_address:'',
+	delivery_province:'',
+	delivery_city:'',
+	delivery_town:'',
+	consignee:'',
+	consignee_phone:''
+}
+{
+	success: true,
+	code: 0,
+	desc: '',
+	data: {
+		
+	}
+}
+
+38. 修改产品库存
+url: '/changeStocks'
+post: data: {
+	token: '',
+	product_id:'',
+	stocks:'',
+	unit:'',
+	province:'',
+	city:'',
+	town:'',
+	address:
+}
+{
+	success: true,
+	code: 0,
+	desc: '',
+	data: {
+		
+	}
+}
+
+39. 获取单件产品的所有图片
+url: '/getAllImages/product'
+post: data: {
+	product_id:'',
+}
+{
+	success: true,
+	code: 0,
+	desc: '',
+	data: {
+		
+	}
+}
+
+40. 用户添加商品(根据是否是admin判断产品是否属于自营)
+url: '/uploadProducts/user'
+post: data: {
+	token:'',
+	product_md5:'',
+	product_name:'',
+	product_unit:'',
+	product_price:'',
+	produst_desc:'',
+	product_stocks:'',
+	stock_unit:''
+}
+{
+	success: true,
+	code: 0,
+	desc: '',
+	data: {
+		
+	}
+}
+
+41. 用户修改商品
+url: '/updateProduct'
+post: data: {
+	token:'',
+	product_id:'',
+	product_md5:'',
+	product_name:'',
+	product_unit:'',
+	product_price:'',
+	produst_desc:'',
+}
+{
+	success: true,
+	code: 0,
 	desc: '',
 	data: {
 		

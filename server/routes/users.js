@@ -101,14 +101,11 @@ router.post('/updateUserAccount/info', verify_token, (req, res, next) => {
 	let post = {
 		user_id: req.api_user.data.user_id,
 		image_md5: _user.image_md5,
-		first_name: _user.first_name,
-		last_name: _user.last_name,
 		email: _user.email,
 		user_name: _user.user_name,
 		personal_site: _user.personal_site,
-		instagram: _user.personal_site,
-		twitter: _user.twitter,
-		location: _user.location,
+		wechat: _user.wechat,
+		address: _user.location,
 		bio: _user.bio,
 		province: _user.province,
 		city: _user.city,
@@ -120,11 +117,15 @@ router.post('/updateUserAccount/info', verify_token, (req, res, next) => {
 	if(!post.email) {
 		return res.json(formater({code:'1', desc:'邮件不能为空！'}));
 	}
-	query('UPDATE users SET image_md5=?, first_name=?, last_name=?, email=?, user_name=?,' +
-		 'personal_site=?, instagram=?, twitter=?, location=?, bio=?, province_code=?, city_code=?, town_code=? WHERE user_id=?', 
-		 [post.image_md5, post.first_name, post.last_name, post.email, post.user_name, post.personal_site,
-				post.instagram, post.twitter, post.location, post.bio, post.province, post.city, post.town, post.user_id])
+	query('UPDATE users SET image_md5=?, email=?, user_name=?,' +
+		 'personal_site=?, wechat=?, address=?, bio=?, province=?, city=?, town=? WHERE user_id=?', 
+		 [post.image_md5, post.email, post.user_name, post.personal_site,
+				post.wechat, post.address, post.bio, post.province, post.city, post.town, post.user_id])
 		.then(function(data) {
+			if(data.err) {
+				console.log(data.err);
+				return res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+			}
 			res.json(formater({code:'0', desc:'修改成功！'}))
 		})
 		.catch(function(error) {
@@ -157,6 +158,10 @@ router.post('/updateUserAccount/password', verify_token, (req, res, next) => {
 			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
 			throw error;
 		});
+});
+// 修改用户收货地址
+router.post('/updateUserAccount/delivery', verify_token, (req, res, next) => {
+
 });
 // 删除账户, 用户存储在其他表格的信息，如添加的应用、邮件设置、关注的category和摄像师等资料，也需要删除。外键的删除规则
 // 设置为层叠(cascade)
@@ -698,6 +703,10 @@ router.post('/uploadProductImageToAliyun', verify_token, (req, res, next) => {
 	});
 });
 
+// 修改产品库存
+router.post('/changeStocks', verify_token, (req, res, next) => {
+
+});
 // 获取store中的最新产品列表
 router.post('/getProducts/new', (req, res, next) => {
 
@@ -722,24 +731,24 @@ router.post('/addToCart', verify_token, (req, res, next) => {
 router.post('/getProductsInCart', verify_token, (req, res, next) => {
 
 });
-// 获取单件商品的具体信息
+// 获取单件商品的基本信息
 router.post('/getProductDetails', (req, res, next) => {
 
 });
-// 登录用户添加商品
+// 获取单件产品的所有图片
+router.post('/getAllImages/product', (req, res, next) => {
+
+});
+// 用户添加商品(根据是否是admin判断产品是否属于自营)
 router.post('/uploadProducts/user', verify_token,(req, res, next) => {
 
 });
-// admin添加商品:自营
-router.post('/uploadProducts/admin', verify_token,(req, res, next) => {
+// 用户修改商品
+router.post('/updateProduct', verify_token,(req, res, next) => {
 
 });
-// 用户提交订单步骤1
-router.post('/submitOrder/step1', verify_token, (req, res, next) => {
-
-});
-// 用户提交订单步骤2
-router.post('/submitOrder/step12', verify_token, (req, res, next) => {
+// 用户提交订单
+router.post('/placeOrder', verify_token, (req, res, next) => {
 
 });
 

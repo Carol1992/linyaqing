@@ -758,19 +758,80 @@ router.post('/getProducts/self', (req, res, next) => {
 });
 // 登录用户将商品加入购物车
 router.post('/addToCart', verify_token, (req, res, next) => {
-
+	let _user = req.body;
+	let product_id = _user.product_id;
+	let product_quantity = parseInt(_user.quantity);
+	if(!product_id) {
+		return res.json(formater({code:'0', desc:'请提供产品id!'}));
+	} else {
+		query('SELECT SUM(stocks) AS stocks FROM inventories WHERE product_id = ?', [product_id])
+			.then(data => {
+				if(data.err) {
+					console.log(data.err);
+					return res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+				} else {
+					if(stocks >= product_quantity) {
+						query('INSERT INTO carts SET product_id = ?, product_quantity = ?', [product_id, product_quantity])
+							.then(data => {
+								if(data.err) {
+									console.log(data.err);
+									return res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+								} else {
+									res.json(formater({code:'0', desc:'成功将商品加入购物车!'}));
+								}
+							})
+					} else {
+						res.json(formater({code:'0', desc:'产品库存不足!'}));
+					}
+				}
+			})
+	}
 });
 // 登录用户获取购物车中的所有商品列表
 router.post('/getProductsInCart', verify_token, (req, res, next) => {
+	
+});
+//用户移除或修改购物车产品的数量
+router.post('/removeFromCart', verify_token, (req, res, next) => {
 
 });
 // 获取单件商品的基本信息
 router.post('/getProductDetails', (req, res, next) => {
-
+	let _user = req.body;
+	let product_id = _user.product_id;
+	if(!product_id) {
+		return res.json(formater({code:'0', desc:'请提供产品id!'}));
+	} else {
+		query('SELECT * FROM products WHERE product_id = ?', [product_id])
+			.then(data => {
+				if(data.err) {
+					console.log(data.err);
+					return res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+				} else {
+					res.json(formater({code:'0', data:data.results}));
+				}
+			})
+	}
 });
 // 获取单件产品的所有图片
 router.post('/getAllImages/product', (req, res, next) => {
-
+	let _user = req.body;
+	let product_id = _user.product_id;
+	if(!product_id) {
+		return res.json(formater({code:'0', desc:'请提供产品id!'}));
+	} else {
+		query('SELECT s.image_id, s.image_name, s.image_url, s.image_desc FROM store_images s, ' + 
+			'(SELECT a.image_id FROM product_image a WHERE a.product_id = ?) p WHERE s.image_id = p.image_id', [product_id])
+			.then(data => {
+				console.log(data);
+				if(data.err) {
+					console.log(data.err);
+					return res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+				} else {
+					res.json(formater({code:'0', data:data.results}));
+				}
+			})
+	}
 });
 // 用户添加商品(根据是否是admin判断产品是否属于自营)
 router.post('/uploadProducts', verify_token,(req, res, next) => {
@@ -829,8 +890,60 @@ router.post('/uploadProducts', verify_token,(req, res, next) => {
 	}
 });
 // 用户给商品添加图片
-router.post('/addProductImages', verify_token,(req, res, next) => {
-
+router.post('/addProductImages', verify_token, (req, res, next) => {
+	let _user = req.body;
+	let user_id = req.api_user.data.user_id;
+	let product_id = _user.product_id;
+	let post = {
+		image_name: _user.image_name,
+		image_url: _user.image_url,
+		image_desc: _user.image_desc
+	};
+	if(!product_id) {
+		return res.json(formater({code:'0', desc:'请提供产品id！'}));
+	} else {
+		if(!post.image_url) {
+			return res.json(formater({code:'0', desc:'请提供图片链接！'}));
+		} else {
+			// 判断该产品是否是该用户创建的
+			query('SELECT user_id FROM products WHERE product_id = ?', [product_id])
+				.then(data => {
+					if(data.err) {
+						console.log(data.err);
+						return res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+					} else {
+						if(data.results.length === 0) {
+							res.json(formater({code:'0', desc:'该产品不存在！'}));
+						} else {
+							if(data.results[0].user_id !== user_id) {
+								res.json(formater({code:'0', desc:'该产品不是该用户创建的！'}));
+							} else {
+								query('INSERT INTO store_images SET ?', [post])
+								.then(data => {
+									if(data.err) {
+										console.log(data.err);
+										return res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+									} else {
+										return data.results.insertId;
+									}
+								})
+								.then(insertId => {
+									query('INSERT INTO product_image SET product_id = ?, image_id = ?', [product_id, insertId])
+										.then(data => {
+											if(data.err) {
+												console.log(data.err);
+												return res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+											} else {
+												res.json(formater({code:'0', desc:'图片插入成功！'}));
+											}
+										})
+								})
+							}
+						}
+					}
+				})
+		}
+	}
 });
 // 用户提交订单
 router.post('/placeOrder', verify_token, (req, res, next) => {

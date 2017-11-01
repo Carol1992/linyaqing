@@ -742,6 +742,7 @@ post: data: {
 url: '/uploadProducts/user'
 post: data: {
 	token:'',
+	product_id:'', //修改商品信息时需要提供，新增商品则不需要
 	product_md5:'',
 	product_name:'',
 	product_unit:'',
@@ -757,16 +758,14 @@ post: data: {
 	}
 }
 
-41. 用户修改商品
-url: '/updateProduct'
+42. 用户给商品添加图片
+url: '/addProductImages'
 post: data: {
 	token:'',
 	product_id:'',
-	product_md5:'',
-	product_name:'',
-	product_unit:'',
-	product_price:'',
-	produst_desc:'',
+	image_name:'',
+	image_url:'',
+	image_desc:''
 }
 {
 	success: true,
@@ -776,3 +775,5 @@ post: data: {
 		
 	}
 }
+
+43.用户移除或修改购物车产品的数量

@@ -696,7 +696,7 @@ router.post('/uploadProductImageToAliyun', verify_token, (req, res, next) => {
 		  	// 上传图片
 		  	var result3 = yield client.put(new Date().getTime() + '.' + ext, buffer);
 		  	var url = result3.url;
-			  res.json(formater({code:'0', desc:'hi', data:{url:url}}));
+			  res.json(formater({code:'0', desc:'此url作为添加商品的图片字段', data:{url:url}}));
 			}).catch(function (err) {
 			  console.log(err);
 			});
@@ -705,7 +705,40 @@ router.post('/uploadProductImageToAliyun', verify_token, (req, res, next) => {
 
 // 修改产品库存
 router.post('/changeStocks', verify_token, (req, res, next) => {
-
+	let _user = req.body;
+	let user_id = req.api_user.data.user_id;
+	let inventory_id = _user.inventory_id;
+	let post = {
+		product_id:_user.product_id,
+		stocks:_user.stocks,
+		unit:_user.unit,
+		province:_user.province,
+		city:_user.city,
+		town:_user.town,
+		address:_user.address
+	};
+	// 判断是修改库存还是添加库存
+	if(inventory_id) {
+		query('UPDATE inventories SET stocks = ? WHERE id = ?', [post.stocks, inventory_id])
+			.then(data => {
+				if(data.err) {
+					console.log(data.err);
+					return res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+				} else {
+					res.json(formater({code:'0', desc:'库存更新成功！'}));
+				}
+			})
+	} else {
+		query('INSERT INTO inventories SET ?', [post])
+		.then(data => {
+			if(data.err) {
+				console.log(data.err);
+				return res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+			} else {
+				res.json(formater({code:'0', desc:'库存添加成功！'}));
+			}
+		})
+	}
 });
 // 获取store中的最新产品列表
 router.post('/getProducts/new', (req, res, next) => {
@@ -740,11 +773,63 @@ router.post('/getAllImages/product', (req, res, next) => {
 
 });
 // 用户添加商品(根据是否是admin判断产品是否属于自营)
-router.post('/uploadProducts/user', verify_token,(req, res, next) => {
-
+router.post('/uploadProducts', verify_token,(req, res, next) => {
+	let _user = req.body;
+	let user_id = req.api_user.data.user_id;
+	let product_id = _user.product_id;
+	let post = {
+		product_md5: _user.product_md5,
+		product_name: _user.product_name,
+		product_unit:_user.product_unit,
+		product_price:_user.product_price,
+		product_desc:_user.product_desc
+	};
+	// 判断是修改已有产品的信息还是添加新产品
+	if(product_id) {
+		query('UPDATE products SET product_md5 = ?, product_name = ?, product_unit = ?, product_price = ?, ' + 
+			'product_desc = ? WHERE product_id = ?', [post.product_md5, post.product_name, post.product_unit, post.price, post.desc, product_id])
+			.then(data => {
+				if(data.err) {
+					console.log(data.err);
+					return res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+				} else {
+					res.json(formater({code:'0', desc:'产品信息更改成功！'}));
+				}
+			})
+	} else {
+		// 判断该用户是否是admin
+	query('SELECT is_admin FROM users WHERE user_id = ?', [user_id])
+		.then(data => {
+			if(data.err) {
+				console.log(data.err);
+				return res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+			} else {
+				if(data.results[0].is_admin === '0') {
+					// 添加自营产品
+					post.is_self = '0';
+				} else {
+					post.is_self = '1';
+				}
+			}
+			return data;
+		})
+		.then(data => {
+			query('INSERT INTO products SET product_md5 = ?, product_name = ?, product_unit = ?, ' + 
+				'product_price = ?, product_desc = ?, is_self = ?, user_id = ?', [post.product_md5, post.product_name, 
+				post.product_unit, post.product_price, post.product_desc, post.is_self, user_id])
+				.then(data => {
+					if(data.err) {
+						console.log(data.err);
+						return res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+					} else {
+						res.json(formater({code:'0', desc:'产品添加成功！', data:{'product_id': data.results.insertId}}));
+					}
+				})
+		})
+	}
 });
-// 用户修改商品
-router.post('/updateProduct', verify_token,(req, res, next) => {
+// 用户给商品添加图片
+router.post('/addProductImages', verify_token,(req, res, next) => {
 
 });
 // 用户提交订单

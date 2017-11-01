@@ -747,8 +747,6 @@ post: data: {
 	product_unit:'',
 	product_price:'',
 	produst_desc:'',
-	product_stocks:'',
-	stock_unit:''
 }
 {
 	success: true,

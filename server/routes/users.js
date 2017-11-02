@@ -1145,7 +1145,34 @@ router.post('/getDeliveryAddress', verify_token, (req, res, next) => {
 router.post('/placeOrder', verify_token, (req, res, next) => {
 	let _user = req.body;
 	let user_id = req.api_user.data.user_id;
-
+	let delivery_id = _user.delivery_id;
+	let orders = _user.orders;
+	// 插入orders表，拿到order_id，将order_id和其对应的product_id和product_quantity插入order_details
+	query('INSERT INTO orders SET user_id = ?, delivery_id = ?', [user_id, delivery_id])
+		.then(data => {
+			if(data.err) {
+				console.log(data.err);
+				return res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+			} else {
+				return data.results.insertId;
+			}
+		})
+		.then(order_id => {
+			let order_details = [];
+			for(let order of orders) {
+				console.log(order);
+				order_details.push([order_id, order.product_id, order.product_quantity]);
+			}
+			query('INSERT INTO order_details(order_id, product_id, quantity) VALUES ?', [order_details])
+				.then(data => {
+					if(data.err) {
+						console.log(data.err);
+						return res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+					} else {
+						res.json(formater({code:'0', desc:'新增订单成功！'}));
+					}
+				})
+		})
 });
 
 module.exports = router;

@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50719
 File Encoding         : 65001
 
-Date: 2017-10-31 21:55:55
+Date: 2017-11-02 18:14:02
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -106,7 +106,10 @@ CREATE TABLE `carts` (
 -- ----------------------------
 -- Records of carts
 -- ----------------------------
-INSERT INTO `carts` VALUES ('1', '2', '12', null, null, '2017-10-31 18:10:49');
+INSERT INTO `carts` VALUES ('1', '1', '32', null, null, '2017-11-02 13:19:53');
+INSERT INTO `carts` VALUES ('1', '2', '32', null, null, '2017-11-02 13:19:53');
+INSERT INTO `carts` VALUES ('2', '1', '32', null, null, '2017-11-02 13:19:53');
+INSERT INTO `carts` VALUES ('3', '3', '72', null, null, '2017-11-02 17:24:21');
 
 -- ----------------------------
 -- Table structure for `categories`
@@ -155,6 +158,50 @@ INSERT INTO `collections` VALUES ('16', null, 'sssssssssssssssssss', null);
 INSERT INTO `collections` VALUES ('17', null, 'sssssssssssssssssss', null);
 INSERT INTO `collections` VALUES ('18', null, 'sssssssssssssssssss', null);
 INSERT INTO `collections` VALUES ('19', null, 'sssssssssssssssssss', null);
+
+-- ----------------------------
+-- Table structure for `deliveries`
+-- ----------------------------
+DROP TABLE IF EXISTS `deliveries`;
+CREATE TABLE `deliveries` (
+  `delivery_id` int(9) NOT NULL AUTO_INCREMENT,
+  `delivery_address` varchar(90) DEFAULT NULL,
+  `delivery_city` varchar(45) DEFAULT NULL,
+  `delivery_province` varchar(45) DEFAULT NULL,
+  `delivery_town` varchar(45) DEFAULT NULL,
+  `consignee` varchar(45) DEFAULT NULL,
+  `consignee_phone` char(13) DEFAULT NULL,
+  PRIMARY KEY (`delivery_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of deliveries
+-- ----------------------------
+INSERT INTO `deliveries` VALUES ('1', 'hshshsh', '深圳', '广东', '龙华', '林晴', '18826417583');
+INSERT INTO `deliveries` VALUES ('2', '哈哈道具卡还是看', '广州', '广东', '越秀', '绵绵', '17726262662');
+INSERT INTO `deliveries` VALUES ('3', '金卡金卡金卡', '北京', '北京', null, null, '92798798793');
+INSERT INTO `deliveries` VALUES ('4', 'jjdjdjjd', null, null, null, 'carol', '17772772');
+
+-- ----------------------------
+-- Table structure for `delivery_address`
+-- ----------------------------
+DROP TABLE IF EXISTS `delivery_address`;
+CREATE TABLE `delivery_address` (
+  `user_id` int(9) NOT NULL,
+  `delivery_id` int(9) NOT NULL,
+  PRIMARY KEY (`user_id`,`delivery_id`),
+  KEY `delivery_id` (`delivery_id`),
+  CONSTRAINT `delivery_address_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `delivery_address_ibfk_2` FOREIGN KEY (`delivery_id`) REFERENCES `deliveries` (`delivery_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of delivery_address
+-- ----------------------------
+INSERT INTO `delivery_address` VALUES ('3', '1');
+INSERT INTO `delivery_address` VALUES ('3', '2');
+INSERT INTO `delivery_address` VALUES ('2', '3');
+INSERT INTO `delivery_address` VALUES ('3', '4');
 
 -- ----------------------------
 -- Table structure for `email_settings`
@@ -231,21 +278,26 @@ DROP TABLE IF EXISTS `inventories`;
 CREATE TABLE `inventories` (
   `id` int(9) NOT NULL AUTO_INCREMENT,
   `product_id` int(9) DEFAULT NULL,
-  `inventory` smallint(5) DEFAULT NULL,
+  `stocks` smallint(5) DEFAULT NULL,
   `unit` varchar(45) DEFAULT NULL COMMENT '单位：件、个、幅等',
-  `location` varchar(45) DEFAULT NULL,
+  `address` varchar(45) DEFAULT NULL,
+  `province` varchar(45) DEFAULT NULL,
+  `city` varchar(45) DEFAULT NULL,
+  `town` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `product_id` (`product_id`),
   CONSTRAINT `inventories_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of inventories
 -- ----------------------------
-INSERT INTO `inventories` VALUES ('1', '1', '8999', '件', '深圳');
-INSERT INTO `inventories` VALUES ('2', '2', '999', '件', '上海');
-INSERT INTO `inventories` VALUES ('3', '1', '22', '件', '广州');
-INSERT INTO `inventories` VALUES ('4', '1', '13', null, '北京');
+INSERT INTO `inventories` VALUES ('1', '1', '8999', '件', '深圳', null, null, null);
+INSERT INTO `inventories` VALUES ('2', '2', '999', '件', '上海', null, null, null);
+INSERT INTO `inventories` VALUES ('3', '1', '22', '件', '广州', null, null, null);
+INSERT INTO `inventories` VALUES ('4', '1', '13', null, '北京', null, null, null);
+INSERT INTO `inventories` VALUES ('5', '6', '80', '件', null, '广东', '深圳', '龙华');
+INSERT INTO `inventories` VALUES ('6', '3', '345', null, null, null, null, null);
 
 -- ----------------------------
 -- Table structure for `orders`
@@ -255,15 +307,20 @@ CREATE TABLE `orders` (
   `order_id` int(9) NOT NULL AUTO_INCREMENT,
   `user_id` int(9) DEFAULT NULL,
   `created_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `delivery_id` int(9) DEFAULT NULL,
   PRIMARY KEY (`order_id`),
   KEY `user_id` (`user_id`),
-  CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+  KEY `delivery_id` (`delivery_id`),
+  CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `orders_ibfk_2` FOREIGN KEY (`delivery_id`) REFERENCES `deliveries` (`delivery_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of orders
 -- ----------------------------
-INSERT INTO `orders` VALUES ('1', '3', '2017-10-31 21:46:07');
+INSERT INTO `orders` VALUES ('1', '3', '2017-10-31 21:46:07', null);
+INSERT INTO `orders` VALUES ('2', '2', '2017-11-02 12:54:08', null);
+INSERT INTO `orders` VALUES ('3', '1', '2017-11-02 12:54:47', null);
 
 -- ----------------------------
 -- Table structure for `order_details`
@@ -289,6 +346,8 @@ CREATE TABLE `order_details` (
 INSERT INTO `order_details` VALUES ('1', '1', '12', null, null);
 INSERT INTO `order_details` VALUES ('1', '2', '13', null, null);
 INSERT INTO `order_details` VALUES ('1', '3', '23', null, null);
+INSERT INTO `order_details` VALUES ('2', '1', '12', null, null);
+INSERT INTO `order_details` VALUES ('3', '1', '133', null, null);
 
 -- ----------------------------
 -- Table structure for `permissions`
@@ -316,24 +375,25 @@ CREATE TABLE `products` (
   `product_name` varchar(45) DEFAULT NULL COMMENT '商品名',
   `user_id` int(9) DEFAULT NULL COMMENT '作者',
   `product_price` decimal(10,0) DEFAULT NULL COMMENT '产品价格',
-  `profits_share` char(1) DEFAULT '0' COMMENT '作者得到利润的30% \n0： true\n1: false',
   `created_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '商品创建时间',
   `product_desc` tinytext COMMENT '产品描述',
-  `product_size` varchar(2) DEFAULT NULL COMMENT '产品规格：xs, s, m, l, xl',
-  `body_length` tinyint(3) DEFAULT NULL COMMENT '衣长',
-  `chest` tinyint(3) DEFAULT NULL COMMENT '胸围',
-  `sleeve` tinyint(3) DEFAULT NULL COMMENT '袖长',
+  `product_unit` varchar(6) DEFAULT NULL,
+  `is_self` char(1) NOT NULL DEFAULT '1' COMMENT '是否自营：1: 否  0: 是',
   PRIMARY KEY (`product_id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `products_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COMMENT='商品列表';
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8 COMMENT='商品列表';
 
 -- ----------------------------
 -- Records of products
 -- ----------------------------
-INSERT INTO `products` VALUES ('1', '11111111111111111111111111', '产品', '1', '12', '0', '2017-10-31 18:06:51', '端到端', '12', '23', '22', null);
-INSERT INTO `products` VALUES ('2', '3333333333333333', '谔谔谔谔', '3', '23', '0', '2017-10-31 18:06:49', '订单', '23', '22', '22', null);
-INSERT INTO `products` VALUES ('3', '222222222222', '分发', '3', null, '0', '2017-10-31 18:07:04', null, null, null, null, null);
+INSERT INTO `products` VALUES ('1', '11111111111111111111111111', '产品', '1', '12', '2017-10-31 18:06:51', '端到端', null, '1');
+INSERT INTO `products` VALUES ('2', '3333333333333333', '谔谔谔谔', '3', '23', '2017-10-31 18:06:49', '订单', null, '1');
+INSERT INTO `products` VALUES ('3', '222222222222', '分发', '3', '44', '2017-11-01 13:40:11', null, null, '1');
+INSERT INTO `products` VALUES ('4', '000000000000', 'carol', '3', '12', '2017-11-01 16:18:06', 'hs', '', '1');
+INSERT INTO `products` VALUES ('5', '000000000000', 'carol', '3', '12', '2017-11-01 16:18:46', 'hs', '', '1');
+INSERT INTO `products` VALUES ('6', '0000000gggg00000', 'cafffrol', '3', '12', '2017-11-01 16:21:09', 'hs', '件', '1');
+INSERT INTO `products` VALUES ('7', 'sssssssssssssss', 'ddddd', '8', '12', '2017-11-01 17:15:24', null, null, '0');
 
 -- ----------------------------
 -- Table structure for `product_image`
@@ -353,6 +413,9 @@ CREATE TABLE `product_image` (
 -- ----------------------------
 INSERT INTO `product_image` VALUES ('1', '1');
 INSERT INTO `product_image` VALUES ('1', '2');
+INSERT INTO `product_image` VALUES ('6', '4');
+INSERT INTO `product_image` VALUES ('4', '5');
+INSERT INTO `product_image` VALUES ('5', '6');
 
 -- ----------------------------
 -- Table structure for `relationships`
@@ -388,7 +451,7 @@ CREATE TABLE `store_images` (
   `image_desc` tinytext,
   `created_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`image_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of store_images
@@ -396,6 +459,9 @@ CREATE TABLE `store_images` (
 INSERT INTO `store_images` VALUES ('1', '11111', '111', '111', '2017-10-31 18:07:34');
 INSERT INTO `store_images` VALUES ('2', '1122', '333', '222', '2017-10-31 18:07:43');
 INSERT INTO `store_images` VALUES ('3', '12', '33', '饿饿的', '2017-10-31 18:07:54');
+INSERT INTO `store_images` VALUES ('4', 'hajhjahjs', 'sahkjhakhd', null, '2017-11-01 22:27:17');
+INSERT INTO `store_images` VALUES ('5', 'hajhjahjs', 'sahkjhakhd', null, '2017-11-01 22:27:30');
+INSERT INTO `store_images` VALUES ('6', 'hajhjahjs', 'sahkjhakhd', null, '2017-11-01 22:27:57');
 
 -- ----------------------------
 -- Table structure for `users`
@@ -406,8 +472,6 @@ CREATE TABLE `users` (
   `is_developer` char(1) DEFAULT '1' COMMENT '是否注册为开发者：\n0：是\n1：否',
   `is_admin` char(1) DEFAULT '1' COMMENT '是否是管理员\n0： 是\n1： 不是',
   `user_name` varchar(90) DEFAULT NULL COMMENT '用户名',
-  `first_name` varchar(45) DEFAULT NULL COMMENT '名',
-  `last_name` varchar(45) DEFAULT NULL COMMENT '姓',
   `phone` varchar(14) DEFAULT NULL COMMENT '手机号码',
   `email` varchar(45) DEFAULT NULL COMMENT '邮件',
   `password` varchar(45) DEFAULT NULL,
@@ -416,35 +480,31 @@ CREATE TABLE `users` (
   `town` char(6) DEFAULT NULL COMMENT '县区代码',
   `image_md5` varchar(255) DEFAULT NULL COMMENT '用户头像，MD5格式',
   `personal_site` varchar(255) DEFAULT NULL COMMENT '个人网站',
-  `instagram` varchar(45) DEFAULT NULL COMMENT 'instagram用户名',
-  `twitter` varchar(45) DEFAULT NULL COMMENT 'twitter 用户名',
-  `location` varchar(255) DEFAULT NULL COMMENT '地址',
+  `wechat` varchar(45) DEFAULT NULL COMMENT 'instagram用户名',
+  `address` varchar(255) DEFAULT NULL COMMENT '地址',
   `bio` tinytext CHARACTER SET dec8 COLLATE dec8_bin COMMENT '个人简介',
   `created_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `dev_url` varchar(255) DEFAULT NULL,
   `dev_desc` tinytext,
-  `company` varchar(45) DEFAULT NULL,
   `delivery_address` varchar(90) DEFAULT NULL,
-  `delivery_city` char(6) DEFAULT NULL,
-  `delivery_province` char(6) DEFAULT NULL,
-  `delivery_town` char(6) DEFAULT NULL,
-  `postal_code` varchar(6) DEFAULT NULL,
-  `card_num` char(16) DEFAULT NULL,
-  `name_on_card` varchar(45) DEFAULT NULL,
-  `mm/yy` char(5) DEFAULT NULL,
-  `cvv` char(3) DEFAULT NULL,
+  `delivery_city` varchar(45) DEFAULT NULL,
+  `delivery_province` varchar(45) DEFAULT NULL,
+  `delivery_town` varchar(45) DEFAULT NULL,
+  `consignee` varchar(45) DEFAULT NULL,
+  `consignee_phone` char(13) DEFAULT NULL,
   PRIMARY KEY (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8 COMMENT='存储注册用户的相关信息';
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8 COMMENT='存储注册用户的相关信息';
 
 -- ----------------------------
 -- Records of users
 -- ----------------------------
-INSERT INTO `users` VALUES ('1', '1', '1', '大苏打', '', '', null, 'mklklklkeli@gmail.com', 'hh', '广东', '深圳', '福田', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
-INSERT INTO `users` VALUES ('2', '0', '1', '大苏打', '', '', null, 'm@gmail.com', 'kijkjkjkju', null, null, null, null, null, null, null, null, null, null, 'https://baidu.com', 'I AM AN EXCELLENT DEVELOPER', null, null, null, null, null, null, null, null, null, null);
-INSERT INTO `users` VALUES ('3', '0', '1', '大苏lll打', '', '', null, 'm0@gmail.com', 'hh', null, null, null, null, null, null, null, null, null, null, 'https://baidu.com', 'I AM AN EXCELLENT DEVELOPER', null, null, null, null, null, null, null, null, null, null);
-INSERT INTO `users` VALUES ('4', '1', '1', '大苏lll打', '', '', null, 'mklklk0@gmail.com', 'hh', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
-INSERT INTO `users` VALUES ('6', '1', '1', '大苏打', '', '', null, 'm1@gmail.com', '5e36941b3d856737e81516acd45edc50', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
-INSERT INTO `users` VALUES ('7', '1', '1', '大苏打', '', '', null, 'q@gmail.com', '5e36941b3d856737e81516acd45edc50', null, null, null, null, null, null, null, null, null, '2017-10-31 13:13:49', null, null, null, null, null, null, null, null, null, null, null, null);
+INSERT INTO `users` VALUES ('1', '1', '1', '大苏打', null, 'mklklklkeli@gmail.com', 'hh', '广东', '深圳', '福田', null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+INSERT INTO `users` VALUES ('2', '0', '1', '大苏打', null, 'm@gmail.com', 'kijkjkjkju', null, null, null, null, null, null, null, null, null, 'https://baidu.com', 'I AM AN EXCELLENT DEVELOPER', null, null, null, null, null, null);
+INSERT INTO `users` VALUES ('3', '0', '1', '大苏打', null, 'meli@gmail.com', 'hh', null, '深圳', '福田', null, null, null, null, null, '2017-11-01 07:14:32', 'https://baidu.com', 'I AM AN EXCELLENT DEVELOPER', null, null, null, null, null, null);
+INSERT INTO `users` VALUES ('4', '1', '1', '大苏lll打', null, 'mklklk0@gmail.com', 'hh', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+INSERT INTO `users` VALUES ('6', '1', '1', '大苏打', null, 'm1@gmail.com', '5e36941b3d856737e81516acd45edc50', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+INSERT INTO `users` VALUES ('7', '1', '1', '大苏打', null, 'q@gmail.com', '5e36941b3d856737e81516acd45edc50', null, null, null, null, null, null, null, null, '2017-10-31 13:13:49', null, null, null, null, null, null, null, null);
+INSERT INTO `users` VALUES ('8', '0', '0', '林晴', '18826417583', 'lq@gmail.com', '123321', null, null, null, null, null, null, null, null, '2017-11-01 17:13:27', null, null, null, null, null, null, null, null);
 
 -- ----------------------------
 -- Table structure for `user_category`

@@ -159,10 +159,6 @@ router.post('/updateUserAccount/password', verify_token, (req, res, next) => {
 			throw error;
 		});
 });
-// 修改用户收货地址
-router.post('/updateUserAccount/delivery', verify_token, (req, res, next) => {
-
-});
 // 删除账户, 用户存储在其他表格的信息，如添加的应用、邮件设置、关注的category和摄像师等资料，也需要删除。外键的删除规则
 // 设置为层叠(cascade)
 router.post('/updateUserAccount/delete', verify_token, (req, res, next) => {
@@ -742,42 +738,120 @@ router.post('/changeStocks', verify_token, (req, res, next) => {
 });
 // 获取store中的最新产品列表
 router.post('/getProducts/new', (req, res, next) => {
-
+	let _user = req.body;
+	let pageNo = _user.pageNo || 1;
+	let pageSize = _user.pageSize || 50;
+	let _left = (pageNo - 1) * pageSize;
+	let q1 = query('SELECT COUNT(*) AS totalCounts FROM products', '');
+	let q2 = query('SELECT * FROM products ORDER BY created_time DESC LIMIT ?,?', [_left, pageSize]);
+	Promise.all([q1, q2]).then(values => {
+		let new_data = {
+			pageNo: pageNo,
+			pageSize: pageSize,
+			totalPage: Math.ceil(values[0].results[0].totalCounts / pageSize),
+			lists: values[1].results
+		};
+		res.json(formater({code:'0', data:new_data}));				
+	})
 });
 // 获取store中的最热产品列表
 router.post('/getProducts/hot', (req, res, next) => {
-
+	let _user = req.body;
+	let pageNo = _user.pageNo || 1;
+	let pageSize = _user.pageSize || 50;
+	let _left = (pageNo - 1) * pageSize;
+	let q1 = query('SELECT COUNT(*) AS totalCounts FROM products', '');
+	let q2 = query('SELECT p.*, sales.total_sales FROM products p, (SELECT product_id, SUM(quantity) AS total_sales ' + 
+		'FROM order_details GROUP BY product_id ORDER BY total_sales DESC) sales ' + 
+		'WHERE p.product_id = sales.product_id LIMIT ?,?', [_left, pageSize]);
+	Promise.all([q1, q2]).then(values => {
+		let new_data = {
+			pageNo: pageNo,
+			pageSize: pageSize,
+			totalPage: Math.ceil(values[0].results[0].totalCounts / pageSize),
+			lists: values[1].results
+		};
+		res.json(formater({code:'0', data:new_data}));	
+	})
 });
 // 获取store中所有产品列表
 router.post('/getProducts/all', (req, res, next) => {
-
+	let _user = req.body;
+	let pageNo = _user.pageNo || 1;
+	let pageSize = _user.pageSize || 50;
+	let _left = (pageNo - 1) * pageSize;
+	let q1 = query('SELECT COUNT(*) AS totalCounts FROM products', '');
+	let q2 = query('SELECT * FROM products LIMIT ?,?', [_left, pageSize]);
+	Promise.all([q1, q2]).then(values => {
+		let new_data = {
+			pageNo: pageNo,
+			pageSize: pageSize,
+			totalPage: Math.ceil(values[0].results[0].totalCounts / pageSize),
+			lists: values[1].results
+		};
+		res.json(formater({code:'0', data:new_data}));
+	})
 });
 // 获取store中自营的产品列表
 router.post('/getProducts/self', (req, res, next) => {
-
+	let _user = req.body;
+	let pageNo = _user.pageNo || 1;
+	let pageSize = _user.pageSize || 50;
+	let _left = (pageNo - 1) * pageSize;
+	let q1 = query('SELECT COUNT(*) AS totalCounts FROM products WHERE is_self = 0', '');
+	let q2 = query('SELECT * FROM products WHERE is_self = 0 LIMIT ?,?', [_left, pageSize])
+	Promise.all([q1, q2]).then(values => {
+		let new_data = {
+			pageNo: pageNo,
+			pageSize: pageSize,
+			totalPage: Math.ceil(values[0].results[0].totalCounts / pageSize),
+			lists: values[1].results
+		};
+		res.json(formater({code:'0', data:new_data}));
+	})
 });
-// 登录用户将商品加入购物车
+// 登录用户将商品加入购物车(限制为100条商品记录)
 router.post('/addToCart', verify_token, (req, res, next) => {
 	let _user = req.body;
+	let user_id = req.api_user.data.user_id;
 	let product_id = _user.product_id;
 	let product_quantity = parseInt(_user.quantity);
-	if(!product_id) {
-		return res.json(formater({code:'0', desc:'请提供产品id!'}));
+	if(!product_id || !product_quantity) {
+		return res.json(formater({code:'0', desc:'请提供产品id和产品数量!'}));
 	} else {
-		query('SELECT SUM(stocks) AS stocks FROM inventories WHERE product_id = ?', [product_id])
+		query('SELECT SUM(stocks) AS total_stocks FROM inventories WHERE product_id = ?', [product_id])
 			.then(data => {
 				if(data.err) {
 					console.log(data.err);
 					return res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
 				} else {
-					if(stocks >= product_quantity) {
-						query('INSERT INTO carts SET product_id = ?, product_quantity = ?', [product_id, product_quantity])
+					if(data.results[0].total_stocks >= product_quantity) {
+						// 产品是否已经在购物车中
+						query('SELECT product_id, product_quantity FROM carts WHERE user_id = ? AND product_id = ?', [user_id, product_id])
 							.then(data => {
 								if(data.err) {
 									console.log(data.err);
 									return res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
 								} else {
-									res.json(formater({code:'0', desc:'成功将商品加入购物车!'}));
+									if(data.results.length === 0) {
+										// 购物车中不存在该产品则新增
+										query('INSERT INTO carts SET user_id = ?, product_id = ?, product_quantity = ?', [user_id, product_id, product_quantity])
+											.then(data => {
+												if(data.err) {
+													console.log(data.err);
+													return res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+												} else {
+													res.json(formater({code:'0', desc:'成功将商品加入购物车!'}));
+												}
+											})
+									} else {
+										// 购物车中存在该商品
+										query('UPDATE carts SET product_quantity = ? WHERE product_id = ? AND user_id = ?', 
+											[data.results[0].product_quantity + product_quantity, product_id, user_id])
+											.then(data => {
+												res.json(formater({code:'0', desc:'购物车中已有该商品，成功更新库存!'}));
+											})
+									}
 								}
 							})
 					} else {
@@ -789,11 +863,54 @@ router.post('/addToCart', verify_token, (req, res, next) => {
 });
 // 登录用户获取购物车中的所有商品列表
 router.post('/getProductsInCart', verify_token, (req, res, next) => {
-	
+	//获取每件商品的数量，跟库存对比，如果大于库存，则返回实际库存
+	let _user = req.body;
+	let user_id = req.api_user.data.user_id;
+	let pageNo = _user.pageNo || 1;
+	let pageSize = _user.pageSize || 50;
+	let _left = (pageNo - 1) * pageSize;
+	query('SELECT c.user_id, c.product_id, c.product_quantity, s.stock FROM carts c, ' + 
+		'(SELECT product_id, SUM(stocks) AS stock FROM inventories GROUP BY product_id) s ' + 
+		' WHERE c.product_id = s.product_id AND c.user_id = ? LIMIT ?,?', [user_id, _left, pageSize])
+		.then(data =>{
+			if(data.err) {
+					console.log(data.err);
+					return res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+				} else {
+					res.json(formater({code:'0', data:data.results}));
+				}
+		})
 });
 //用户移除或修改购物车产品的数量
 router.post('/removeFromCart', verify_token, (req, res, next) => {
-
+	let _user = req.body;
+	let user_id = req.api_user.data.user_id;
+	let product_id = _user.product_id;
+	if(!product_id) {
+		return res.json(formater({code:'0', desc:'请提供产品id!'}));
+	} else {
+		query('SELECT product_id, product_quantity FROM carts WHERE user_id = ? AND product_id = ?', [user_id, product_id])
+			.then(data => {
+				if(data.err) {
+					console.log(data.err);
+					return res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+				} else {
+					if(data.results.length === 0) {
+						return res.json(formater({code:'0', desc:'该用户的购物车中不存在该商品！'}));
+					} else {
+						query('DELETE FROM carts WHERE user_id = ? AND product_id = ?', [user_id, product_id])
+							.then(data => {
+								if(data.err) {
+									console.log(data.err);
+									return res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+								} else {
+									res.json(formater({code:'0', desc:'成功从购物车删除该商品!'}));
+								}
+							})
+					}
+				}
+			})
+	}
 });
 // 获取单件商品的基本信息
 router.post('/getProductDetails', (req, res, next) => {
@@ -945,8 +1062,89 @@ router.post('/addProductImages', verify_token, (req, res, next) => {
 		}
 	}
 });
+// 修改用户收货地址
+router.post('/updateUserAccount/delivery', verify_token, (req, res, next) => {
+	let _user = req.body;
+	let user_id = req.api_user.data.user_id;
+	let delivery_id = _user.delivery_id;
+	let post = {
+		delivery_address:_user.delivery_address,
+		delivery_province:_user.delivery_province,
+		delivery_city:_user.delivery_city,
+		delivery_town:_user.delivery_town,
+		consignee:_user.consignee,
+		consignee_phone:_user.consignee_phone
+	};
+	if(delivery_id) {
+		query('SELECT delivery_id FROM deliveries WHERE delivery_id = ?', [delivery_id])
+			.then(data => {
+				if(data.err) {
+					console.log(data.err);
+					return res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+				} else {
+					if(data.results.length === 0) {
+						return res.json(formater({code:'0',desc:'该id对应的收货地址不存在，请确定是要修改已有收货地址还是新增收货地址，新增的话不需要提供id字段！'}));
+					} else {
+						query('UPDATE deliveries SET delivery_address = ?, delivery_province = ?, delivery_city = ?, ' + 
+							'delivery_town = ?, consignee = ?, consignee_phone = ? WHERE delivery_id = ?', [post.delivery_address, post.delivery_province, 
+							post.delivery_city, post.delivery_town, post.consignee, post.consignee_phone, delivery_id])
+							.then(data => {
+								if(data.err) {
+									console.log(data.err);
+									return res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+								} else {
+									res.json(formater({code:'0', desc:'收货地址修改成功！'}));
+								}
+						})
+					}
+				}
+		})
+	} else {
+		query('INSERT INTO deliveries SET ?', [post])
+			.then(data => {
+				if(data.err) {
+					console.log(data.err);
+					return res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+				} else {
+					return data.results.insertId;
+				}
+			})
+			.then(insertId => {
+				query('INSERT INTO delivery_address SET ?',[{user_id: user_id, delivery_id: insertId}])
+					.then(data => {
+						if(data.err) {
+							console.log(data.err);
+							return res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+						} else {
+							res.json(formater({code:'0', desc:'收货地址新增成功！'}));
+						}
+					})
+			})
+	}
+});
+// 获取用户收货地址
+router.post('/getDeliveryAddress', verify_token, (req, res, next) => {
+	let _user = req.body;
+	let user_id = req.api_user.data.user_id;
+	let pageNo = _user.pageNo || 1;
+	let pageSize = _user.pageSize || 50;
+	let _left = (pageNo - 1) * pageSize;
+	query('SELECT d.* FROM deliveries d, (SELECT delivery_id FROM delivery_address WHERE user_id = ?) a ' + 
+		'WHERE d.delivery_id = a.delivery_id LIMIT ?,?', [user_id, _left, pageSize])
+		.then(data => {
+			if(data.err) {
+				console.log(data.err);
+				return res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
+			} else {
+				res.json(formater({code:'0', data:data.results}));
+			}
+		})
+});
+
 // 用户提交订单
 router.post('/placeOrder', verify_token, (req, res, next) => {
+	let _user = req.body;
+	let user_id = req.api_user.data.user_id;
 
 });
 

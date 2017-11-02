@@ -431,7 +431,8 @@ response: {
 url: 'addToCart'
 post: data: {
 	token: '', // 如果是非登录用户将商品放入购物车，则用localStorage在本地记住就好
-	product_id: ''
+	product_id: '',
+	product_quantity:'' //如果是删减则传负数，比如用户删减了2件，则传-2
 }
 
 27. 用户获取购物车中的所有商品列表
@@ -777,3 +778,5 @@ post: data: {
 }
 
 43.用户移除或修改购物车产品的数量
+
+44.获取用户收货地址

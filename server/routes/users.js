@@ -25,8 +25,6 @@ router.post('/register', function(req, res, next) {
 	let _user = req.body;
 	let md5 = crypto.createHash("md5");
 	let post = {
-		first_name : _user.first_name,
-		last_name : _user.last_name,
 		user_name : _user.user_name,
 		email : _user.email,
 		password : _user.password
@@ -40,7 +38,7 @@ router.post('/register', function(req, res, next) {
 	if(!post.password) {
 		return res.json(formater({code:'1', desc:'密码不能为空'}));
 	} else {
-		post.password = md5.update(post.password).digest("hex")
+		//post.password = md5.update(post.password).digest("hex")
 	}
 	query('SELECT * FROM users WHERE email = ?', [post.email])
 		.then(function(data) {
@@ -49,17 +47,10 @@ router.post('/register', function(req, res, next) {
 				return res.json(formater({code:'1', desc:'使用该邮件注册的用户已经存在'}));
 			} else {
 				query('INSERT INTO users SET ?', [post])
-					.then(function() {
-						query('SELECT * FROM users WHERE email = ?', [post.email])
-							.then(function(data) {
-								res.json(formater({code:'0', data:data.results[0]}));
-							})
+					.then(data => {
+						res.json(formater({code:'0', desc:'注册成功！', data:{user_id:data.results.insertId}}))
 					})
 			}
-		})
-		.catch(function(error) {
-			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
-			throw error;
 		});
 });
 // 用户登录
@@ -89,10 +80,6 @@ router.post('/login', function(req, res, next) {
 	  	} else {
 	  		res.json(formater({code:'1', desc:'密码错误！'}))
 	  	}
-		})
-		.catch(function(error) {
-			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
-			throw error;
 		});
 });
 // 修改用户信息
@@ -122,15 +109,7 @@ router.post('/updateUserAccount/info', verify_token, (req, res, next) => {
 		 [post.image_md5, post.email, post.user_name, post.personal_site,
 				post.wechat, post.address, post.bio, post.province, post.city, post.town, post.user_id])
 		.then(function(data) {
-			if(data.err) {
-				console.log(data.err);
-				return res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
-			}
-			res.json(formater({code:'0', desc:'修改成功！'}))
-		})
-		.catch(function(error) {
-			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
-			throw error;
+			res.json(formater({code:'0', desc:'用户信息修改成功！'}))
 		});
 });
 // 修改用户密码
@@ -146,17 +125,14 @@ router.post('/updateUserAccount/password', verify_token, (req, res, next) => {
 			if(data.results.length === 0) {
 				console.log('user not existed.');
 				return res.json(formater({code:'1', desc:'该用户不存在！'}));
+				next();
 			}
 		})
 		.then(function() {
 			query('UPDATE users SET password = ? WHERE user_id = ?', [post.password, post.user_id])
 				.then(function(data) {
-					res.json(formater({code:'0', desc:'修改成功！'}));
+					res.json(formater({code:'0', desc:'用户密码修改成功！'}));
 				})
-		})
-		.catch(function(error) {
-			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
-			throw error;
 		});
 });
 // 删除账户, 用户存储在其他表格的信息，如添加的应用、邮件设置、关注的category和摄像师等资料，也需要删除。外键的删除规则
@@ -168,15 +144,11 @@ router.all('/updateUserAccount/delete', verify_token, (req, res, next) => {
 	query('DELETE FROM users WHERE user_id = ?', [post.user_id])
 		.then(function(data) {
 			if(data.results.affectedRows === 1) {
-	  		res.json(formater({code:'0', desc:'删除成功！'}));
+	  		res.json(formater({code:'0', desc:'账户删除成功！'}));
 	  	} else {
 	  		console.log('user not existed.');
 	  		res.json(formater({code:'1', desc:'该用户不存在！'}));
 	  	}
-		})
-		.catch(function(error) {
-			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
-			throw error;
 		});
 });
 // 修改邮件设置
@@ -189,17 +161,22 @@ router.post('/updateUserAccount/emailSettings', verify_token, (req, res, next) =
 		let s = [user_id, setting];
 		user_settings.push(s);
 	}
-	query('DELETE FROM user_email WHERE user_id = ?', [user_id])
-		.then(function() {
-			query('INSERT INTO user_email(user_id, settings_id) VALUES ?', [user_settings])
-				.then(function(data) {
-					res.json(formater({code:'0', desc:'邮件设置成功！'}));
-				})
+	query('SELECT user_id FROM users WHERE user_id = ?', [user_id])
+		.then(data => {
+			if(data.results.length === 0) {
+				return res.json(formater({code:'1', desc:'该用户不存在！'}));
+				next();
+			}
 		})
-		.catch(function(error) {
-			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
-			throw error;
-		});
+		.then(() => {
+			query('DELETE FROM user_email WHERE user_id = ?', [user_id])
+				.then(function() {
+					query('INSERT INTO user_email(user_id, settings_id) VALUES ?', [user_settings])
+						.then(function(data) {
+							res.json(formater({code:'0', desc:'邮件设置成功！'}));
+						})
+				});
+		})
 });
 // 用户注册成为developer
 router.post('/updateUserAccount/developer', verify_token, (req, res, next) => {
@@ -220,10 +197,6 @@ router.post('/updateUserAccount/developer', verify_token, (req, res, next) => {
 						res.json(formater({code:'0', desc:'开发者注册成功！'}));
 					})
 			}
-		})
-		.catch(function(error) {
-			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
-			throw error;
 		});
 });
 // 获取用户连接的应用
@@ -237,7 +210,6 @@ router.all('/getUserApplication', verify_token, (req, res, next) => {
 	Promise.all([q1]).then(values => {
 		query('SELECT * FROM (SELECT * FROM applications WHERE user_id = ?) a LIMIT ?,?', [user_id, _left, pageSize])
 			.then(data => {
-				console.log(data)
 				let new_data = {
 					pageNo: pageNo,
 					pageSize: pageSize,
@@ -246,11 +218,7 @@ router.all('/getUserApplication', verify_token, (req, res, next) => {
 				};
 				res.json(formater({code:'0', data:new_data}));
 			})
-	})
-	.catch(function(error) {
-			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
-			throw error;
-		});
+	});
 });
 // 删除用户图片
 router.all('/deleteUserPhoto', verify_token, (req, res, next) => {
@@ -262,18 +230,22 @@ router.all('/deleteUserPhoto', verify_token, (req, res, next) => {
 	if(!post.image_id) {
 		return res.json(formater({code:'0', desc:'请提供所要删除图片的id！'}));
 	}
-	query('DELETE FROM images WHERE image_id = ?', [post.image_id])
-		.then(function(data) {
-			if(data.results.affectedRows === 1) {
-				res.json(formater({code:'0', desc:'图片删除成功！'}));
-			} else {
-				res.json(formater({code:'0', desc:'图片不存在！'}));
+	query('SELECT image_id FROM images WHERE image_id = ? AND user_id = ?', [post.image_id, user_id])
+		.then(data => {
+			if(data.results.length === 0) {
+				return res.json(formater({code:'0', desc:'该图片不属于该用户！'}));
 			}
 		})
-		.catch(function(error) {
-			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
-			throw error;
-		});
+		.then(() => {
+			query('DELETE FROM images WHERE image_id = ?', [post.image_id])
+				.then(function(data) {
+					if(data.results.affectedRows === 1) {
+						res.json(formater({code:'0', desc:'图片删除成功！'}));
+					} else {
+						res.json(formater({code:'0', desc:'图片不存在！'}));
+					}
+				});
+		})
 });
 // 用户添加应用
 router.post('/addNewApp', verify_token, (req, res, next) => {
@@ -303,21 +275,17 @@ router.post('/addNewApp', verify_token, (req, res, next) => {
 							res.json(formater({code:'0', desc:'添加应用成功！'}));
 						})
 				})
-		})
-		.catch(function(error) {
-			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
-			throw error;
 		});
 });
 // 获取给用户标注的图片
 router.all('/getUntagedPhoto', (req, res, next) => {
 	query('SELECT * FROM images WHERE enough_tags = "1" LIMIT 1', '')
 		.then(function(data) {
-			res.json(formater({code:'0', data: data.results[0]}));
-		})
-		.catch(function(error) {
-			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
-			throw error;
+			res.json(formater({code:'0', data:{
+				image_id: data.results[0].image_id,
+				image_md5: data.results[0].image_md5,
+				image_tags: data.results[0].image_tags
+			}}));
 		});
 });
 // 提交用户对图片的标注结果
@@ -340,10 +308,6 @@ router.post('/updatePhotoTag', (req, res, next) => {
 				.then(function() {
 					res.json(formater({code:'0', desc:'标签更新成功！'}));
 				})
-		})
-		.catch(function(error) {
-			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
-			throw error;
 		});
 });
 // 更新用户关注的摄影师
@@ -362,10 +326,6 @@ router.post('/updatePhotographers', verify_token, (req, res, next) => {
 				.then(function(data) {
 					res.json(formater({code:'0', desc:'摄影师列表更新成功！'}));
 				})
-		})
-		.catch(function(error) {
-			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
-			throw error;
 		});
 });
 // 获取推荐的摄影师
@@ -375,11 +335,7 @@ router.all('/getPhotographers', (req, res, next) => {
 				' FROM relationships GROUP BY user_id ORDER BY follower_nums DESC LIMIT 0,25) a WHERE a.user_id = users.user_id', '')
 		.then(function(data) {
 			res.json(formater({code:'0', data: data.results}));
-	})
-	.catch(function(error) {
-			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
-			throw error;
-		});
+	});
 });
 // 关键字搜索
 router.all('/search', (req, res, next) => {
@@ -400,21 +356,13 @@ router.all('/search', (req, res, next) => {
 			lists: values[1].results
 		};
 		res.json(formater({code:'0', data:response}));
-	})
-	.catch(function(error) {
-			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
-			throw error;
-		});
+	});
 });
 // 获取所有类别
 router.all('/getCategories', (req, res, next) => {
 	query('SELECT * FROM categories', '')
 		.then(function(data) {
 			res.json(formater({code:'0', data: data.results}));
-		})
-	.catch(function(error) {
-			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
-			throw error;
 		});
 });
 // 更新用户关注的类别
@@ -433,10 +381,6 @@ router.post('/updateUserCategories', verify_token, (req, res, next) => {
 				.then(function(data) {
 					res.json(formater({code:'0', desc:'用户关注的类别更新成功！'}));
 				})
-		})
-		.catch(function(error) {
-			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
-			throw error;
 		});
 });
 // 获取最新图片列表
@@ -455,11 +399,7 @@ router.all('/getList/new', (req, res, next) => {
 				lists: values[1].results
 			};
 			res.json(formater({code:'0', data:new_data}))
-	})
-	.catch(function(error) {
-			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
-			throw error;
-		});
+	});
 });
 // 获取最热图片列表
 router.all('/getList/hot', (req, res, next) => {
@@ -477,11 +417,7 @@ router.all('/getList/hot', (req, res, next) => {
 				lists: values[1].results
 			};
 			res.json(formater({code:'0', data:new_data}))
-	})
-	.catch(function(error) {
-			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
-			throw error;
-		});
+	});
 });
 // 已登录用户，获取其所关注的作者的图片列表
 router.all('/getList/following', verify_token, (req, res, next) => {
@@ -500,11 +436,7 @@ router.all('/getList/following', verify_token, (req, res, next) => {
 				lists: values[1].results
 			};
 			res.json(formater({code:'0', data:new_data}));
-	})
-	.catch(function(error) {
-			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
-			throw error;
-		});
+	});
 });
 // 获取所有图片集
 router.all('/getCollection/all', (req, res, next) => {
@@ -523,10 +455,6 @@ router.all('/getCollection/all', (req, res, next) => {
 			lists: values[1].results
 		};
 		res.json(formater({code:'0', data:new_data}));
-	})
-	.catch(function(error) {
-			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
-			throw error;
 	});
 });
 // 获取用户自己的图片集
@@ -546,10 +474,6 @@ router.all('/getCollection/user', verify_token, (req, res, next) => {
 			lists: values[1].results
 		};
 		res.json(formater({code:'0', data:new_data}));
-	})
-	.catch(function(error) {
-			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
-			throw error;
 	});
 });
 // 获取每个图片集里面的图片
@@ -599,10 +523,6 @@ router.post('/uploadUserPhoto', verify_token, (req, res, next) => {
 					.then(values => {
 						res.json(formater({code:'0', desc:'图片上传成功！', data:{collection_id: data.results.insertId}}));
 					})
-			})
-			.catch(function(error) {
-				res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
-				throw error;
 			});
 	} else {
 		query('SELECT collection_id FROM collections WHERE collection_id = ?', [post.collection_id])
@@ -615,10 +535,6 @@ router.post('/uploadUserPhoto', verify_token, (req, res, next) => {
 						res.json(formater({code:'0', desc:'图片上传成功！', data:{collection_id: post.collection_id}}));
 					})
 				}
-			})
-			.catch(function(error) {
-				res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
-				throw error;
 			});
 	}
 });

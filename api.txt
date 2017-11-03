@@ -1,5 +1,5 @@
 baseUrl = 'http://localhost:3000'
-support methods: post, get(有些考虑到参数较多，故不支持get)
+support methods: post, all(有些考虑到参数较多，故只支持post)
 response 的结构：
 {
 	success: true/false,
@@ -201,13 +201,10 @@ url: 'updateUserAccount/info'
 post: data: {
 	token: '用户的token',
 	image_md5: '', //以md5的格式
-	first_name: '',
-	last_name: '',
 	email: '',
 	user_name: '',
 	personal_site: '',
-	instagram: '',
-	twitter: '',
+	wechat: '',
 	location: '',
 	bio: '',
 	province: '',
@@ -279,10 +276,10 @@ response: {
 }
 
 16. 用户修改邮件设置
-url: 'updateUserAccount/developer'
+url: 'updateUserAccount/emailSettings'
 post: data: {
 	token: 'token',
-	settings: '1,2' // 设置为true的id，之间用逗号隔开
+	email_settings: '1,2' // 设置为true的id，之间用逗号隔开
 }
 response: {
 	success: true,
@@ -311,7 +308,7 @@ post: data: {
 	token:'token',
 	app_name: '',
 	app_desc: '',
-	redirect_url:'',
+	callback_url:'',
 	permissions: '1,2' // id 之间用逗号隔开
 }
 response: {
@@ -329,7 +326,8 @@ response: {
 	desc: '',
 	data: {
 		image_id: '',
-		image_md5: ''
+		image_md5: '',
+		image_tags:''
 	}
 }
 
@@ -507,56 +505,6 @@ response: {
 				desc: ''
 			}
 		] //正文中每张图片及其对应的文字
-	}
-}
-
-27-2. 用户提交订单步骤1
-url: 'placeOrder'
-post: data: {
-	customer_email:'',
-	shipping_address: {
-		firstName:'',
-		lastName:'',
-		company: '',
-		address: '',
-		apt:'',
-		city: '',
-		country: '',
-		province: '',
-		postal_code: '',
-		phone:''
-	}
-}
-response: {
-	success: true,
-	code: 0, // 0代表成功，其他数字结合desc理解
-	desc: '',
-	data: {
-		customer_info: {
-			firstName:'',
-			lastName:'',
-			email: '',
-			phone: ''
-		},
-		logistics_info: {
-			from: '',
-			to: '',
-			shipping_price: '',
-			estimate_shipping_days: '',
-		},
-		products_info:{
-			basic_info: {
-				total_quantity: '',
-				total_price: ''
-			},
-			products_list:[
-				{
-					name: '',
-					price: '',
-					quantity: ''
-				}
-			]
-		}
 	}
 }
 
@@ -778,8 +726,40 @@ post: data: {
 }
 
 43.用户移除或修改购物车产品的数量
+url: '/removeFromCart'
+post: data: {
+	token:'',
+	product_id:'',
+}
+{
+	success: true,
+	code: 0,
+	desc: '',
+	data: {
+		delivery_id:'',
+		delivery_address:'',
+		delivery_province:'',
+		delivery_city:'',
+		delivery_town:'',
+		consignee:'',
+		consignee_phone:''
+	}
+}
 
 44.获取用户收货地址
+url: '/getDeliveryAddress'
+post: data: {
+	token:'',
+	
+}
+{
+	success: true,
+	code: 0,
+	desc: '',
+	data: {
+		
+	}
+}
 
 45.用户提交订单
 url:'/placeOrder'

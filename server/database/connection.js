@@ -16,6 +16,10 @@ module.exports=function(sql, data){
       		conn.query(sql, data, function(err,results,fields){
 	          //释放连接
 	          conn.release();
+            if(err) {
+              console.log(err);
+              return;
+            }
 	          //传递Promise回调对象
 	          resolve({"err":err, "results":results, "fields":fields});
 	        });
@@ -23,6 +27,10 @@ module.exports=function(sql, data){
       		conn.query(sql, function(err,results,fields){
 	          //释放连接
 	          conn.release();
+            if(err) {
+              console.log(err);
+              return;
+            }
 	          //传递Promise回调对象
 	          resolve({"err":err, "results":results, "fields":fields});
 	        });

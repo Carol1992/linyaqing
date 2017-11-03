@@ -161,7 +161,7 @@ router.post('/updateUserAccount/password', verify_token, (req, res, next) => {
 });
 // 删除账户, 用户存储在其他表格的信息，如添加的应用、邮件设置、关注的category和摄像师等资料，也需要删除。外键的删除规则
 // 设置为层叠(cascade)
-router.post('/updateUserAccount/delete', verify_token, (req, res, next) => {
+router.all('/updateUserAccount/delete', verify_token, (req, res, next) => {
 	let post = {
 		user_id: req.api_user.data.user_id
 	};
@@ -227,11 +227,11 @@ router.post('/updateUserAccount/developer', verify_token, (req, res, next) => {
 		});
 });
 // 获取用户连接的应用
-router.post('/getUserApplication', verify_token, (req, res, next) => {
+router.all('/getUserApplication', verify_token, (req, res, next) => {
 	let _user = req.body;
 	let user_id = req.api_user.data.user_id;
-	let pageNo = _user.pageNo || 1;
-	let pageSize = _user.pageSize || 50;
+	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
+	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
 	let q1 = query('SELECT COUNT(*) AS totalPage FROM applications WHERE user_id = ?', [user_id]);
 	Promise.all([q1]).then(values => {
@@ -253,18 +253,17 @@ router.post('/getUserApplication', verify_token, (req, res, next) => {
 		});
 });
 // 删除用户图片
-router.post('/deleteUserPhoto', verify_token, (req, res, next) => {
+router.all('/deleteUserPhoto', verify_token, (req, res, next) => {
 	let _user = req.body;
 	let user_id = req.api_user.data.user_id;
 	let post = {
-		image_id: _user.image_id
+		image_id: _user.image_id || req.query.image_id
 	};
 	if(!post.image_id) {
 		return res.json(formater({code:'0', desc:'请提供所要删除图片的id！'}));
 	}
 	query('DELETE FROM images WHERE image_id = ?', [post.image_id])
 		.then(function(data) {
-			console.log(data.results);
 			if(data.results.affectedRows === 1) {
 				res.json(formater({code:'0', desc:'图片删除成功！'}));
 			} else {
@@ -311,7 +310,7 @@ router.post('/addNewApp', verify_token, (req, res, next) => {
 		});
 });
 // 获取给用户标注的图片
-router.post('/getUntagedPhoto', (req, res, next) => {
+router.all('/getUntagedPhoto', (req, res, next) => {
 	query('SELECT * FROM images WHERE enough_tags = "1" LIMIT 1', '')
 		.then(function(data) {
 			res.json(formater({code:'0', data: data.results[0]}));
@@ -370,7 +369,7 @@ router.post('/updatePhotographers', verify_token, (req, res, next) => {
 		});
 });
 // 获取推荐的摄影师
-router.post('/getPhotographers', (req, res, next) => {
+router.all('/getPhotographers', (req, res, next) => {
 	query('SELECT users.user_id, users.user_name, users.image_md5, users.instagram, ' + 
 			'a.follower_nums FROM users, (SELECT user_id, COUNT(follower_id) AS follower_nums ' + 
 				' FROM relationships GROUP BY user_id ORDER BY follower_nums DESC LIMIT 0,25) a WHERE a.user_id = users.user_id', '')
@@ -383,9 +382,9 @@ router.post('/getPhotographers', (req, res, next) => {
 		});
 });
 // 关键字搜索
-router.post('/search', (req, res, next) => {
+router.all('/search', (req, res, next) => {
 	let _user = req.body;
-	let keyword = _user.keyword;
+	let keyword = _user.keyword || req.query.keyword;
 	let q1 = query('SELECT COUNT(DISTINCT user_id) AS all_users, COUNT(DISTINCT image_id) AS all_images, ' + 
 		'COUNT(DISTINCT collection_id) AS all_collections ' + 
 		'FROM images WHERE image_tags LIKE "%' + keyword + '%"', '');
@@ -408,7 +407,7 @@ router.post('/search', (req, res, next) => {
 		});
 });
 // 获取所有类别
-router.post('/getCategories', (req, res, next) => {
+router.all('/getCategories', (req, res, next) => {
 	query('SELECT * FROM categories', '')
 		.then(function(data) {
 			res.json(formater({code:'0', data: data.results}));
@@ -441,10 +440,10 @@ router.post('/updateUserCategories', verify_token, (req, res, next) => {
 		});
 });
 // 获取最新图片列表
-router.post('/getList/new', (req, res, next) => {
+router.all('/getList/new', (req, res, next) => {
 	let _user = req.body;
-	let pageNo = _user.pageNo || 1;
-	let pageSize = _user.pageSize || 50;
+	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
+	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
 	let q1 = query('SELECT COUNT(*) AS totalPage FROM images', '');
 	let q2 = query('SELECT * FROM (SELECT * FROM images ORDER BY created_time DESC) a LIMIT ?,?', [_left, pageSize]);
@@ -463,10 +462,10 @@ router.post('/getList/new', (req, res, next) => {
 		});
 });
 // 获取最热图片列表
-router.post('/getList/hot', (req, res, next) => {
+router.all('/getList/hot', (req, res, next) => {
 	let _user = req.body;
-	let pageNo = _user.pageNo || 1;
-	let pageSize = _user.pageSize || 50;
+	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
+	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
 	let q1 = query('SELECT COUNT(*) AS totalPage FROM images', '');
 	let q2 = query('SELECT * FROM (SELECT * FROM images ORDER BY liked DESC) a LIMIT ?,?', [_left, pageSize]);
@@ -485,11 +484,11 @@ router.post('/getList/hot', (req, res, next) => {
 		});
 });
 // 已登录用户，获取其所关注的作者的图片列表
-router.post('/getList/following', verify_token, (req, res, next) => {
+router.all('/getList/following', verify_token, (req, res, next) => {
 	let _user = req.body;
 	let user_id = req.api_user.data.user_id;
-	let pageNo = _user.pageNo || 1;
-	let pageSize = _user.pageSize || 50;
+	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
+	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
 	let q1 = query('SELECT COUNT(*) AS totalPage FROM images, (SELECT follower_id FROM relationships WHERE user_id = ?) a WHERE images.user_id = a.follower_id', [user_id]);
 	let q2 = query('SELECT * FROM (SELECT * FROM images, (SELECT follower_id FROM relationships WHERE user_id = ?) a WHERE images.user_id = a.follower_id) b LIMIT ?,?', [user_id, _left, pageSize]);
@@ -508,10 +507,10 @@ router.post('/getList/following', verify_token, (req, res, next) => {
 		});
 });
 // 获取所有图片集
-router.post('/getCollection/all', (req, res, next) => {
+router.all('/getCollection/all', (req, res, next) => {
 	let _user = req.body;
-	let pageNo = _user.pageNo || 1;
-	let pageSize = _user.pageSize || 50;
+	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
+	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
 	let q1 = query('SELECT * FROM collections');
 	let q2 = query('SELECT * FROM collections LIMIT ?,?', [_left, pageSize]);
@@ -531,11 +530,11 @@ router.post('/getCollection/all', (req, res, next) => {
 	});
 });
 // 获取用户自己的图片集
-router.post('/getCollection/user', verify_token, (req, res, next) => {
+router.all('/getCollection/user', verify_token, (req, res, next) => {
 	let _user = req.body;
 	let user_id = req.api_user.data.user_id;
-	let pageNo = _user.pageNo || 1;
-	let pageSize = _user.pageSize || 50;
+	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
+	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
 	let q1 = query('SELECT COUNT(collection_id) AS totalPage FROM images WHERE user_id = ? GROUP BY collection_id', [user_id]);
 	let q2 = query('SELECT * FROM (SELECT collection_id FROM images WHERE user_id = ? GROUP BY collection_id) a LIMIT ?,?', [user_id, _left, pageSize]);
@@ -554,12 +553,11 @@ router.post('/getCollection/user', verify_token, (req, res, next) => {
 	});
 });
 // 获取每个图片集里面的图片
-router.post('/getCollection/one', (req, res, next) => {
+router.all('/getCollection/one', (req, res, next) => {
 	let _user = req.body;
-	//let user_id = req.api_user.data.user_id;
-	let collection_id = _user.collection_id;
-	let pageNo = _user.pageNo || 1;
-	let pageSize = _user.pageSize || 50;
+	let collection_id = _user.collection_id || req.query.collection_id;
+	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
+	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
 	let q1 = query('SELECT COUNT(*) AS totalPage FROM images WHERE collection_id = ?', [collection_id]);
 	let q2 = query('SELECT * FROM (SELECT * FROM images WHERE collection_id = ?) a LIMIT ?,?', [collection_id, _left, pageSize]);
@@ -571,10 +569,6 @@ router.post('/getCollection/one', (req, res, next) => {
 			lists: values[1].results
 		};
 		res.json(formater({code:'0', data:new_data}));
-	})
-	.catch(function(error) {
-			res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
-			throw error;
 	});
 });
 // 用户上传图片
@@ -737,10 +731,10 @@ router.post('/changeStocks', verify_token, (req, res, next) => {
 	}
 });
 // 获取store中的最新产品列表
-router.post('/getProducts/new', (req, res, next) => {
+router.all('/getProducts/new', (req, res, next) => {
 	let _user = req.body;
-	let pageNo = _user.pageNo || 1;
-	let pageSize = _user.pageSize || 50;
+	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
+	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
 	let q1 = query('SELECT COUNT(*) AS totalCounts FROM products', '');
 	let q2 = query('SELECT * FROM products ORDER BY created_time DESC LIMIT ?,?', [_left, pageSize]);
@@ -755,10 +749,10 @@ router.post('/getProducts/new', (req, res, next) => {
 	})
 });
 // 获取store中的最热产品列表
-router.post('/getProducts/hot', (req, res, next) => {
+router.all('/getProducts/hot', (req, res, next) => {
 	let _user = req.body;
-	let pageNo = _user.pageNo || 1;
-	let pageSize = _user.pageSize || 50;
+	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
+	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
 	let q1 = query('SELECT COUNT(*) AS totalCounts FROM products', '');
 	let q2 = query('SELECT p.*, sales.total_sales FROM products p, (SELECT product_id, SUM(quantity) AS total_sales ' + 
@@ -775,10 +769,10 @@ router.post('/getProducts/hot', (req, res, next) => {
 	})
 });
 // 获取store中所有产品列表
-router.post('/getProducts/all', (req, res, next) => {
+router.all('/getProducts/all', (req, res, next) => {
 	let _user = req.body;
-	let pageNo = _user.pageNo || 1;
-	let pageSize = _user.pageSize || 50;
+	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
+	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
 	let q1 = query('SELECT COUNT(*) AS totalCounts FROM products', '');
 	let q2 = query('SELECT * FROM products LIMIT ?,?', [_left, pageSize]);
@@ -793,10 +787,10 @@ router.post('/getProducts/all', (req, res, next) => {
 	})
 });
 // 获取store中自营的产品列表
-router.post('/getProducts/self', (req, res, next) => {
+router.all('/getProducts/self', (req, res, next) => {
 	let _user = req.body;
-	let pageNo = _user.pageNo || 1;
-	let pageSize = _user.pageSize || 50;
+	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
+	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
 	let q1 = query('SELECT COUNT(*) AS totalCounts FROM products WHERE is_self = 0', '');
 	let q2 = query('SELECT * FROM products WHERE is_self = 0 LIMIT ?,?', [_left, pageSize])
@@ -862,24 +856,28 @@ router.post('/addToCart', verify_token, (req, res, next) => {
 	}
 });
 // 登录用户获取购物车中的所有商品列表
-router.post('/getProductsInCart', verify_token, (req, res, next) => {
+router.all('/getProductsInCart', verify_token, (req, res, next) => {
 	//获取每件商品的数量，跟库存对比，如果大于库存，则返回实际库存
 	let _user = req.body;
 	let user_id = req.api_user.data.user_id;
-	let pageNo = _user.pageNo || 1;
-	let pageSize = _user.pageSize || 50;
+	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
+	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
-	query('SELECT c.user_id, c.product_id, c.product_quantity, s.stock FROM carts c, ' + 
+	let q1 = query('SELECT COUNT(*) AS totalCounts FROM(SELECT c.user_id, c.product_id, c.product_quantity, s.stock FROM carts c, ' + 
 		'(SELECT product_id, SUM(stocks) AS stock FROM inventories GROUP BY product_id) s ' + 
-		' WHERE c.product_id = s.product_id AND c.user_id = ? LIMIT ?,?', [user_id, _left, pageSize])
-		.then(data =>{
-			if(data.err) {
-					console.log(data.err);
-					return res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
-				} else {
-					res.json(formater({code:'0', data:data.results}));
-				}
-		})
+		' WHERE c.product_id = s.product_id AND c.user_id = ?) a', [user_id]);
+	let q2 = query('SELECT c.user_id, c.product_id, c.product_quantity, s.stock FROM carts c, ' + 
+		'(SELECT product_id, SUM(stocks) AS stock FROM inventories GROUP BY product_id) s ' + 
+		' WHERE c.product_id = s.product_id AND c.user_id = ? LIMIT ?,?', [user_id, _left, pageSize]);
+	Promise.all([q1, q2]).then(values => {
+		let new_data = {
+			pageNo: pageNo,
+			pageSize: pageSize,
+			totalPage: Math.ceil(values[0].results[0].totalCounts / pageSize),
+			lists: values[1].results
+		};
+		res.json(formater({code:'0', data:new_data}));
+	})
 });
 //用户移除或修改购物车产品的数量
 router.post('/removeFromCart', verify_token, (req, res, next) => {
@@ -913,9 +911,9 @@ router.post('/removeFromCart', verify_token, (req, res, next) => {
 	}
 });
 // 获取单件商品的基本信息
-router.post('/getProductDetails', (req, res, next) => {
+router.all('/getProductDetails', (req, res, next) => {
 	let _user = req.body;
-	let product_id = _user.product_id;
+	let product_id = _user.product_id || req.query.product_id;
 	if(!product_id) {
 		return res.json(formater({code:'0', desc:'请提供产品id!'}));
 	} else {
@@ -931,22 +929,16 @@ router.post('/getProductDetails', (req, res, next) => {
 	}
 });
 // 获取单件产品的所有图片
-router.post('/getAllImages/product', (req, res, next) => {
+router.all('/getAllImages/product', (req, res, next) => {
 	let _user = req.body;
-	let product_id = _user.product_id;
+	let product_id = _user.product_id || req.query.product_id;
 	if(!product_id) {
 		return res.json(formater({code:'0', desc:'请提供产品id!'}));
 	} else {
 		query('SELECT s.image_id, s.image_name, s.image_url, s.image_desc FROM store_images s, ' + 
 			'(SELECT a.image_id FROM product_image a WHERE a.product_id = ?) p WHERE s.image_id = p.image_id', [product_id])
 			.then(data => {
-				console.log(data);
-				if(data.err) {
-					console.log(data.err);
-					return res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
-				} else {
-					res.json(formater({code:'0', data:data.results}));
-				}
+				res.json(formater({code:'0', data:data.results}));
 			})
 	}
 });
@@ -1123,22 +1115,25 @@ router.post('/updateUserAccount/delivery', verify_token, (req, res, next) => {
 	}
 });
 // 获取用户收货地址
-router.post('/getDeliveryAddress', verify_token, (req, res, next) => {
+router.all('/getDeliveryAddress', verify_token, (req, res, next) => {
 	let _user = req.body;
 	let user_id = req.api_user.data.user_id;
-	let pageNo = _user.pageNo || 1;
-	let pageSize = _user.pageSize || 50;
+	let pageNo = _user.pageNo || +req.query.pageNo || 1;
+	let pageSize = _user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
-	query('SELECT d.* FROM deliveries d, (SELECT delivery_id FROM delivery_address WHERE user_id = ?) a ' + 
-		'WHERE d.delivery_id = a.delivery_id LIMIT ?,?', [user_id, _left, pageSize])
-		.then(data => {
-			if(data.err) {
-				console.log(data.err);
-				return res.json(formater({success:'false', code:'-1', desc:'sql operation error.'}));
-			} else {
-				res.json(formater({code:'0', data:data.results}));
-			}
-		})
+	let q1 = query('SELECT COUNT(*) AS totalCounts FROM (SELECT d.* FROM deliveries d, (SELECT delivery_id FROM delivery_address WHERE user_id = ?) a ' + 
+		'WHERE d.delivery_id = a.delivery_id) a', [user_id]);
+	let q2 = query('SELECT d.* FROM deliveries d, (SELECT delivery_id FROM delivery_address WHERE user_id = ?) a ' + 
+		'WHERE d.delivery_id = a.delivery_id LIMIT ?,?', [user_id, _left, pageSize]);
+	Promise.all([q1, q2]).then(values => {
+		let new_data = {
+			pageNo: pageNo,
+			pageSize: pageSize,
+			totalPage: Math.ceil(values[0].results[0].totalCounts / pageSize),
+			lists: values[1].results
+		};
+		res.json(formater({code:'0', data:new_data}));
+	})
 });
 
 // 用户提交订单

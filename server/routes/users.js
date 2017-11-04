@@ -993,6 +993,32 @@ router.post('/placeOrder', verify_token, (req, res, next) => {
 	})
 });
 
+// 用户给图片点赞
+router.post('/photoLike', (req, res, next) => {
+	let image_id = req.body.image_id;
+	let like = req.body.like;
+	if(like !== '0' && like !== '1') {
+		return res.json(formater({code:'0', desc:'参数错误！'}));
+	}
+	query('SELECT image_id, liked FROM images WHERE image_id = ?', [image_id])
+	.then(data => {
+		if(data.results.length === 0) {
+			return res.json(formater({code:'0', desc:'图片不存在！'}));
+		} else {
+			let liked = parseInt(data.results[0].liked);
+			if(like === '0') {
+				liked -= 1;
+			} else {
+				liked += 1;
+			}
+			query('UPDATE images SET liked = ? WHERE image_id = ?', [liked, image_id])
+			.then(data => {
+				res.json(formater({code:'0', desc:'点赞数更新成功！'}));
+			})
+		}
+	})
+});
+
 module.exports = router;
 
 

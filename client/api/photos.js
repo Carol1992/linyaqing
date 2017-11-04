@@ -180,5 +180,17 @@ module.exports = {
 		.catch(function (error) {
 		  console.log(error)
 		});	
+	},
+	photoLike () {
+		axios.post('/api/photoLike', {
+			image_id:'8',
+			like:'1' // 1代表喜欢该图片，0取消该喜欢
+		})
+		.then(function (response) {
+		  console.log(response)
+		})
+		.catch(function (error) {
+		  console.log(error)
+		});	
 	}
 }

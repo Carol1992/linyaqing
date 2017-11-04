@@ -769,3 +769,10 @@ post: data:{
 		},
 	]
 }
+
+46.用户给图片点赞
+url:'/photoLike'
+post: data: {
+	image_id:'',
+	like:1/0 // 1代表喜欢该图片，0取消该喜欢
+}

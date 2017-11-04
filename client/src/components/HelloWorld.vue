@@ -7,8 +7,8 @@
 <script>
 // import $ from 'jquery'
 import userOp from '../../api/user'
-// import storeOp from '../../api/store'
-// import photosOp from '../../api/photos'
+import storeOp from '../../api/store'
+import photosOp from '../../api/photos'
 export default {
   name: 'HelloWorld',
   data () {
@@ -54,91 +54,94 @@ export default {
       userOp.updatePhotoTag()
     },
     uploadPhotoToAliyun () {
-      userOp.uploadPhotoToAliyun()
+      photosOp.uploadPhotoToAliyun()
     },
     uploadProductImageToAliyun () {
-      userOp.uploadProductImageToAliyun()
+      photosOp.uploadProductImageToAliyun()
     },
     getProducts_new () {
-      userOp.getProducts.new()
+      storeOp.getProducts.new()
     },
     getProducts_hot () {
-      userOp.getProducts.hot()
+      storeOp.getProducts.hot()
     },
     getProducts_all () {
-      userOp.getProducts.all()
+      storeOp.getProducts.all()
     },
     getProducts_self () {
-      userOp.getProducts.self()
+      storeOp.getProducts.self()
     },
     addToCart () {
-      userOp.addToCart()
+      storeOp.addToCart()
     },
     getProductsInCart () {
-      userOp.getProductsInCart()
+      storeOp.getProductsInCart()
     },
     getProductDetails () {
-      userOp.getProductDetails()
+      storeOp.getProductDetails()
     },
     getCategories () {
-      userOp.getCategories()
+      photosOp.getCategories()
     },
     updateUserCategories () {
-      userOp.updateUserCategories()
+      photosOp.updateUserCategories()
     },
     getPhotographers () {
-      userOp.getPhotographers()
+      photosOp.getPhotographers()
     },
     updatePhotographers () {
-      userOp.updatePhotographers()
+      photosOp.updatePhotographers()
     },
     getAllImages () {
-      userOp.getAllImages()
+      storeOp.getAllImages()
     },
     search () {
-      userOp.search()
+      photosOp.search()
     },
     uploadProducts () {
-      userOp.uploadProducts()
+      storeOp.uploadProducts()
     },
     addProductImages () {
-      userOp.addProductImages()
+      storeOp.addProductImages()
     },
     removeFromCart () {
-      userOp.removeFromCart()
+      storeOp.removeFromCart()
     },
     getDeliveryAddress () {
-      userOp.getDeliveryAddress()
+      storeOp.getDeliveryAddress()
     },
     changeStocks () {
-      userOp.changeStocks()
+      storeOp.changeStocks()
     },
     uploadUserPhoto () {
-      userOp.uploadUserPhoto()
+      photosOp.uploadUserPhoto()
     },
     placeOrder () {
-      userOp.placeOrder()
+      storeOp.placeOrder()
     },
     updateUserAccount_delivery () {
-      userOp.updateUserAccount.delivery()
+      storeOp.updateUserAccount.delivery()
     },
     getCollection_all () {
-      userOp.getCollection.all()
+      photosOp.getCollection.all()
     },
     getCollection_user () {
-      userOp.getCollection.user()
+      photosOp.getCollection.user()
     },
     getCollection_one () {
-      userOp.getCollection.one()
+      photosOp.getCollection.one()
     },
     getList_new () {
-      userOp.getList.new()
+      photosOp.getList.new()
     },
     getList_hot () {
-      userOp.getList.hot()
+      photosOp.getList.hot()
     },
     getList_following () {
-      userOp.getList.following()
+      photosOp.getList.following()
+    },
+    photoLike () {
+      photosOp.photoLike()
     }
   },
   mounted () {
@@ -180,6 +183,7 @@ export default {
     // this.getList_new()
     // this.getList_hot()
     // this.getList_following()
+    // this.photoLike()
   }
 }
 </script>

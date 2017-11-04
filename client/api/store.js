@@ -64,7 +64,9 @@ module.exports = {
 	},
 	getProductsInCart () {
 		axios.post('/api/getProductsInCart', {
-			token:localStorage.token
+			token:localStorage.token,
+			pageNo:1,
+			pageSize:3
 		})
 		.then(function (response) {
 		  console.log(response)
@@ -140,7 +142,9 @@ module.exports = {
 	},
 	getDeliveryAddress () {
 		axios.post('/api/getDeliveryAddress', {
-			token:localStorage.token
+			token:localStorage.token,
+			pageNo:1,
+			pageSize:3
 		})
 		.then(function (response) {
 		  console.log(response)

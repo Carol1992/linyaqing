@@ -1,4 +1,23 @@
-1. 登录密码的加密方式采用RSA非对称加密
+0. 如何运行
+```js
+// 阿里云oss的accessKeyId和accessKeySecret，这是我的图片存储方案。
+// 不选择这种方案的话，可以更改routes/users.js中的两个api接口：uploadPhotoToAliyun, uploadProductImageToAliyun
+
+// cmd_1
+$ cd server
+$ npm install
+$ set DEBUG=server & npm start
+
+// cmd_2
+$ cd client
+$ npm install
+$ npm run dev
+
+// 线上访问(未部署)
+http://linyaqing.com
+```
+
+1. 登录密码的加密方式采用MD5加密
 2. 确定接口数据格式，即书写API文档
 3. 写接口并测试，给出测试文档
 4. 页面UI构建，使用iview框架

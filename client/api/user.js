@@ -97,6 +97,9 @@ module.exports = {
 			.catch(function (error) {
 			  console.log(error)
 			});
+		},
+		delivery () {
+
 		}
 	},
 	getUserApplication () {
@@ -188,25 +191,148 @@ module.exports = {
 	},
 	getProducts: {
 		new () {
+			axios.post('/api/getProducts/new', {
+				pageNo:1,
+				pageSize:3
+			})
+			.then(function (response) {
+			  console.log(response)
+			})
+			.catch(function (error) {
+			  console.log(error)
+			});
+		},
+		hot () {
+			axios.post('/api/getProducts/hot', {
+				pageNo:1,
+				pageSize:3
+			})
+			.then(function (response) {
+			  console.log(response)
+			})
+			.catch(function (error) {
+			  console.log(error)
+			});
+		},
+		all () {
+			axios.post('/api/getProducts/all', {
+				pageNo:1,
+				pageSize:3
+			})
+			.then(function (response) {
+			  console.log(response)
+			})
+			.catch(function (error) {
+			  console.log(error)
+			});
+		},
+		self () {
+			axios.post('/api/getProducts/self', {
+				pageNo:1,
+				pageSize:3
+			})
+			.then(function (response) {
+			  console.log(response)
+			})
+			.catch(function (error) {
+			  console.log(error)
+			});
+		}
+	},
+	addToCart () {
+		axios.post('/api/addToCart', {
+			token: localStorage.token, // 如果是非登录用户将商品放入购物车，则用localStorage在本地记住就好
+			product_id: 2,
+			quantity: 20 //如果是删减则传负数，比如用户删减了2件，则传-2
+		})
+		.then(function (response) {
+		  console.log(response)
+		})
+		.catch(function (error) {
+		  console.log(error)
+		});
+	},
+	getProductsInCart () {
+		axios.post('/api/getProductsInCart', {
+			token:localStorage.token
+		})
+		.then(function (response) {
+		  console.log(response)
+		})
+		.catch(function (error) {
+		  console.log(error)
+		});
+	},
+	getProductDetails () {
+		axios.post('/api/getProductDetails', {
+			product_id: 1
+		})
+		.then(function (response) {
+		  console.log(response)
+		})
+		.catch(function (error) {
+		  console.log(error)
+		});
+	},
+	getCategories () {
+
+	},
+	updateUserCategories () {
+
+	},
+	getPhotographers () {
+
+	},
+	updatePhotographers () {
+
+	},
+	getAllImages () {
+
+	},
+	uploadProducts () {
+
+	},
+	addProductImages () {
+
+	},
+	removeFromCart () {
+
+	},
+	getDeliveryAddress () {
+
+	},
+	changeStocks () {
+
+	},
+	uploadUserPhoto () {
+
+	},
+	placeOrder () {
+
+	},
+	getCollection: {
+		all () {
+
+		},
+		user () {
+
+		},
+		one () {
+
+		}
+	},
+	getList: {
+		new () {
 
 		},
 		hot () {
 
 		},
-		all () {
-
-		},
-		self () {
+		following () {
 
 		}
 	},
-	addToCart () {
+	search () {
 
-	},
-	getProductsInCart () {
-
-	},
-	getProductDetails () {
-		
 	}
 }

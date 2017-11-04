@@ -40,7 +40,7 @@ get: ?keyword='keyword'
 }
 
 2. 获取最热图片列表
-url: '/getList/trending'
+url: '/getList/hot'
 {
 	success: true,
 	code: 0,
@@ -163,8 +163,11 @@ get: ?token='用户的token'
 	}
 }
 
+8-1. 获取每个图片集里面的图片
+url: 'getCollection/one'
+
 9. 用户上传图片
-url: 'uploadUserPhoto/new'
+url: 'uploadUserPhoto'
 post: data: {
 	token: '用户的token',
 	image_md5: '', // 给我图片的md5
@@ -430,7 +433,7 @@ url: 'addToCart'
 post: data: {
 	token: '', // 如果是非登录用户将商品放入购物车，则用localStorage在本地记住就好
 	product_id: '',
-	product_quantity:'' //如果是删减则传负数，比如用户删减了2件，则传-2
+	quantity:'' //如果是删减则传负数，比如用户删减了2件，则传-2
 }
 
 27. 用户获取购物车中的所有商品列表
@@ -566,7 +569,7 @@ response: {
 }
 
 33. 获取所有类别的图片集列表
-url: 'getCategories/all'
+url: 'getCategories'
 response: {
 	success: true,
 	code: 0, // 0代表成功，其他数字结合desc理解
@@ -674,7 +677,7 @@ post: data: {
 }
 
 39. 获取单件产品的所有图片
-url: '/getAllImages/product'
+url: '/getAllImages'
 post: data: {
 	product_id:'',
 }
@@ -688,7 +691,7 @@ post: data: {
 }
 
 40. 用户添加商品(根据是否是admin判断产品是否属于自营)
-url: '/uploadProducts/user'
+url: '/uploadProducts'
 post: data: {
 	token:'',
 	product_id:'', //修改商品信息时需要提供，新增商品则不需要

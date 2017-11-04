@@ -56,6 +56,27 @@ export default {
     },
     uploadProductImageToAliyun () {
       userOp.uploadProductImageToAliyun()
+    },
+    getProducts_new () {
+      userOp.getProducts.new()
+    },
+    getProducts_hot () {
+      userOp.getProducts.hot()
+    },
+    getProducts_all () {
+      userOp.getProducts.all()
+    },
+    getProducts_self () {
+      userOp.getProducts.self()
+    },
+    addToCart () {
+      userOp.addToCart()
+    },
+    getProductsInCart () {
+      userOp.getProductsInCart()
+    },
+    getProductDetails () {
+      userOp.getProductDetails()
     }
   },
   mounted () {
@@ -71,6 +92,13 @@ export default {
     // this.addNewApp()
     // this.getUntagedPhoto()
     // this.updatePhotoTag()
+    // this.getProducts_new()
+    // this.getProducts_hot()
+    // this.getProducts_all()
+    // this.getProducts_self()
+    // this.addToCart()
+    // this.getProductsInCart()
+    this.getProductDetails()
   }
 }
 </script>

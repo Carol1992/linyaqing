@@ -99,7 +99,22 @@ module.exports = {
 			});
 		},
 		delivery () {
-
+			axios.post('/api/updateUserAccount/delivery', {
+				token:localStorage.token,
+				delivery_id:'',//不传或为空则默认为新建收货地址，有则为更改该条收货信息
+				delivery_address:'1866蓝湾半岛',
+				delivery_province:'广西',
+				delivery_city:'北海',
+				delivery_town:'',
+				consignee:'林晴',
+				consignee_phone:'18826417583'
+			})
+			.then(function (response) {
+			  console.log(response)
+			})
+			.catch(function (error) {
+			  console.log(error)
+			});
 		}
 	},
 	getUserApplication () {
@@ -162,177 +177,5 @@ module.exports = {
 		.catch(function (error) {
 		  console.log(error)
 		});
-	},
-	uploadPhotoToAliyun () {
-		axios.post('/api/uploadPhotoToAliyun', {
-			token:localStorage.token,
-			processData: false,
-			contentType: false
-		})
-		.then(function (response) {
-		  console.log(response)
-		})
-		.catch(function (error) {
-		  console.log(error)
-		});
-	},
-	uploadProductImageToAliyun () {
-		axios.post('/api/uploadProductImageToAliyun', {
-			token:localStorage.token,
-			processData: false,
-			contentType: false
-		})
-		.then(function (response) {
-		  console.log(response)
-		})
-		.catch(function (error) {
-		  console.log(error)
-		});
-	},
-	getProducts: {
-		new () {
-			axios.post('/api/getProducts/new', {
-				pageNo:1,
-				pageSize:3
-			})
-			.then(function (response) {
-			  console.log(response)
-			})
-			.catch(function (error) {
-			  console.log(error)
-			});
-		},
-		hot () {
-			axios.post('/api/getProducts/hot', {
-				pageNo:1,
-				pageSize:3
-			})
-			.then(function (response) {
-			  console.log(response)
-			})
-			.catch(function (error) {
-			  console.log(error)
-			});
-		},
-		all () {
-			axios.post('/api/getProducts/all', {
-				pageNo:1,
-				pageSize:3
-			})
-			.then(function (response) {
-			  console.log(response)
-			})
-			.catch(function (error) {
-			  console.log(error)
-			});
-		},
-		self () {
-			axios.post('/api/getProducts/self', {
-				pageNo:1,
-				pageSize:3
-			})
-			.then(function (response) {
-			  console.log(response)
-			})
-			.catch(function (error) {
-			  console.log(error)
-			});
-		}
-	},
-	addToCart () {
-		axios.post('/api/addToCart', {
-			token: localStorage.token, // 如果是非登录用户将商品放入购物车，则用localStorage在本地记住就好
-			product_id: 2,
-			quantity: 20 //如果是删减则传负数，比如用户删减了2件，则传-2
-		})
-		.then(function (response) {
-		  console.log(response)
-		})
-		.catch(function (error) {
-		  console.log(error)
-		});
-	},
-	getProductsInCart () {
-		axios.post('/api/getProductsInCart', {
-			token:localStorage.token
-		})
-		.then(function (response) {
-		  console.log(response)
-		})
-		.catch(function (error) {
-		  console.log(error)
-		});
-	},
-	getProductDetails () {
-		axios.post('/api/getProductDetails', {
-			product_id: 1
-		})
-		.then(function (response) {
-		  console.log(response)
-		})
-		.catch(function (error) {
-		  console.log(error)
-		});
-	},
-	getCategories () {
-
-	},
-	updateUserCategories () {
-
-	},
-	getPhotographers () {
-
-	},
-	updatePhotographers () {
-
-	},
-	getAllImages () {
-
-	},
-	uploadProducts () {
-
-	},
-	addProductImages () {
-
-	},
-	removeFromCart () {
-
-	},
-	getDeliveryAddress () {
-
-	},
-	changeStocks () {
-
-	},
-	uploadUserPhoto () {
-
-	},
-	placeOrder () {
-
-	},
-	getCollection: {
-		all () {
-
-		},
-		user () {
-
-		},
-		one () {
-
-		}
-	},
-	getList: {
-		new () {
-
-		},
-		hot () {
-
-		},
-		following () {
-
-		}
-	},
-	search () {
-
 	}
 }

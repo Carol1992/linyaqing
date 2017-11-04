@@ -169,26 +169,20 @@ url: 'getCollection/one'
 9. 用户上传图片
 url: 'uploadUserPhoto'
 post: data: {
-	token: '用户的token',
-	image_md5: '', // 给我图片的md5
-	image_tags: '', // 多个tag用逗号(,)分隔
-	exif: {
-		make: '',
-		model: '',
-		focalLength: '',
-		aperture: '',
-		iso: '',
-		shutterSpeed: ''
-	},
-	story: {
-		title: '',
-		story: ''
-	},
-	location: {
-		address: '',
-		display: 0 // 1则不展示location
-	},
-	collection_id: '' // id 之间用逗号隔开
+	token:localStorage.token,
+			image_md5:'http://my-image-carol.oss-cn-beijing.aliyuncs.com/1509425905335.jpeg',
+			image_tags:'pig, animals',
+			make: '2222',
+			model: '2222',
+			focalLength: '2222',
+			aperture: '2222',
+			iso: '2222',
+			shutterSpeed: '2222',
+			story_title: '雅阁',
+			story_detail: '照片拍摄于今天早上，天气有点冷',
+			location: '广东省深圳市龙华区',
+			display_location: '0',
+			collection_id: ''
 }
 response: {
 	success: true,
@@ -589,7 +583,7 @@ response: {
 url: 'updateUserCategories'
 post: data: {
 	token: '',
-	categories: [] //用户选择的图片集的id
+	categories: '' //用户选择的图片集的id
 }
 response: {
 	success: true,
@@ -659,13 +653,14 @@ post: data: {
 url: '/changeStocks'
 post: data: {
 	token: '',
-	product_id:'',
-	stocks:'',
-	unit:'',
-	province:'',
-	city:'',
-	town:'',
-	address:
+	product_id:_user.product_id,
+	stocks:_user.stocks,
+	unit:_user.unit,
+	province:_user.province,
+	city:_user.city,
+	town:_user.town,
+	address:_user.address，
+	inventory_id：'' //有则修改，无则新增
 }
 {
 	success: true,
@@ -739,13 +734,7 @@ post: data: {
 	code: 0,
 	desc: '',
 	data: {
-		delivery_id:'',
-		delivery_address:'',
-		delivery_province:'',
-		delivery_city:'',
-		delivery_town:'',
-		consignee:'',
-		consignee_phone:''
+	
 	}
 }
 

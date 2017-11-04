@@ -7,6 +7,8 @@
 <script>
 // import $ from 'jquery'
 import userOp from '../../api/user'
+// import storeOp from '../../api/store'
+// import photosOp from '../../api/photos'
 export default {
   name: 'HelloWorld',
   data () {
@@ -77,6 +79,66 @@ export default {
     },
     getProductDetails () {
       userOp.getProductDetails()
+    },
+    getCategories () {
+      userOp.getCategories()
+    },
+    updateUserCategories () {
+      userOp.updateUserCategories()
+    },
+    getPhotographers () {
+      userOp.getPhotographers()
+    },
+    updatePhotographers () {
+      userOp.updatePhotographers()
+    },
+    getAllImages () {
+      userOp.getAllImages()
+    },
+    search () {
+      userOp.search()
+    },
+    uploadProducts () {
+      userOp.uploadProducts()
+    },
+    addProductImages () {
+      userOp.addProductImages()
+    },
+    removeFromCart () {
+      userOp.removeFromCart()
+    },
+    getDeliveryAddress () {
+      userOp.getDeliveryAddress()
+    },
+    changeStocks () {
+      userOp.changeStocks()
+    },
+    uploadUserPhoto () {
+      userOp.uploadUserPhoto()
+    },
+    placeOrder () {
+      userOp.placeOrder()
+    },
+    updateUserAccount_delivery () {
+      userOp.updateUserAccount.delivery()
+    },
+    getCollection_all () {
+      userOp.getCollection.all()
+    },
+    getCollection_user () {
+      userOp.getCollection.user()
+    },
+    getCollection_one () {
+      userOp.getCollection.one()
+    },
+    getList_new () {
+      userOp.getList.new()
+    },
+    getList_hot () {
+      userOp.getList.hot()
+    },
+    getList_following () {
+      userOp.getList.following()
     }
   },
   mounted () {
@@ -98,7 +160,26 @@ export default {
     // this.getProducts_self()
     // this.addToCart()
     // this.getProductsInCart()
-    this.getProductDetails()
+    // this.getProductDetails()
+    // this.getCategories()
+    // this.updateUserCategories()
+    // this.getPhotographers()
+    // this.updatePhotographers()
+    // this.getAllImages()
+    // this.search()
+    // this.updateUserAccount_delivery()
+    // this.uploadProducts()
+    // this.addProductImages()
+    // this.getDeliveryAddress()
+    // this.changeStocks()
+    // this.uploadUserPhoto()
+    // this.placeOrder()
+    // this.getCollection_all()
+    // this.getCollection_user()
+    // this.getCollection_one()
+    // this.getList_new()
+    // this.getList_hot()
+    // this.getList_following()
   }
 }
 </script>

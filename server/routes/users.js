@@ -330,7 +330,7 @@ router.post('/updatePhotographers', verify_token, (req, res, next) => {
 });
 // 获取推荐的摄影师
 router.all('/getPhotographers', (req, res, next) => {
-	query('SELECT users.user_id, users.user_name, users.image_md5, users.instagram, ' + 
+	query('SELECT users.user_id, users.user_name, users.image_md5, users.wechat, ' + 
 			'a.follower_nums FROM users, (SELECT user_id, COUNT(follower_id) AS follower_nums ' + 
 				' FROM relationships GROUP BY user_id ORDER BY follower_nums DESC LIMIT 0,25) a WHERE a.user_id = users.user_id', '')
 	.then(function(data) {
@@ -981,8 +981,9 @@ router.post('/placeOrder', verify_token, (req, res, next) => {
 	})
 	.then(order_id => {
 		let order_details = [];
+		let order_ids = new Set();
 		for(let order of orders) {
-			console.log(order);
+			order_ids.add(order.product_id); 
 			order_details.push([order_id, order.product_id, order.product_quantity]);
 		}
 		query('INSERT INTO order_details(order_id, product_id, quantity) VALUES ?', [order_details])

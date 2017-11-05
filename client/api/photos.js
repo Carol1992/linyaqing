@@ -81,7 +81,7 @@ module.exports = {
 			story_title: '雅阁',
 			story_detail: '照片拍摄于今天早上，天气有点冷',
 			location: '广东省深圳市龙华区',
-			display_location: '0',
+			display: '0',
 			collection_id: ''
 		})
 		.then(function (response) {
@@ -132,38 +132,28 @@ module.exports = {
 		}
 	},
 	getList: {
-		new () {
-			axios.post('/api/getList/new', {
-				pageNo:1,
-				pageSize:3
-			})
+		new (data, callback) {
+			axios.post('/api/getList/new', data)
 			.then(function (response) {
-			  console.log(response)
+			  callback(response)
 			})
 			.catch(function (error) {
 			  console.log(error)
 			});	
 		},
-		hot () {
-			axios.post('/api/getList/hot', {
-				pageNo:1,
-				pageSize:3
-			})
+		hot (data, callback) {
+			axios.post('/api/getList/hot', data)
 			.then(function (response) {
-			  console.log(response)
+			  callback(response)
 			})
 			.catch(function (error) {
 			  console.log(error)
 			});	
 		},
-		following () {
-			axios.post('/api/getList/following', {
-				token:localStorage.token,
-				pageNo:1,
-				pageSize:3
-			})
+		following (data, callback) {
+			axios.post('/api/getList/following', data)
 			.then(function (response) {
-			  console.log(response)
+			  callback(response)
 			})
 			.catch(function (error) {
 			  console.log(error)

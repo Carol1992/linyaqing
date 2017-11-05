@@ -390,7 +390,7 @@ router.all('/getList/new', (req, res, next) => {
 	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
 	let q1 = query('SELECT COUNT(*) AS totalPage FROM images', '');
-	let q2 = query('SELECT * FROM (SELECT * FROM images ORDER BY created_time DESC) a LIMIT ?,?', [_left, pageSize]);
+	let q2 = query('SELECT * FROM images ORDER BY created_time DESC LIMIT ?,?', [_left, pageSize]);
 	Promise.all([q1, q2]).then(values => {
 		let new_data = {
 				pageNo: pageNo,
@@ -408,7 +408,7 @@ router.all('/getList/hot', (req, res, next) => {
 	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
 	let q1 = query('SELECT COUNT(*) AS totalPage FROM images', '');
-	let q2 = query('SELECT * FROM (SELECT * FROM images ORDER BY liked DESC) a LIMIT ?,?', [_left, pageSize]);
+	let q2 = query('SELECT * FROM images ORDER BY liked DESC LIMIT ?,?', [_left, pageSize]);
 	Promise.all([q1, q2]).then(values => {
 		let new_data = {
 				pageNo: pageNo,

@@ -18,7 +18,7 @@
       <div class="upload">
         <span>上传图片</span>
       </div>
-      <div class="user">
+      <div class="user" @click='tryLogin'>
         <span>登录</span>
       </div>
     </div>
@@ -45,6 +45,9 @@
           'border': 'none',
           'background-color': '#f1f1f1'
         })
+      },
+      tryLogin () {
+        this.$store.commit('showLogin', true)
       }
     },
     mounted () {}

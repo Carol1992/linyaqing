@@ -1,5 +1,7 @@
 <template>
   <div id="app">
+    <Login v-show='$store.state.showLogin'></Login>
+    <Register v-if='$store.state.showRegister'></Register>
     <div class="myheader">
       <LHeader></LHeader>
     </div>
@@ -22,11 +24,15 @@
 import photosOp from '../api/photos'
 import LHeader from './components/LHeader'
 import Photos from './components/photos/Photos'
+import Login from './components/user/Login'
+import Register from './components/user/Register'
 export default {
   name: 'app',
   components: {
     LHeader,
-    Photos
+    Photos,
+    Login,
+    Register
   },
   data () {
     return {

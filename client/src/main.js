@@ -65,7 +65,8 @@ axios.interceptors.response.use(
 const store = new Vuex.Store({
   state: {
     apiUrl: 'http://localhost:3000',
-    isShowLogin: true,
+    showLogin: false,
+    showRegister: false,
     userInfo: null,
     permissions: null,
     notice: null,
@@ -73,7 +74,10 @@ const store = new Vuex.Store({
   },
   mutations: {
     showLogin (state, flag) {
-      state.isShowLogin = flag
+      state.showLogin = flag
+    },
+    showRegister (state, flag) {
+      state.showRegister = flag
     },
     updateUserInfo (state, data) {
       state.userInfo = data

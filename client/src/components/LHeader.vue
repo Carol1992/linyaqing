@@ -7,8 +7,8 @@
       <span><Icon type="ios-search-strong" size="30" color="#999"></Icon></span>
       <input type="text" placeholder="输入关键字搜索图片" @focus='changeBorder' @blur='changeBorder2'>
     </div>
-    <div class="hideMore"><span><Icon type="more"></Icon></span></div>
-    <div class="more">
+    <div class="hideMore" v-if='!showMore'><span><Icon type="more"></Icon></span></div>
+    <div class="more" v-if='showMore'>
       <div class="collection">
         <span>相册</span>
       </div>
@@ -18,8 +18,11 @@
       <div class="upload">
         <span>上传图片</span>
       </div>
-      <div class="user" @click='tryLogin'>
-        <span>登录</span>
+      <div class="user" @click='tryLogin' v-if='!alreadyLogin'>
+        <span >登录</span>
+      </div>
+      <div class="loginUser" v-if='alreadyLogin' @click='gotoUserCenter'>
+        <img :src='avatar' height="49" width="49" alt="">
       </div>
     </div>
   </div>
@@ -31,6 +34,9 @@
     name: 'Lheader',
     data () {
       return {
+        alreadyLogin: false,
+        showMore: true,
+        avatar: ''
       }
     },
     methods: {
@@ -47,10 +53,35 @@
         })
       },
       tryLogin () {
-        this.$store.commit('showLogin', true)
+        this.$router.push('login')
+      },
+      onResize () {
+        if (document.body.clientWidth < 809) {
+          this.showMore = false
+        } else {
+          this.showMore = true
+        }
+      },
+      gotoUserCenter () {
+        this.$router.push({path: `/userCenter/${localStorage.lq_user_name}`})
       }
     },
-    mounted () {}
+    mounted () {
+      this.$nextTick(function () {
+        window.addEventListener('resize', this.onResize)
+      })
+      if (localStorage.token) {
+        this.alreadyLogin = true
+      }
+      if (document.body.clientWidth < 809) {
+        this.showMore = false
+      }
+      if (localStorage.lq_image_md5 !== 'null') {
+        this.avatar = localStorage.lq_image_md5
+      } else {
+        this.avatar = require('../assets/img/user_default.jpg')
+      }
+    }
   }
 </script>
 
@@ -136,18 +167,18 @@
   .hideMore span {
     line-height: 49px;
     font-size: 40px;
-    display: none;
   }
   .hideMore {
     float: right;
   }
+  .loginUser {
+    border-radius: 50%;
+    overflow: hidden;
+    width: 49px !important;
+    height: 49px;
+    margin-left: calc(25% - 49px);
+  }
   @media screen and (max-width: 809px) {
-    .more span {
-      display: none;
-    }
-    .hideMore span{
-      display: inline-block;
-    }
     .search {
       width: 70%;
     }

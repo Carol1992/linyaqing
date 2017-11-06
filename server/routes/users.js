@@ -75,7 +75,7 @@ router.post('/login', function(req, res, next) {
 		}
 		if(post.password === data.results[0].password) {
   		// 登录成功返回该用户的token，之后需要用到权限的地方都要带上token到后台查询
-  		data.results[0].token = jwt.sign({data: data.results[0]}, 'secret', { expiresIn: '24h' });
+  		data.results[0].token = jwt.sign({data: data.results[0]}, 'secret', { expiresIn: '720h' });
   		res.json(formater({code:'0', desc:'登录成功！', data:data.results[0]}))
   	} else {
   		res.json(formater({code:'1', desc:'密码错误！'}))
@@ -390,7 +390,9 @@ router.all('/getList/new', (req, res, next) => {
 	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
 	let q1 = query('SELECT COUNT(*) AS totalPage FROM images', '');
-	let q2 = query('SELECT * FROM images ORDER BY created_time DESC LIMIT ?,?', [_left, pageSize]);
+	let q2 = query('SELECT i.display_location, i.location, i.created_time, i.image_md5, i.story_title, ' + 
+		'i.story_detail, i.user_id, i.liked, u.user_name, u.image_md5 AS user_avatar, u.email FROM images i, users u WHERE i.user_id = u.user_id ' + 
+		'ORDER BY created_time DESC LIMIT ?,?', [_left, pageSize]);
 	Promise.all([q1, q2]).then(values => {
 		let new_data = {
 				pageNo: pageNo,
@@ -408,7 +410,9 @@ router.all('/getList/hot', (req, res, next) => {
 	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
 	let q1 = query('SELECT COUNT(*) AS totalPage FROM images', '');
-	let q2 = query('SELECT * FROM images ORDER BY liked DESC LIMIT ?,?', [_left, pageSize]);
+	let q2 = query('SELECT i.display_location, i.location, i.created_time, i.image_md5, i.story_title, ' + 
+		'i.story_detail, i.user_id, i.liked, u.user_name, u.image_md5 AS user_avatar, u.email FROM images i, users u WHERE i.user_id = u.user_id ' + 
+		'ORDER BY i.liked DESC LIMIT ?,?', [_left, pageSize]);
 	Promise.all([q1, q2]).then(values => {
 		let new_data = {
 				pageNo: pageNo,
@@ -427,7 +431,9 @@ router.all('/getList/following', verify_token, (req, res, next) => {
 	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
 	let q1 = query('SELECT COUNT(*) AS totalPage FROM images, (SELECT follower_id FROM relationships WHERE user_id = ?) a WHERE images.user_id = a.follower_id', [user_id]);
-	let q2 = query('SELECT * FROM (SELECT * FROM images, (SELECT follower_id FROM relationships WHERE user_id = ?) a WHERE images.user_id = a.follower_id) b LIMIT ?,?', [user_id, _left, pageSize]);
+	let q2 = query('SELECT i.display_location, i.location, i.created_time, i.image_md5, i.story_title, ' + 
+		'i.story_detail, i.user_id, i.liked, u.user_name, u.image_md5 AS user_avatar, u.email FROM (SELECT * FROM images, (SELECT follower_id FROM relationships WHERE ' + 
+		'user_id = ?) a WHERE images.user_id = a.follower_id) i, users u WHERE i.user_id = u.user_id LIMIT ?,?', [user_id, _left, pageSize]);
 	Promise.all([q1, q2]).then(values => {
 		let new_data = {
 				pageNo: pageNo,

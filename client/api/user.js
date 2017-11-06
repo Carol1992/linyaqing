@@ -59,22 +59,10 @@ module.exports = {
 		});
 	},
 	updateUserAccount: {
-		info () {
-			axios.post('/api/updateUserAccount/info', {
-				token:localStorage.token,
-				image_md5: 'http://my-image-carol.oss-cn-beijing.aliyuncs.com/1509425371413.jpeg', 
-				email: 'carol2@gmail.com',
-				user_name: 'carol2',
-				personal_site: 'http://linyaqing.com',
-				wechat: '18826417583',
-				location: '1866绿景小区',
-				bio: '读书多了，容颜自然改变，许多时候，自己可能以为许多看过的书籍都成了过眼云烟，不复记忆，其实他们仍是潜在的。在气质里，在谈吐上，在胸襟的无涯，当然也可能显露在生活和文字里。',
-				province: '广东',
-				city: '深圳',
-				town: '龙华区'
-			})
+		info (data, callback) {
+			axios.post('/api/updateUserAccount/info', data)
 			.then(function (response) {
-			  console.log(response)
+			  callback(response)
 			})
 			.catch(function (error) {
 			  console.log(error)

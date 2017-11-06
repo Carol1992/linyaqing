@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="logo">
+    <div class="logo" @click='goHome'>
       <Icon type="camera" size="50"></Icon>
     </div>
     <div class="search">
@@ -40,6 +40,9 @@
       }
     },
     methods: {
+      goHome () {
+        this.$router.push('/')
+      },
       changeBorder (e) {
         $(e.target).css({
           'border': '1px solid #ddd',
@@ -76,7 +79,7 @@
       if (document.body.clientWidth < 809) {
         this.showMore = false
       }
-      if (localStorage.lq_image_md5 !== 'null') {
+      if (localStorage.lq_image_md5 !== 'null' && localStorage.lq_image_md5 !== '') {
         this.avatar = localStorage.lq_image_md5
       } else {
         this.avatar = require('../assets/img/user_default.jpg')

@@ -13,11 +13,11 @@
         </div>
         <!-- <div class="photos" @click='isProfile = false; isPhoto = true; isEmail = false; isPwd = false; isApp = false; isDelete = false; nowEdit = "照片信息"'>
           <span :class='{activated: isPhoto}'>照片信息</span>
-        </div>
+        </div> -->
         <div class="email" @click='isProfile = false; isPhoto = false; isEmail = true; isPwd = false; isApp = false; isDelete = false; nowEdit = "邮件设置"'>
           <span :class='{activated: isEmail}'>邮件设置</span>
         </div>
-        <div class="app" @click='isProfile = false; isPhoto = false; isEmail = false; isPwd = false; isApp = true; isDelete = false; nowEdit = "添加应用"'>
+        <!-- <div class="app" @click='isProfile = false; isPhoto = false; isEmail = false; isPwd = false; isApp = true; isDelete = false; nowEdit = "添加应用"'>
           <span :class='{activated: isApp}'>添加应用</span>
         </div> -->
         <div class="delete" @click='isProfile = false; isPhoto = false; isEmail = false; isPwd = false; isApp = false; isDelete = true; nowEdit = "删除账户"'>
@@ -33,7 +33,7 @@
             <div class="myavatar">
               <img :src='avatar' alt="">
             </div>
-            <span id="changeIco">更换头像</span>
+            <span id="changeIco" @click='changeAvatar'>更换头像</span>
           </div>
           <div class="user_info">
             <div class="account">
@@ -53,13 +53,16 @@
         <div class="part2">
           <div class="user_loc">
             <span><Icon type="location"></Icon> 住 址</span>
-            <input type="text" maxlength="100" v-model='localtion'>
+            <input type="text" maxlength="100" v-model='location'>
           </div>
           <div class="user_bio">
             <span><Icon type="information-circled"></Icon> 个人简介</span>
             <textarea name="" id="" cols="30" rows="10" v-model='bio'></textarea>
           </div>
-          <div class="submit">
+          <div class="error" v-if='showError1'>
+            <span>{{errorMsg}}</span>
+          </div>
+          <div class="submit" @click='changeInfo'>
             <input type="button" value='提 交'>
           </div>
         </div>
@@ -69,7 +72,7 @@
           <p>确定要删除账户吗？删除账户后与账户关联的所有信息都将被清除！</p>
           <p>如果只是要删除部分信息，请导航到具体模块进行删除。</p>
         </div>
-        <div class="confirmed">
+        <div class="confirmed" @clcik='deleteAccount'>
           <input type="button" value='删除账户'>
         </div>
       </div>
@@ -82,7 +85,16 @@
           <span><Icon type="locked"></Icon> 确认密码 <span class="info"></span></span>
           <input type="password" maxlength="20" v-model='password'>
         </div>
-         <div class="submit">
+        <div class="error" v-if='showError2'>
+          <span>{{errorMsg}}</span>
+        </div>
+         <div class="submit" @click='changePwd'>
+           <input type="button" value='提 交'>
+         </div>
+      </div>
+      <div class="isEmail" v-if='isEmail'>
+        <myCheckBox></myCheckBox>
+        <div class="submit" @click=changeEmailSettings>
            <input type="button" value='提 交'>
          </div>
       </div>
@@ -91,6 +103,8 @@
 </template>
 
 <script>
+  import myCheckBox from './Settings/CheckBox'
+  import userOp from '../../../api/user'
   export default {
     name: 'userProfile',
     data () {
@@ -103,11 +117,66 @@
         isDelete: false,
         nowEdit: '个人信息',
         avatar: localStorage.lq_image_md5,
-        email: '',
-        username: '',
-        website: '',
-        location: '',
-        bio: ''
+        email: localStorage.lq_email,
+        username: localStorage.lq_user_name,
+        website: localStorage.lq_personal_site,
+        location: localStorage.lq_address,
+        bio: localStorage.lq_bio,
+        wechat: '',
+        province: '',
+        city: '',
+        town: '',
+        showError1: false,
+        showError2: false,
+        errorMsg: ''
+      }
+    },
+    components: {
+      myCheckBox
+    },
+    methods: {
+      changeInfo () {
+        let data = {
+          token: localStorage.token,
+          email: this.email,
+          user_name: this.username,
+          personal_site: this.website,
+          wechat: this.wechat,
+          location: this.location,
+          bio: this.bio,
+          province: this.province,
+          city: this.city,
+          town: this.town
+        }
+        if (!this.email || !this.username) {
+          this.showError1 = true
+          this.errorMsg = '邮箱和昵称不能为空！'
+          return
+        }
+        this.showError1 = false
+        userOp.updateUserAccount.info(data, (res) => {
+          localStorage.lq_user_name = this.user_name
+          localStorage.lq_email = this.email
+          localStorage.lq_personal_site = this.personal_site
+          localStorage.lq_address = this.location
+          localStorage.lq_bio = this.bio
+          // localStorage.lq_province = this.province
+          // localStorage.lq_city = this.city
+          // localStorage.lq_town = this.town
+          // localStorage.lq_wechat = this.wechat
+        })
+      },
+      changePwd () {
+
+      },
+      deleteAccount () {
+
+      },
+      changeEmailSettings () {
+
+      },
+      changeAvatar () {
+
       }
     }
   }
@@ -243,5 +312,38 @@
   }
   .newpassword{
     margin-top: 30px;
+  }
+  .isEmail {
+    margin-top: 30px;
+  }
+  .error {
+    text-align: center;
+    color: orangered;
+    margin-top: 5px;
+  }
+  @media screen and (max-width: 809px) {
+    .left {
+      display: block;
+      clear: both;
+    }
+    .right {
+      display: block;
+      clear: both;
+      width: 100%;
+    }
+    .setting_title {
+      visibility: hidden;
+    }
+    .myavatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      overflow: hidden;
+      margin: auto;
+    }
+    .myavatar > img {
+      width: 120px;
+      height: 120px;
+    }
   }
 </style>

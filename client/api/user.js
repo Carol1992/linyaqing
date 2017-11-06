@@ -80,6 +80,18 @@ module.exports = {
 			  console.log(error)
 			});
 		},
+		avatar () {
+			axios.post('/api/updateUserAccount/avatar', {
+				token:localStorage.token,
+				image_md5:'http://my-image-carol.oss-cn-beijing.aliyuncs.com/1509421900187.png'
+			})
+			.then(function (response) {
+			  console.log(response)
+			})
+			.catch(function (error) {
+			  console.log(error)
+			});
+		},
 		password () {
 			var md5 = require('md5')
 			axios.post('/api/updateUserAccount/password', {

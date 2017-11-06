@@ -87,7 +87,6 @@ router.post('/updateUserAccount/info', verify_token, (req, res, next) => {
 	let _user = req.body;
 	let post = {
 		user_id: req.api_user.data.user_id,
-		image_md5: _user.image_md5,
 		email: _user.email,
 		user_name: _user.user_name,
 		personal_site: _user.personal_site,
@@ -104,14 +103,26 @@ router.post('/updateUserAccount/info', verify_token, (req, res, next) => {
 	if(!post.email) {
 		return res.json(formater({code:'1', desc:'邮件不能为空！'}));
 	}
-	query('UPDATE users SET image_md5=?, email=?, user_name=?,' +
+	query('UPDATE users SET email=?, user_name=?,' +
 		 'personal_site=?, wechat=?, address=?, bio=?, province=?, city=?, town=? WHERE user_id=?', 
-		 [post.image_md5, post.email, post.user_name, post.personal_site,
+		 [post.email, post.user_name, post.personal_site,
 				post.wechat, post.address, post.bio, post.province, post.city, post.town, post.user_id])
 	.then(function(data) {
 		res.json(formater({code:'0', desc:'用户信息修改成功！'}))
 	});
 });
+// 修改用户图片
+router.post('/updateUserAccount/avatar', verify_token, (req, res, next) => {
+	let user_id = req.api_user.data.user_id
+	let avatar = req.body.image_md5
+	if(!avatar) {
+		return res.json(formater({code:'1', desc:'图片不能为空！'}));
+	}
+	query('UPDATE users SET image_md5 = ? WHERE user_id = ?', [avatar, user_id])
+	.then((data) => {
+		res.json(formater({code:'0', desc:'用户头像修改成功！'}))
+	})
+})
 // 修改用户密码
 router.post('/updateUserAccount/password', verify_token, (req, res, next) => {
 	let _user = req.body;

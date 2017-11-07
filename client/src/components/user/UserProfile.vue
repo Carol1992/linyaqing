@@ -33,7 +33,8 @@
             <div class="myavatar">
               <img :src='avatar' alt="">
             </div>
-            <span id="changeIco" @click='changeAvatar'>更换头像</span>
+            <span id="changeIco" @click='changeAvatar1'>更换头像</span>
+            <input type="file" class="hidden-file-upload" id="uploadImg" @change='changeAvatar2'>
           </div>
           <div class="user_info">
             <div class="account">
@@ -103,8 +104,10 @@
 </template>
 
 <script>
+  import $ from 'jquery'
   import myCheckBox from './Settings/CheckBox'
   import userOp from '../../../api/user'
+  import aliyunOp from '../../../api/aliyun'
   export default {
     name: 'userProfile',
     data () {
@@ -128,13 +131,26 @@
         town: '',
         showError1: false,
         showError2: false,
-        errorMsg: ''
+        errorMsg: '',
+        notifyMsg: ''
       }
     },
     components: {
       myCheckBox
     },
     methods: {
+      success (nodesc) {
+        this.$Notice.success({
+          title: this.notifyMsg,
+          desc: nodesc ? '' : ''
+        })
+      },
+      error (nodesc) {
+        this.$Notice.error({
+          title: this.notifyMsg,
+          desc: nodesc ? '' : ''
+        })
+      },
       changeInfo () {
         let data = {
           token: localStorage.token,
@@ -155,16 +171,44 @@
         }
         this.showError1 = false
         userOp.updateUserAccount.info(data, (res) => {
-          localStorage.lq_user_name = this.user_name
-          localStorage.lq_email = this.email
-          localStorage.lq_personal_site = this.personal_site
-          localStorage.lq_address = this.location
-          localStorage.lq_bio = this.bio
-          // localStorage.lq_province = this.province
-          // localStorage.lq_city = this.city
-          // localStorage.lq_town = this.town
-          // localStorage.lq_wechat = this.wechat
+          localStorage.lq_user_name = data.user_name
+          localStorage.lq_email = data.email
+          localStorage.lq_personal_site = data.personal_site
+          localStorage.lq_address = data.location
+          localStorage.lq_bio = data.bio
+          this.notifyMsg = '修改成功！'
+          this.success(true)
+          // localStorage.lq_province = data.province
+          // localStorage.lq_city = data.city
+          // localStorage.lq_town = data.town
+          // localStorage.lq_wechat = data.wechat
         })
+      },
+      saveImgToAliyun (formData, file) {
+        let reader = new FileReader()
+        reader.onload = function (e) {
+          let data = e.target.result
+          let image = new Image()
+          image.onload = function () {
+            let width = image.width
+            let height = image.height
+            if (width < 480 || height < 480) {
+              this.notifyMsg = '图片尺寸不小于480*480！'
+              this.error(true)
+              return
+            }
+            aliyunOp.uploadPhotoToAliyun(formData, (res) => {
+              if (!res.data.data.url) {
+                this.notifyMsg = '图片上传失败！'
+                this.error(true)
+                return
+              }
+              localStorage.lq_image_md5 = res.data.data.url
+            })
+          }
+          image.src = data
+        }
+        reader.readAsDataURL(file)
       },
       changePwd () {
 
@@ -175,8 +219,21 @@
       changeEmailSettings () {
 
       },
-      changeAvatar () {
-
+      changeAvatar1 () {
+        $('#uploadImg').click()
+      },
+      changeAvatar2 () {
+        let formData = new FormData()
+        let file = $('.hidden-file-upload')[0].files[0]
+        if (file) {
+          if (file.type.indexOf('image/') !== -1) {
+            formData.append('file', file)
+            this.saveImgToAliyun(formData, file)
+          } else {
+            this.notifyMsg = '文件格式不正确！'
+            this.error(true)
+          }
+        }
       }
     }
   }
@@ -320,6 +377,9 @@
     text-align: center;
     color: orangered;
     margin-top: 5px;
+  }
+  .hidden-file-upload {
+    display: none;
   }
   @media screen and (max-width: 809px) {
     .left {

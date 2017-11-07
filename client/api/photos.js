@@ -1,30 +1,4 @@
 module.exports = {
-	uploadPhotoToAliyun () {
-		axios.post('/api/uploadPhotoToAliyun', {
-			token:localStorage.token,
-			processData: false,
-			contentType: false
-		})
-		.then(function (response) {
-		  console.log(response)
-		})
-		.catch(function (error) {
-		  console.log(error)
-		});
-	},
-	uploadProductImageToAliyun () {
-		axios.post('/api/uploadProductImageToAliyun', {
-			token:localStorage.token,
-			processData: false,
-			contentType: false
-		})
-		.then(function (response) {
-		  console.log(response)
-		})
-		.catch(function (error) {
-		  console.log(error)
-		});
-	},
 	getCategories () {
 		axios.post('/api/getCategories', {})
 		.then(function (response) {

@@ -556,13 +556,13 @@ router.post('/uploadUserPhoto', verify_token, (req, res, next) => {
 });
 // 上传图片到服务器
 router.post('/uploadPhotoToAliyun', verify_token, (req, res, next) => {
-	if(req.headers['content-length'] === '0') {
-		return res.json(formater({code:'0', desc:'没有选择图片！'}));
-	}
-	let ext = req.headers["content-type"].split("/")[1];
-	if(ext !== 'jpeg' && ext !== 'png' && ext !== 'gif') {
-		return res.json(formater({code:'0', desc:'图片格式不符合，只支持jpg/png/gif格式！'}));
-	}
+	// if(req.headers['content-length'] === '0') {
+	// 	return res.json(formater({code:'0', desc:'没有选择图片！'}));
+	// }
+	// let ext = req.headers["content-type"].split("/")[1];
+	// if(ext !== 'jpeg' && ext !== 'png' && ext !== 'gif') {
+	// 	return res.json(formater({code:'0', desc:'图片格式不符合，只支持jpg/png/gif格式！'}));
+	// }
 	var chunks = [];
 	var size = 0;
 	req.on('data' , function(chunk){

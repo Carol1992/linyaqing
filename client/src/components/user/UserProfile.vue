@@ -3,6 +3,10 @@
     <div class="left">
       <div class="title">
         <span>账户设置</span>
+        <!-- <form action="/api/uploadPhotoToAliyun" method="post">
+         <input type="file">
+          <input type="submit" value="Submit">
+        </form> -->
       </div>
       <div class="details">
         <div class="profile" @click='isProfile = true; isPhoto = false; isEmail = false; isPwd = false; isApp = false; isDelete = false; nowEdit = "个人信息"' >
@@ -73,7 +77,7 @@
           <p>确定要删除账户吗？删除账户后与账户关联的所有信息都将被清除！</p>
           <p>如果只是要删除部分信息，请导航到具体模块进行删除。</p>
         </div>
-        <div class="confirmed" @clcik='deleteAccount'>
+        <div class="confirmed" @click='deleteAccount'>
           <input type="button" value='删除账户'>
         </div>
       </div>
@@ -84,10 +88,7 @@
         </div>
         <div class="newpassword">
           <span><Icon type="locked"></Icon> 确认密码 <span class="info"></span></span>
-          <input type="password" maxlength="20" v-model='password'>
-        </div>
-        <div class="error" v-if='showError2'>
-          <span>{{errorMsg}}</span>
+          <input type="password" maxlength="20" v-model='password_confirmed'>
         </div>
          <div class="submit" @click='changePwd'>
            <input type="button" value='提 交'>
@@ -95,7 +96,7 @@
       </div>
       <div class="isEmail" v-if='isEmail'>
         <myCheckBox></myCheckBox>
-        <div class="submit" @click=changeEmailSettings>
+        <div class="submit" @click='changeEmailSettings'>
            <input type="button" value='提 交'>
          </div>
       </div>
@@ -132,7 +133,9 @@
         showError1: false,
         showError2: false,
         errorMsg: '',
-        notifyMsg: ''
+        notifyMsg: '',
+        password: '',
+        password_confirmed: ''
       }
     },
     components: {
@@ -171,6 +174,11 @@
         }
         this.showError1 = false
         userOp.updateUserAccount.info(data, (res) => {
+          if (res.data.code === '1') {
+            this.notifyMsg = res.data.desc || '操作失败！'
+            this.error(true)
+            return
+          }
           localStorage.lq_user_name = data.user_name
           localStorage.lq_email = data.email
           localStorage.lq_personal_site = data.personal_site
@@ -198,8 +206,8 @@
               return
             }
             aliyunOp.uploadPhotoToAliyun(formData, (res) => {
-              if (!res.data.data.url) {
-                this.notifyMsg = '图片上传失败！'
+              if (res.data.code === '1') {
+                this.notifyMsg = res.data.desc || '操作失败！'
                 this.error(true)
                 return
               }
@@ -211,13 +219,50 @@
         reader.readAsDataURL(file)
       },
       changePwd () {
-
+        let data = {
+          password: this.password,
+          password2: this.password_confirmed
+        }
+        if (data.password !== data.password2) {
+          this.notifyMsg = '密码不一致！'
+          this.error(true)
+          return
+        }
+        userOp.updateUserAccount.password(data, (res) => {
+          if (res.data.code === '1') {
+            this.notifyMsg = res.data.desc || '操作失败！'
+            this.error(true)
+            return
+          }
+          this.notifyMsg = '密码修改成功！'
+          this.success(true)
+        })
       },
       deleteAccount () {
-
+        userOp.updateUserAccount.delete((res) => {
+          if (res.data.code === '1') {
+            this.notifyMsg = res.data.desc || '操作失败！'
+            this.error(true)
+            return
+          }
+          this.notifyMsg = '账户成功删除！'
+          this.success(true)
+          localStorage.clear()
+          this.$router.push('/')
+        })
       },
       changeEmailSettings () {
-
+        let emailSettings = this.$store.state.email_setting_checkbox
+        userOp.updateUserAccount.emailSettings(emailSettings, (res) => {
+          if (res.data.code === '1') {
+            this.notifyMsg = res.data.desc || '操作失败！'
+            this.error(true)
+            return
+          }
+          localStorage.lq_email_settings = emailSettings
+          this.notifyMsg = '邮件提醒设置成功！'
+          this.success(true)
+        })
       },
       changeAvatar1 () {
         $('#uploadImg').click()

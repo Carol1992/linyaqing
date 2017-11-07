@@ -29,29 +29,30 @@ module.exports = {
 			localStorage.clear()
 		  localStorage.token = info.token
 		  localStorage.lq_userId = info.user_id
-	    localStorage.lq_is_developer = info.is_developer,
-			localStorage.lq_is_admin = info.is_admin,
-			localStorage.lq_user_name = info.user_name,
-			localStorage.lq_phone = info.phone,
-			localStorage.lq_email = info.email,
-			localStorage.lq_password = info.password,
-			localStorage.lq_province = info.province,
-			localStorage.lq_city = info.city,
-			localStorage.lq_town = info.town,
-			localStorage.lq_image_md5 = info.image_md5,
-			localStorage.lq_personal_site = info.personal_site,
-			localStorage.lq_wechat = info.wechat,
-			localStorage.lq_address = info.address,
-			localStorage.lq_bio = info.bio,
-			localStorage.lq_created_time = info.created_time,
-			localStorage.lq_dev_url = info.dev_url,
-			localStorage.lq_dev_desc = info.dev_desc,
-			localStorage.lq_delivery_address = info.delivery_address,
-			localStorage.lq_delivery_city = info.delivery_city,
-			localStorage.lq_delivery_province = info.delivery_province,
-			localStorage.lq_delivery_town = info.delivery_town,
-			localStorage.lq_consignee = info.consignee,
-			localStorage.lq_consignee_phone = info.consignee_phone,
+	    localStorage.lq_is_developer = info.is_developer
+			localStorage.lq_is_admin = info.is_admin
+			localStorage.lq_user_name = info.user_name
+			localStorage.lq_phone = info.phone
+			localStorage.lq_email = info.email
+			localStorage.lq_password = info.password
+			localStorage.lq_province = info.province
+			localStorage.lq_city = info.city
+			localStorage.lq_town = info.town
+			localStorage.lq_image_md5 = info.image_md5
+			localStorage.lq_personal_site = info.personal_site
+			localStorage.lq_wechat = info.wechat
+			localStorage.lq_address = info.address
+			localStorage.lq_bio = info.bio
+			localStorage.lq_created_time = info.created_time
+			localStorage.lq_dev_url = info.dev_url
+			localStorage.lq_dev_desc = info.dev_desc
+			localStorage.lq_delivery_address = info.delivery_address
+			localStorage.lq_delivery_city = info.delivery_city
+			localStorage.lq_delivery_province = info.delivery_province
+			localStorage.lq_delivery_town = info.delivery_town
+			localStorage.lq_consignee = info.consignee
+			localStorage.lq_consignee_phone = info.consignee_phone
+			localStorage.lq_email_settings = info.email_settings
 		  callback(response)
 		})
 		.catch(function (error) {
@@ -80,50 +81,50 @@ module.exports = {
 			  console.log(error)
 			});
 		},
-		password () {
+		password (data, callback) {
 			var md5 = require('md5')
 			axios.post('/api/updateUserAccount/password', {
 				token:localStorage.token,
-				password:md5('aaaaaa')
+				password:md5(data.password)
 			})
 			.then(function (response) {
-			  console.log(response)
+			  callback(response)
 			})
 			.catch(function (error) {
 			  console.log(error)
 			});
 		},
-		delete () {
+		delete (callback) {
 			axios.post('/api/updateUserAccount/delete', {
 				token:localStorage.token
 			})
 			.then(function (response) {
-			  console.log(response)
+			  callback(response)
 			})
 			.catch(function (error) {
 			  console.log(error)
 			});
 		},
-		emailSettings () {
+		emailSettings (data, callback) {
 			axios.post('/api/updateUserAccount/emailSettings', {
 				token:localStorage.token,
-				email_settings:'1,2,3,4'
+				email_settings: data
 			})
 			.then(function (response) {
-			  console.log(response)
+			  callback(response)
 			})
 			.catch(function (error) {
 			  console.log(error)
 			});
 		},
-		developer () {
+		developer (data, callback) {
 			axios.post('/api/updateUserAccount/developer', {
 				token:localStorage.token,
-				url: 'http://baidu.com',
-				description: '读书多了，容颜自然改变，许多时候，自己可能以为许多看过的书籍都成了过眼云烟，不复记忆，其实他们仍是潜在的。在气质里，在谈吐上，在胸襟的无涯，当然也可能显露在生活和文字里。'
+				url: data.url,
+				description: data.desc 
 			})
 			.then(function (response) {
-			  console.log(response)
+			  callback(response)
 			})
 			.catch(function (error) {
 			  console.log(error)

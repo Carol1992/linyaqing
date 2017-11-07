@@ -76,7 +76,15 @@ router.post('/login', function(req, res, next) {
 		if(post.password === data.results[0].password) {
   		// 登录成功返回该用户的token，之后需要用到权限的地方都要带上token到后台查询
   		data.results[0].token = jwt.sign({data: data.results[0]}, 'secret', { expiresIn: '720h' });
-  		res.json(formater({code:'0', desc:'登录成功！', data:data.results[0]}))
+  		query('SELECT settings_id FROM user_email WHERE user_id = ?', [data.results[0].user_id])
+  		.then((value) => {
+  			let settings = []
+  			for(s of value.results) {
+  				settings.push(s.settings_id)
+  			}
+  			data.results[0].email_settings = settings.toString()
+  			res.json(formater({code:'0', desc:'登录成功！', data:data.results[0]}))
+  		})
   	} else {
   		res.json(formater({code:'1', desc:'密码错误！'}))
   	}
@@ -239,12 +247,12 @@ router.all('/deleteUserPhoto', verify_token, (req, res, next) => {
 		image_id: _user.image_id || req.query.image_id
 	};
 	if(!post.image_id) {
-		return res.json(formater({code:'0', desc:'请提供所要删除图片的id！'}));
+		return res.json(formater({code:'1', desc:'请提供所要删除图片的id！'}));
 	}
 	query('SELECT image_id FROM images WHERE image_id = ? AND user_id = ?', [post.image_id, user_id])
 	.then(data => {
 		if(data.results.length === 0) {
-			return res.json(formater({code:'0', desc:'该图片不属于该用户！'}));
+			return res.json(formater({code:'1', desc:'该图片不属于该用户！'}));
 		}
 	})
 	.then(() => {
@@ -253,7 +261,7 @@ router.all('/deleteUserPhoto', verify_token, (req, res, next) => {
 			if(data.results.affectedRows === 1) {
 				res.json(formater({code:'0', desc:'图片删除成功！'}));
 			} else {
-				res.json(formater({code:'0', desc:'图片不存在！'}));
+				res.json(formater({code:'1', desc:'图片不存在！'}));
 			}
 		});
 	})
@@ -271,7 +279,7 @@ router.post('/addNewApp', verify_token, (req, res, next) => {
 	query('SELECT is_developer FROM users WHERE user_id = ?', [post.user_id])
 	.then(function(data) {
 		if(data.results[0].is_developer === '1') {
-			return res.json(formater({code:'0', desc:'该用户不是开发者，无法添加应用！'}));
+			return res.json(formater({code:'1', desc:'该用户不是开发者，无法添加应用！'}));
 		}
 		query('INSERT INTO applications SET ?', [post])
 		.then(function(data) {
@@ -544,7 +552,7 @@ router.post('/uploadUserPhoto', verify_token, (req, res, next) => {
 		query('SELECT collection_id FROM collections WHERE collection_id = ?', [post.collection_id])
 		.then(data => {
 			if(data.results.length === 0) {
-				return res.json(formater({code:'0', desc:'插入失败，该id对应的图片集不存在！'}));
+				return res.json(formater({code:'1', desc:'插入失败，该id对应的图片集不存在！'}));
 			} else {
 				query('INSERT INTO images SET ?', [post])
 				.then(values => {
@@ -555,14 +563,14 @@ router.post('/uploadUserPhoto', verify_token, (req, res, next) => {
 	}
 });
 // 上传图片到服务器
-router.post('/uploadPhotoToAliyun', verify_token, (req, res, next) => {
-	// if(req.headers['content-length'] === '0') {
-	// 	return res.json(formater({code:'0', desc:'没有选择图片！'}));
-	// }
-	// let ext = req.headers["content-type"].split("/")[1];
-	// if(ext !== 'jpeg' && ext !== 'png' && ext !== 'gif') {
-	// 	return res.json(formater({code:'0', desc:'图片格式不符合，只支持jpg/png/gif格式！'}));
-	// }
+router.post('/uploadPhotoToAliyun', (req, res, next) => {
+	if(req.headers['content-length'] === '0') {
+		return res.json(formater({code:'1', desc:'没有选择图片！'}));
+	}
+	let ext = req.headers["content-type"].split("/")[1];
+	if(ext !== 'jpeg' && ext !== 'png' && ext !== 'gif') {
+		return res.json(formater({code:'1', desc:'图片格式不符合，只支持jpg/png/gif格式！'}));
+	}
 	var chunks = [];
 	var size = 0;
 	req.on('data' , function(chunk){
@@ -590,20 +598,39 @@ router.post('/uploadPhotoToAliyun', verify_token, (req, res, next) => {
 		  	// 删除文件
 		  	// var result4 = yield client.delete('object-key');
 		  	// console.log(result4);
-			  res.json(formater({code:'0', desc:'hi', data:{url:url}}));
+			  res.json(formater({code:'0', data:{url:url}}));
 			}).catch(function (err) {
 			  console.log(err);
 			});
 	});
 });
+router.post('/uploadPhotoToAliyun/bak', verify_token, (req, res, next) => {
+	co(function* () {
+		client.useBucket('my-image-carol');
+	  	// 上传图片
+	  	// use 'chunked encoding'
+	  var stream = fs.createReadStream('local-file');
+	  var result = yield client.putStream('object-key', stream);
+	  console.log(result);
+	  // don't use 'chunked encoding'
+	  var stream = fs.createReadStream('local-file');
+	  var size = fs.statSync('local-file').size;
+	  var result = yield client.putStream(
+	    'object-key', stream, {contentLength: size});
+	  console.log(result);
+		  res.json(formater({code:'0', data:{url:url}}));
+		}).catch(function (err) {
+		  console.log(err);
+		});
+});
 // 上传商品图片到服务器
 router.post('/uploadProductImageToAliyun', verify_token, (req, res, next) => {
 	if(req.headers['content-length'] === '0') {
-		return res.json(formater({code:'0', desc:'没有选择图片！'}));
+		return res.json(formater({code:'1', desc:'没有选择图片！'}));
 	}
 	let ext = req.headers["content-type"].split("/")[1];
 	if(ext !== 'jpeg' && ext !== 'png' && ext !== 'gif') {
-		return res.json(formater({code:'0', desc:'图片格式不符合，只支持jpg/png/gif格式！'}));
+		return res.json(formater({code:'1', desc:'图片格式不符合，只支持jpg/png/gif格式！'}));
 	}
 	var chunks = [];
 	var size = 0;
@@ -733,7 +760,7 @@ router.post('/addToCart', verify_token, (req, res, next) => {
 	let product_id = _user.product_id;
 	let product_quantity = parseInt(_user.quantity);
 	if(!product_id || !product_quantity) {
-		return res.json(formater({code:'0', desc:'请提供产品id和产品数量!'}));
+		return res.json(formater({code:'1', desc:'请提供产品id和产品数量!'}));
 	} else {
 		query('SELECT SUM(stocks) AS total_stocks FROM inventories WHERE product_id = ?', [product_id])
 		.then(data => {
@@ -757,7 +784,7 @@ router.post('/addToCart', verify_token, (req, res, next) => {
 					}
 				})
 			} else {
-				res.json(formater({code:'0', desc:'产品库存不足!'}));
+				res.json(formater({code:'1', desc:'产品库存不足!'}));
 			}
 		})
 	}
@@ -792,12 +819,12 @@ router.post('/removeFromCart', verify_token, (req, res, next) => {
 	let user_id = req.api_user.data.user_id;
 	let product_id = _user.product_id;
 	if(!product_id) {
-		return res.json(formater({code:'0', desc:'请提供产品id!'}));
+		return res.json(formater({code:'1', desc:'请提供产品id!'}));
 	} else {
 		query('SELECT product_id, product_quantity FROM carts WHERE user_id = ? AND product_id = ?', [user_id, product_id])
 		.then(data => {
 			if(data.results.length === 0) {
-				return res.json(formater({code:'0', desc:'该用户的购物车中不存在该商品！'}));
+				return res.json(formater({code:'1', desc:'该用户的购物车中不存在该商品！'}));
 			} else {
 				query('DELETE FROM carts WHERE user_id = ? AND product_id = ?', [user_id, product_id])
 				.then(data => {
@@ -812,7 +839,7 @@ router.all('/getProductDetails', (req, res, next) => {
 	let _user = req.body;
 	let product_id = _user.product_id || req.query.product_id;
 	if(!product_id) {
-		return res.json(formater({code:'0', desc:'请提供产品id!'}));
+		return res.json(formater({code:'1', desc:'请提供产品id!'}));
 	} else {
 		let q1 = query('SELECT p.*, o.totalSales FROM products p INNER JOIN ' + 
 			'(SELECT product_id, SUM(quantity) AS totalSales FROM order_details GROUP BY product_id) o ' + 
@@ -832,7 +859,7 @@ router.all('/getAllImages', (req, res, next) => {
 	let _user = req.body;
 	let product_id = _user.product_id || req.query.product_id;
 	if(!product_id) {
-		return res.json(formater({code:'0', desc:'请提供产品id!'}));
+		return res.json(formater({code:'1', desc:'请提供产品id!'}));
 	} else {
 		query('SELECT s.image_id, s.image_name, s.image_url, s.image_desc FROM store_images s, ' + 
 			'(SELECT a.image_id FROM product_image a WHERE a.product_id = ?) p WHERE s.image_id = p.image_id', [product_id])
@@ -893,19 +920,19 @@ router.post('/addProductImages', verify_token, (req, res, next) => {
 		image_desc: _user.image_desc
 	};
 	if(!product_id) {
-		return res.json(formater({code:'0', desc:'请提供产品id！'}));
+		return res.json(formater({code:'1', desc:'请提供产品id！'}));
 	} else {
 		if(!post.image_url) {
-			return res.json(formater({code:'0', desc:'请提供图片链接！'}));
+			return res.json(formater({code:'1', desc:'请提供图片链接！'}));
 		} else {
 			// 判断该产品是否是该用户创建的
 			query('SELECT user_id FROM products WHERE product_id = ?', [product_id])
 			.then(data => {
 				if(data.results.length === 0) {
-					res.json(formater({code:'0', desc:'该产品不存在！'}));
+					res.json(formater({code:'1', desc:'该产品不存在！'}));
 				} else {
 					if(data.results[0].user_id !== user_id) {
-						res.json(formater({code:'0', desc:'该产品不是该用户创建的！'}));
+						res.json(formater({code:'1', desc:'该产品不是该用户创建的！'}));
 					} else {
 						query('INSERT INTO store_images SET ?', [post])
 						.then(data => {
@@ -940,7 +967,7 @@ router.post('/updateUserAccount/delivery', verify_token, (req, res, next) => {
 		query('SELECT delivery_id FROM deliveries WHERE delivery_id = ?', [delivery_id])
 		.then(data => {
 			if(data.results.length === 0) {
-				return res.json(formater({code:'0',desc:'该id对应的收货地址不存在，请确定是要修改已有收货地址还是新增收货地址，新增的话不需要提供id字段！'}));
+				return res.json(formater({code:'1',desc:'该id对应的收货地址不存在，请确定是要修改已有收货地址还是新增收货地址，新增的话不需要提供id字段！'}));
 			} else {
 				query('UPDATE deliveries SET delivery_address = ?, delivery_province = ?, delivery_city = ?, ' + 
 					'delivery_town = ?, consignee = ?, consignee_phone = ? WHERE delivery_id = ?', [post.delivery_address, post.delivery_province, 
@@ -1015,12 +1042,12 @@ router.post('/photoLike', (req, res, next) => {
 	let image_id = req.body.image_id;
 	let like = req.body.like;
 	if(like !== '0' && like !== '1') {
-		return res.json(formater({code:'0', desc:'参数错误！'}));
+		return res.json(formater({code:'1', desc:'参数错误！'}));
 	}
 	query('SELECT image_id, liked FROM images WHERE image_id = ?', [image_id])
 	.then(data => {
 		if(data.results.length === 0) {
-			return res.json(formater({code:'0', desc:'图片不存在！'}));
+			return res.json(formater({code:'1', desc:'图片不存在！'}));
 		} else {
 			let liked = parseInt(data.results[0].liked);
 			if(like === '0') {

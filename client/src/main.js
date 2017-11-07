@@ -66,27 +66,14 @@ const store = new Vuex.Store({
   state: {
     apiUrl: 'http://localhost:3000',
     showLogin: false,
-    showRegister: false,
-    userInfo: null,
-    permissions: null,
-    notice: null,
-    expired: false
+    email_setting_checkbox: ''
   },
   mutations: {
     showLogin (state, flag) {
       state.showLogin = flag
     },
-    showRegister (state, flag) {
-      state.showRegister = flag
-    },
-    updateUserInfo (state, data) {
-      state.userInfo = data
-    },
-    updatePermission (state, data) {
-      state.permissions = data
-    },
-    updateNotice (state, data) {
-      state.notice = data
+    get_email_setting (state, settings) {
+      state.email_setting_checkbox = settings
     }
   }
 })

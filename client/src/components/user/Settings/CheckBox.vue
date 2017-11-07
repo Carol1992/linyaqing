@@ -22,7 +22,7 @@
       return {
         indeterminate: true,
         checkAll: false,
-        checkAllGroup: ['1', '2', '3', '4', '5', '6']
+        checkAllGroup: localStorage.lq_email_settings.split(',') || []
       }
     },
     methods: {
@@ -41,7 +41,7 @@
         }
       },
       checkAllGroupChange (data) {
-        if (data.length === 3) {
+        if (data.length === 6) {
           this.indeterminate = false
           this.checkAll = true
         } else if (data.length > 0) {
@@ -51,7 +51,11 @@
           this.indeterminate = false
           this.checkAll = false
         }
+        this.$store.commit('get_email_setting', this.checkAllGroup.toString())
       }
+    },
+    mounted () {
+      this.$store.commit('get_email_setting', this.checkAllGroup.toString())
     }
   }
 </script>

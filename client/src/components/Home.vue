@@ -7,7 +7,7 @@
     <div class="navigate">
       <span class="nav" :class="{activated: isActivated}" @click='getHot'>最热</span>
       <span class="nav" :class="{activated: isActivated2}" @click='getNew'>最新</span>
-      <span class="nav" :class="{activated: isActivated3}" @click='getFollowing'>关注</span>
+      <span v-if='isLogin' class="nav" :class="{activated: isActivated3}" @click='getFollowing'>关注</span>
     </div>
     <Photos :photos="photos"></Photos>
   </div>
@@ -24,6 +24,7 @@ export default {
   },
   data () {
     return {
+      isLogin: this.$store.state.isLogin,
       isActivated: true,
       isActivated2: false,
       isActivated3: false,
@@ -154,10 +155,10 @@ export default {
     }
   },
   mounted () {
+    this.getHot()
     this.$nextTick(function () {
       window.addEventListener('scroll', this.onScroll)
     })
-    this.getHot()
   }
 }
 </script>

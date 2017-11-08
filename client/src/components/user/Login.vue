@@ -22,7 +22,7 @@
         <input type="button" value="登 录" @click='goLogin'>
       </div>
       <div class="goRegister">
-        <span>尚未注册？ 前往<router-link to='register'>注册</router-link></span>
+        <span>尚未注册？ 前往<router-link to='/register'>注册</router-link></span>
       </div>
     </div>
   </div>
@@ -87,6 +87,7 @@
     position: fixed;
     top: 0;
     z-index: 3;
+    background-color: #fff;
   }
   .home {
     width: 100px;

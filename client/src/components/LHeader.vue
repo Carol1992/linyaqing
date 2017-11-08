@@ -56,7 +56,7 @@
         })
       },
       tryLogin () {
-        this.$router.push('login')
+        this.$router.push('/login')
       },
       onResize () {
         if (document.body.clientWidth < 809) {

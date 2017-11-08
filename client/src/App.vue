@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <div class="myheader">
+    <div class="myheader" v-if='showHeader'>
       <LHeader></LHeader>
     </div>
     <router-view/>
@@ -16,7 +16,7 @@ export default {
   },
   data () {
     return {
-
+      showHeader: this.$store.state.showHeader
     }
   },
   methods: {

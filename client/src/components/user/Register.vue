@@ -26,7 +26,7 @@
         <input type="button" value="注 册" @click='goRegister'>
       </div>
       <div class="goRegister">
-        <span>已经有账号？ 前往<router-link to='login'>登录</router-link></span>
+        <span>已经有账号？ 前往<router-link to='/login'>登录</router-link></span>
       </div>
     </div>
   </div>
@@ -96,6 +96,7 @@
     position: fixed;
     top: 0;
     z-index: 3;
+    background-color: #fff;
   }
   .home {
     width: 100px;

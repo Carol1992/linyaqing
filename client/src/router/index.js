@@ -40,12 +40,18 @@ export default new Router({
     {
       path: '/userCenter/*',
       name: 'userCenter',
-      component: UserCenter
+      component: UserCenter,
+      meta: {
+        requireAuth: true
+      }
     },
     {
       path: '/userProfile/*',
       name: 'userProfile',
-      component: UserProfile
+      component: UserProfile,
+      meta: {
+        requireAuth: true
+      }
     }
   ]
 })

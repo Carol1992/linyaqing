@@ -3,15 +3,14 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
-import Vuex from 'vuex'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 import iView from 'iview'
 import '../my-theme/index.less'
+import store from './store/index.js'
 
 Vue.config.debug = true // debug
 Vue.use(VueAxios, axios)
-Vue.use(Vuex)
 Vue.use(iView)
 
 Vue.config.productionTip = false
@@ -27,7 +26,7 @@ router.beforeEach((to, from, next) => {
       next()
     } else {
       next({
-        path: '/',
+        path: '/login',
         query: {redirect: to.fullPath}  // 将跳转的路由path作为参数，登录成功后跳转到该路由
       })
     }
@@ -44,11 +43,11 @@ axios.interceptors.response.use(
   error => {
     if (error.response) {
       switch (error.response.status) {
-        case 401:
-          // 返回 401 清除token信息并跳转到登录页面
+        case 403:
+          // 返回 403 清除token信息并跳转到登录页面
           localStorage.removeItem('token')
           router.replace({
-            path: '/',
+            path: '/login',
             query: {redirect: router.currentRoute.fullPath}
           })
           break
@@ -62,21 +61,6 @@ axios.interceptors.response.use(
     return Promise.reject(error)   // 返回接口返回的错误信息
   })
 
-const store = new Vuex.Store({
-  state: {
-    apiUrl: 'http://localhost:3000',
-    showLogin: false,
-    email_setting_checkbox: ''
-  },
-  mutations: {
-    showLogin (state, flag) {
-      state.showLogin = flag
-    },
-    get_email_setting (state, settings) {
-      state.email_setting_checkbox = settings
-    }
-  }
-})
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

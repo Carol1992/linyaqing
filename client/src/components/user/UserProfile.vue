@@ -220,11 +220,12 @@
           this.notifyMsg = '账户成功删除！'
           this.success(true)
           localStorage.removeItem('token')
+          this.$store.commit('isLogin', false)
           this.$router.push('/')
         })
       },
       changeEmailSettings () {
-        let emailSettings = this.$store.state.email_setting_checkbox
+        let emailSettings = this.$store.state.emailSettings
         userOp.updateUserAccount.emailSettings(emailSettings, (res) => {
           if (res.data.code === '1') {
             this.notifyMsg = res.data.desc || '操作失败！'

@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <div class="myheader" v-if='showHeader'>
+    <div class="myheader">
       <LHeader></LHeader>
     </div>
     <router-view/>
@@ -15,9 +15,7 @@ export default {
     LHeader
   },
   data () {
-    return {
-      showHeader: this.$store.state.showHeader
-    }
+    return {}
   },
   methods: {
     changeTitle () {
@@ -26,6 +24,19 @@ export default {
   },
   mounted () {
     this.changeTitle()
+    if (localStorage.token) {
+      this.$store.commit('isLogin', true)
+    } else {
+      this.$store.commit('isLogin', false)
+    }
+    if (this.login) {
+      this.$store.dispatch('getUserInfo')
+    }
+  },
+  computed: {
+    login () {
+      return this.$store.state.alreadyLogin
+    }
   }
 }
 </script>

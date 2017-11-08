@@ -1,26 +1,39 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import userOp from '../../api/user'
 
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
   state: {
-    apiUrl: 'http://localhost:3000',
-    showHeader: true,
-    email_setting_checkbox: '',
-    isLogin: false
+    emailSettings: '',
+    userInfo: {},
+    alreadyLogin: false
   },
   mutations: {
-    set_showHeader (state, flag) {
-      state.showHeader = flag
+    UpdateEmailSettings (state, settings) {
+      state.emailSettings = settings
     },
-    get_email_setting (state, settings) {
-      state.email_setting_checkbox = settings
+    updateUserInfo (state, info) {
+      state.userInfo = info
     },
     isLogin (state, flag) {
-      state.isLogin = flag
+      state.alreadyLogin = flag
     }
-  }
+  },
+  actions: {
+    getUserInfo ({ commit }) {
+      userOp.getUserInfo((res) => {
+        let info = res.data.data
+        if (info.image_md5 === 'null' || !info.image_md5) {
+          info.image_md5 = require('@/assets/img/user_default.jpg')
+        }
+        commit('UpdateEmailSettings', info.email_settings)
+        commit('updateUserInfo', info)
+      })
+    }
+  },
+  getters: {}
 })
 
 export default store

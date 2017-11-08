@@ -3,10 +3,10 @@
     <div class="top">
       <div class="user">
         <div class="avatar">
-          <img :src='avatar' alt="">
+          <img :src='info.image_md5' alt="">
         </div>
         <div class="name">
-          <span>{{user_name}}</span>
+          <span>{{info.user_name}}</span>
           <span class="more" @click='gotoProfile'><Icon type="ios-more-outline"></Icon></span>
         </div>
       </div>
@@ -21,14 +21,16 @@
   export default {
     name: 'userCenter',
     data () {
-      return {
-        avatar: localStorage.lq_image_md5,
-        user_name: localStorage.lq_user_name
-      }
+      return {}
     },
     methods: {
       gotoProfile () {
-        this.$router.push({path: `/userProfile/${localStorage.lq_user_name}`})
+        this.$router.push({path: `/userProfile/${this.info.user_name}`})
+      }
+    },
+    computed: {
+      info () {
+        return this.$store.state.userInfo
       }
     }
   }

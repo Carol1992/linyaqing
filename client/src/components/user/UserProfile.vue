@@ -35,7 +35,7 @@
         <div class="part1">
           <div class="user_avatar">
             <div class="myavatar">
-              <img :src='avatar' alt="">
+              <img :src='info.image_md5' alt="">
             </div>
             <span id="changeIco" @click='changeAvatar1'>更换头像</span>
             <input type="file" class="hidden-file-upload" id="uploadImg" @change='changeAvatar2'>
@@ -43,26 +43,26 @@
           <div class="user_info">
             <div class="account">
               <span><Icon type="email"></Icon> 邮 箱</span>
-              <input type="text" maxlength="50" v-model='email'>
+              <input type="text" maxlength="50" v-model='info.email'>
             </div>
             <div class="username">
               <span><Icon type="person"></Icon> 昵 称</span>
-              <input type="text" maxlength="20" v-model='username'>
+              <input type="text" maxlength="20" v-model='info.user_name'>
             </div>
             <div class="website">
               <span><Icon type="link"></Icon> 个人网站</span>
-              <input type="text" maxlength="100" v-model='website'>
+              <input type="text" maxlength="100" v-model='info.personal_site'>
             </div>
           </div>
         </div>
         <div class="part2">
           <div class="user_loc">
             <span><Icon type="location"></Icon> 住 址</span>
-            <input type="text" maxlength="100" v-model='location'>
+            <input type="text" maxlength="100" v-model='info.address'>
           </div>
           <div class="user_bio">
             <span><Icon type="information-circled"></Icon> 个人简介</span>
-            <textarea name="" id="" cols="30" rows="10" v-model='bio'></textarea>
+            <textarea name="" id="" cols="30" rows="10" v-model='info.bio'></textarea>
           </div>
           <div class="error" v-if='showError1'>
             <span>{{errorMsg}}</span>
@@ -120,16 +120,6 @@
         isApp: false,
         isDelete: false,
         nowEdit: '个人信息',
-        avatar: localStorage.lq_image_md5,
-        email: localStorage.lq_email,
-        username: localStorage.lq_user_name,
-        website: localStorage.lq_personal_site,
-        location: localStorage.lq_address,
-        bio: localStorage.lq_bio,
-        wechat: '',
-        province: '',
-        city: '',
-        town: '',
         showError1: false,
         showError2: false,
         errorMsg: '',
@@ -155,19 +145,9 @@
         })
       },
       changeInfo () {
-        let data = {
-          token: localStorage.token,
-          email: this.email,
-          user_name: this.username,
-          personal_site: this.website,
-          wechat: this.wechat,
-          location: this.location,
-          bio: this.bio,
-          province: this.province,
-          city: this.city,
-          town: this.town
-        }
-        if (!this.email || !this.username) {
+        let data = this.info
+        data.token = localStorage.token
+        if (!data.email || !data.user_name) {
           this.showError1 = true
           this.errorMsg = '邮箱和昵称不能为空！'
           return
@@ -179,17 +159,9 @@
             this.error(true)
             return
           }
-          localStorage.lq_user_name = data.user_name
-          localStorage.lq_email = data.email
-          localStorage.lq_personal_site = data.personal_site
-          localStorage.lq_address = data.location
-          localStorage.lq_bio = data.bio
+          this.$store.dispatch('getUserInfo')
           this.notifyMsg = '修改成功！'
           this.success(true)
-          // localStorage.lq_province = data.province
-          // localStorage.lq_city = data.city
-          // localStorage.lq_town = data.town
-          // localStorage.lq_wechat = data.wechat
         })
       },
       saveImgToAliyun (formData, file) {
@@ -211,7 +183,7 @@
                 this.error(true)
                 return
               }
-              localStorage.lq_image_md5 = res.data.data.url
+              this.$store.dispatch('getUserInfo')
             })
           }
           image.src = data
@@ -247,7 +219,7 @@
           }
           this.notifyMsg = '账户成功删除！'
           this.success(true)
-          localStorage.clear()
+          localStorage.removeItem('token')
           this.$router.push('/')
         })
       },
@@ -259,7 +231,7 @@
             this.error(true)
             return
           }
-          localStorage.lq_email_settings = emailSettings
+          this.$store.dispatch('getUserInfo')
           this.notifyMsg = '邮件提醒设置成功！'
           this.success(true)
         })
@@ -279,6 +251,11 @@
             this.error(true)
           }
         }
+      }
+    },
+    computed: {
+      info () {
+        return this.$store.state.userInfo
       }
     }
   }

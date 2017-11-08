@@ -18,11 +18,11 @@
       <div class="upload">
         <span>上传图片</span>
       </div>
-      <div class="user" @click='tryLogin' v-if='!alreadyLogin'>
+      <div class="user" @click='tryLogin' v-if='!login'>
         <span >登录</span>
       </div>
-      <div class="loginUser" v-if='alreadyLogin' @click='gotoUserCenter'>
-        <img :src='avatar' height="49" width="49" alt="">
+      <div class="loginUser" v-if='login' @click='gotoUserCenter'>
+        <img :src='info.image_md5' height="49" width="49" alt="">
       </div>
     </div>
   </div>
@@ -30,13 +30,12 @@
 
 <script>
   import $ from 'jquery'
+  import {mapState} from 'vuex'
   export default {
     name: 'Lheader',
     data () {
       return {
-        alreadyLogin: false,
-        showMore: true,
-        avatar: ''
+        showMore: true
       }
     },
     methods: {
@@ -66,24 +65,23 @@
         }
       },
       gotoUserCenter () {
-        this.$router.push({path: `/userCenter/${localStorage.lq_user_name}`})
+        this.$router.push({path: `/userCenter/${this.info.user_name}`})
       }
     },
     mounted () {
       this.$nextTick(function () {
         window.addEventListener('resize', this.onResize)
       })
-      if (localStorage.token) {
-        this.alreadyLogin = true
-      }
       if (document.body.clientWidth < 809) {
         this.showMore = false
       }
-      if (localStorage.lq_image_md5 !== 'null' && localStorage.lq_image_md5 !== '') {
-        this.avatar = localStorage.lq_image_md5
-      } else {
-        this.avatar = require('../assets/img/user_default.jpg')
-      }
+    },
+    computed: {
+      localComputed () { /* ... */ },
+      ...mapState({
+        info: 'userInfo',
+        login: 'alreadyLogin'
+      })
     }
   }
 </script>

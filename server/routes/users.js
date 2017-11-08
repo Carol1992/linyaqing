@@ -90,6 +90,20 @@ router.post('/login', function(req, res, next) {
   	}
 	});
 });
+// 获取用户信息
+router.all('/getUserInfo', verify_token, (req, res, next) => {
+	let user_id = req.api_user.data.user_id
+	let q1 = query('SELECT * FROM users WHERE user_id = ?', [user_id]);
+	let q2 = query('SELECT settings_id FROM user_email WHERE user_id = ?', [user_id]);
+	Promise.all([q1, q2]).then(values => {
+		let settings = []
+		for(s of values[1].results) {
+			settings.push(s.settings_id)
+		}
+		values[0].results[0].email_settings = settings.toString()
+		res.json(formater({code:'0', data:values[0].results[0]}))
+	})
+})
 // 修改用户信息
 router.post('/updateUserAccount/info', verify_token, (req, res, next) => {
 	let _user = req.body;

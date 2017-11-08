@@ -26,33 +26,44 @@ module.exports = {
 				callback(response)
 				return
 			}
-			localStorage.clear()
+			localStorage.removeItem('token')
 		  localStorage.token = info.token
-		  localStorage.lq_userId = info.user_id
-	    localStorage.lq_is_developer = info.is_developer
-			localStorage.lq_is_admin = info.is_admin
-			localStorage.lq_user_name = info.user_name
-			localStorage.lq_phone = info.phone
-			localStorage.lq_email = info.email
-			localStorage.lq_password = info.password
-			localStorage.lq_province = info.province
-			localStorage.lq_city = info.city
-			localStorage.lq_town = info.town
-			localStorage.lq_image_md5 = info.image_md5
-			localStorage.lq_personal_site = info.personal_site
-			localStorage.lq_wechat = info.wechat
-			localStorage.lq_address = info.address
-			localStorage.lq_bio = info.bio
-			localStorage.lq_created_time = info.created_time
-			localStorage.lq_dev_url = info.dev_url
-			localStorage.lq_dev_desc = info.dev_desc
-			localStorage.lq_delivery_address = info.delivery_address
-			localStorage.lq_delivery_city = info.delivery_city
-			localStorage.lq_delivery_province = info.delivery_province
-			localStorage.lq_delivery_town = info.delivery_town
-			localStorage.lq_consignee = info.consignee
-			localStorage.lq_consignee_phone = info.consignee_phone
-			localStorage.lq_email_settings = info.email_settings
+		 //  localStorage.lq_userId = info.user_id
+	  //   localStorage.lq_is_developer = info.is_developer
+			// localStorage.lq_is_admin = info.is_admin
+			// localStorage.lq_user_name = info.user_name
+			// localStorage.lq_phone = info.phone
+			// localStorage.lq_email = info.email
+			// localStorage.lq_password = info.password
+			// localStorage.lq_province = info.province
+			// localStorage.lq_city = info.city
+			// localStorage.lq_town = info.town
+			// localStorage.lq_image_md5 = info.image_md5
+			// localStorage.lq_personal_site = info.personal_site
+			// localStorage.lq_wechat = info.wechat
+			// localStorage.lq_address = info.address
+			// localStorage.lq_bio = info.bio
+			// localStorage.lq_created_time = info.created_time
+			// localStorage.lq_dev_url = info.dev_url
+			// localStorage.lq_dev_desc = info.dev_desc
+			// localStorage.lq_delivery_address = info.delivery_address
+			// localStorage.lq_delivery_city = info.delivery_city
+			// localStorage.lq_delivery_province = info.delivery_province
+			// localStorage.lq_delivery_town = info.delivery_town
+			// localStorage.lq_consignee = info.consignee
+			// localStorage.lq_consignee_phone = info.consignee_phone
+			// localStorage.lq_email_settings = info.email_settings
+		  callback(response)
+		})
+		.catch(function (error) {
+		  console.log(error)
+		});
+	},
+	getUserInfo (callback) {
+		axios.post('/api/getUserInfo', {
+			token:localStorage.token,
+		})
+		.then(function (response) {
 		  callback(response)
 		})
 		.catch(function (error) {

@@ -6,7 +6,7 @@
       :value="checkAll"
       @click.prevent.native="handleCheckAll">全选</Checkbox>
   </div>
-  <CheckboxGroup v-model="checkAllGroup" @on-change="checkAllGroupChange">
+  <CheckboxGroup v-model="emailSettings" @on-change="checkAllGroupChange">
     <Checkbox label="1"><span>更改用户信息邮件通知</span></Checkbox>
     <Checkbox label="2"><span>关注的作者有作品更新时邮件通知</span></Checkbox>
     <Checkbox label="3"><span>商店有新品上架时邮件通知</span></Checkbox>
@@ -21,8 +21,7 @@
     data () {
       return {
         indeterminate: true,
-        checkAll: false,
-        checkAllGroup: localStorage.lq_email_settings.split(',') || []
+        checkAll: false
       }
     },
     methods: {
@@ -33,12 +32,13 @@
           this.checkAll = !this.checkAll
         }
         this.indeterminate = false
-
+        let emailSettings = ''
         if (this.checkAll) {
-          this.checkAllGroup = ['1', '2', '3', '4', '5', '6']
+          emailSettings = ['1', '2', '3', '4', '5', '6']
         } else {
-          this.checkAllGroup = []
+          emailSettings = []
         }
+        this.$store.commit('UpdateEmailSettings', emailSettings.toString())
       },
       checkAllGroupChange (data) {
         if (data.length === 6) {
@@ -51,11 +51,17 @@
           this.indeterminate = false
           this.checkAll = false
         }
-        this.$store.commit('get_email_setting', this.checkAllGroup.toString())
+        console.log(this.emailSettings)
+        this.$store.commit('UpdateEmailSettings', this.emailSettings.toString())
       }
     },
-    mounted () {
-      this.$store.commit('get_email_setting', this.checkAllGroup.toString())
+    computed: {
+      emailSettings: {
+        get: function () {
+          return this.$store.state.emailSettings.split(',') || []
+        },
+        set: function (newValue) {}
+      }
     }
   }
 </script>

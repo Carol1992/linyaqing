@@ -27,5 +27,15 @@ module.exports = {
       console.log(error)
     });
   },
-
+  getAliyunKey (callback) {
+    axios.post('/api/getAliyunKey', {
+      token:localStorage.token
+    })
+    .then(function (response) {
+      callback(response)
+    })
+    .catch(function (error) {
+      console.log(error)
+    });
+  }
 }

@@ -16,9 +16,9 @@ Vue.use(iView)
 Vue.config.productionTip = false
 
 // 引入mockjs
-require('./mock.js')
-const faker = require('faker')
-faker.locale = 'zh_CN'
+// require('./mock.js')
+// const faker = require('faker')
+// faker.locale = 'zh_CN'
 
 router.beforeEach((to, from, next) => {
   if (to.meta.requireAuth) {  // 判断该路由是否需要登录权限

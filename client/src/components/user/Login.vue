@@ -15,9 +15,6 @@
         <span><Icon type="locked"></Icon> 密 码</span>
         <input type="password" maxlength="20" v-model='password'>
       </div>
-      <div class="error" v-if='showError'>
-        <span>{{errorMsg}}</span>
-      </div>
       <div class="submit">
         <input type="button" value="登 录" @click='goLogin'>
       </div>
@@ -35,42 +32,45 @@
     data () {
       return {
         email: '',
-        password: '',
-        showError: false,
-        errorMsg: ''
+        password: ''
       }
     },
     methods: {
+      error (nodesc) {
+        this.$Notice.error({
+          title: this.notifyMsg,
+          desc: nodesc ? '' : ''
+        })
+      },
       goHome () {
         this.$router.push('/')
       },
       goLogin () {
         if (!this.email || !this.password) {
-          this.showError = true
-          this.errorMsg = '请填写完整的注册信息！'
+          this.notifyMsg = '邮箱和昵称不能为空！'
+          this.error(true)
           return
         }
         let emailPattern = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/
         let passwordPattern = /[a-zA-Z0-9_-]{6,20}/
         if (!emailPattern.exec(this.email)) {
-          this.showError = true
-          this.errorMsg = '请填写有效的邮箱！'
+          this.notifyMsg = '请填写有效的邮箱！'
+          this.error(true)
           return
         }
         if (!passwordPattern.exec(this.password)) {
-          this.showError = true
-          this.errorMsg = '密码格式不正确！'
+          this.notifyMsg = '密码格式不正确！'
+          this.error(true)
           return
         }
-        this.showError = false
         let data = {
           email: this.email,
           password: this.password
         }
         userOp.login(data, (res) => {
           if (JSON.stringify(res.data.data) === '{}') {
-            this.showError = true
-            this.errorMsg = '密码或邮箱错误！'
+            this.notifyMsg = '邮箱或密码错误！'
+            this.error(true)
             return
           }
           this.$router.push('/')

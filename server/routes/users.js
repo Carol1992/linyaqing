@@ -9,13 +9,13 @@ let crypto = require('crypto');
 let jwt = require('jsonwebtoken');
 let verify_token= require('./verify_token');
 // 阿里云OSS
-var secret = require('./secret');
+var my_secret = require('./secret');
 var co = require('co');
 var OSS = require('ali-oss');
 var client = new OSS({
-  region: secret.region,
-  accessKeyId: secret.accessKeyId,
-  accessKeySecret: secret.accessKeySecret
+  region: my_secret.region,
+  accessKeyId: my_secret.accessKeyId,
+  accessKeySecret: my_secret.accessKeySecret
 });
 // 处理表单上传
 var formidable = require('formidable');
@@ -113,7 +113,7 @@ router.post('/updateUserAccount/info', verify_token, (req, res, next) => {
 		user_name: _user.user_name,
 		personal_site: _user.personal_site,
 		wechat: _user.wechat,
-		address: _user.location,
+		address: _user.address,
 		bio: _user.bio,
 		province: _user.province,
 		city: _user.city,
@@ -533,6 +533,31 @@ router.all('/getCollection/one', (req, res, next) => {
 		res.json(formater({code:'0', data:new_data}));
 	});
 });
+// 向服务端请求签名然后直接上传到阿里云
+router.all('/getAliyunKey', verify_token, (req, res, next) => {
+	let upload_dir = 'users/';
+	let end = new Date().getTime() + 300000;
+  let expiration = new Date(end).toISOString();
+  let policyString = {
+    expiration: expiration,
+    conditions: [
+      ['content-length-range', 0, 1048576000],
+      ['starts-with', '$key', upload_dir]
+    ]
+  };
+  policyString = JSON.stringify(policyString);
+  const policy = new Buffer(policyString).toString('base64');
+  const signature = crypto.createHmac('sha1', my_secret.accessKeySecret).update(policy).digest('base64');
+  let keys = {
+    accessKeyId: my_secret.accessKeyId,
+    host_user: my_secret.host_user,
+    policy: policy,
+    signature: signature,
+    saveName: end,
+    startsWith: upload_dir
+  };
+  res.json(formater({code:'0', data:keys}));
+})
 // 用户上传图片
 router.post('/uploadUserPhoto', verify_token, (req, res, next) => {
 	let _user = req.body;

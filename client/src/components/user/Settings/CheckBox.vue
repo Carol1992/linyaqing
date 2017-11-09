@@ -51,8 +51,7 @@
           this.indeterminate = false
           this.checkAll = false
         }
-        console.log(this.emailSettings)
-        this.$store.commit('UpdateEmailSettings', this.emailSettings.toString())
+        this.$store.commit('UpdateEmailSettings', data.toString())
       }
     },
     computed: {

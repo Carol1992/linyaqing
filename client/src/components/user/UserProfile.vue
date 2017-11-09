@@ -64,9 +64,6 @@
             <span><Icon type="information-circled"></Icon> 个人简介</span>
             <textarea name="" id="" cols="30" rows="10" v-model='info.bio'></textarea>
           </div>
-          <div class="error" v-if='showError1'>
-            <span>{{errorMsg}}</span>
-          </div>
           <div class="submit" @click='changeInfo'>
             <input type="button" value='提 交'>
           </div>
@@ -105,7 +102,8 @@
 </template>
 
 <script>
-  import $ from 'jquery'
+  // import $ from 'jquery'
+  // import axios from 'axios'
   import myCheckBox from './Settings/CheckBox'
   import userOp from '../../../api/user'
   import aliyunOp from '../../../api/aliyun'
@@ -120,12 +118,10 @@
         isApp: false,
         isDelete: false,
         nowEdit: '个人信息',
-        showError1: false,
-        showError2: false,
-        errorMsg: '',
         notifyMsg: '',
         password: '',
-        password_confirmed: ''
+        password_confirmed: '',
+        imgUrl: ''
       }
     },
     components: {
@@ -148,11 +144,10 @@
         let data = this.info
         data.token = localStorage.token
         if (!data.email || !data.user_name) {
-          this.showError1 = true
-          this.errorMsg = '邮箱和昵称不能为空！'
+          this.notifyMsg = '邮箱和昵称不能为空！'
+          this.error(true)
           return
         }
-        this.showError1 = false
         userOp.updateUserAccount.info(data, (res) => {
           if (res.data.code === '1') {
             this.notifyMsg = res.data.desc || '操作失败！'
@@ -164,7 +159,8 @@
           this.success(true)
         })
       },
-      saveImgToAliyun (formData, file) {
+      saveImgToAliyun (formData, file, host, startsWith, saveName) {
+        let self = this
         let reader = new FileReader()
         reader.onload = function (e) {
           let data = e.target.result
@@ -177,14 +173,22 @@
               this.error(true)
               return
             }
-            aliyunOp.uploadPhotoToAliyun(formData, (res) => {
-              if (res.data.code === '1') {
-                this.notifyMsg = res.data.desc || '操作失败！'
+            const xhr = new XMLHttpRequest()
+            xhr.open('post', host, true)
+            xhr.addEventListener('load', (e) => {
+              if (e.target.status !== 200) {
+                this.notifyMsg = '操作失败！'
                 this.error(true)
                 return
               }
-              this.$store.dispatch('getUserInfo')
-            })
+              if (e.target.status === 200) {
+                let imgUrl = host + '/' + startsWith + saveName
+                userOp.updateUserAccount.avatar(imgUrl, (res) => {
+                  self.$store.dispatch('getUserInfo')
+                })
+              }
+            }, false)
+            xhr.send(formData)
           }
           image.src = data
         }
@@ -238,25 +242,46 @@
         })
       },
       changeAvatar1 () {
-        $('#uploadImg').click()
+        document.getElementById('uploadImg').click()
       },
       changeAvatar2 () {
-        let formData = new FormData()
-        let file = $('.hidden-file-upload')[0].files[0]
-        if (file) {
-          if (file.type.indexOf('image/') !== -1) {
-            formData.append('file', file)
-            this.saveImgToAliyun(formData, file)
-          } else {
-            this.notifyMsg = '文件格式不正确！'
-            this.error(true)
+        aliyunOp.getAliyunKey((res) => {
+          let fd = new FormData()
+          let file = document.getElementById('uploadImg').files[0]
+          if (file) {
+            if (file.type.indexOf('image/') !== -1) {
+              const {accessKeyId, host_user, policy, signature, saveName, startsWith} = res.data.data
+              fd.append('OSSAccessKeyId', accessKeyId)
+              fd.append('policy', policy)
+              fd.append('signature', signature)
+              fd.append('key', startsWith + saveName)
+              fd.append('success_action_status', 200)
+              fd.append('file', file, saveName)
+              this.saveImgToAliyun(fd, file, host_user, startsWith, saveName)
+            } else {
+              this.notifyMsg = '文件格式不正确！'
+              this.error(true)
+            }
           }
-        }
+        })
       }
     },
     computed: {
       info () {
         return this.$store.state.userInfo
+      },
+      login () {
+        return this.$store.state.alreadyLogin
+      }
+    },
+    mounted () {
+      if (localStorage.token) {
+        this.$store.commit('isLogin', true)
+      } else {
+        this.$store.commit('isLogin', false)
+      }
+      if (this.login) {
+        this.$store.dispatch('getUserInfo')
       }
     }
   }

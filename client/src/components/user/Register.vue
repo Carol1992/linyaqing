@@ -19,9 +19,6 @@
         <span><Icon type="locked"></Icon> 密 码 <span class="info">(6-20位数字/字母/下划线/中划线)</span></span>
         <input type="password" maxlength="20" v-model='password'>
       </div>
-      <div class="error" v-if='showError'>
-        <span>{{errorMsg}}</span>
-      </div>
       <div class="submit">
         <input type="button" value="注 册" @click='goRegister'>
       </div>
@@ -46,11 +43,19 @@
       }
     },
     methods: {
+      error (nodesc) {
+        this.$Notice.error({
+          title: this.notifyMsg,
+          desc: nodesc ? '' : ''
+        })
+      },
       goHome () {
         this.$router.push('/')
       },
       goRegister () {
         if (!this.email || !this.username || !this.password) {
+          this.notifyMsg = '邮箱和昵称不能为空！'
+          this.error(true)
           this.showError = true
           this.errorMsg = '请填写完整的注册信息！'
           return
@@ -59,21 +64,20 @@
         let namePattern = /[\u4e00-\u9fa5_a-zA-Z0-9_]{1,20}/
         let passwordPattern = /[a-zA-Z0-9_-]{6,20}/
         if (!emailPattern.exec(this.email)) {
-          this.showError = true
-          this.errorMsg = '请填写有效的邮箱！'
+          this.notifyMsg = '请填写有效的邮箱！'
+          this.error(true)
           return
         }
         if (!namePattern.exec(this.username)) {
-          this.showError = true
-          this.errorMsg = '用户名支持中英文和数字！'
+          this.notifyMsg = '用户名支持中英文和数字！'
+          this.error(true)
           return
         }
         if (!passwordPattern.exec(this.password)) {
-          this.showError = true
-          this.errorMsg = '密码格式不正确！'
+          this.notifyMsg = '密码格式不正确！'
+          this.error(true)
           return
         }
-        this.showError = false
         let data = {
           user_name: this.username,
           email: this.email,

@@ -10,6 +10,7 @@
       <span class="nav" v-if='login' :class="{activated: isActivated3}" @click='getFollowing'>关注</span>
     </div>
     <Photos :photos="photos"></Photos>
+    <BackTop></BackTop>
   </div>
 </template>
 

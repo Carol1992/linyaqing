@@ -1,4 +1,13 @@
 module.exports = {
+  myPromise (url, data) {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest()
+      xhr.open('post', url, true)
+      xhr.onload = () => resolve(xhr)
+      xhr.onerror = () => reject(xhr.statusText)
+      xhr.send(data)
+    })
+  },
   uploadPhotoToAliyun (formData, callback) {
     axios.post('/api/uploadPhotoToAliyun', {
       token:localStorage.token,

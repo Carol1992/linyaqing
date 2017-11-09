@@ -102,8 +102,6 @@
 </template>
 
 <script>
-  // import $ from 'jquery'
-  // import axios from 'axios'
   import myCheckBox from './Settings/CheckBox'
   import userOp from '../../../api/user'
   import aliyunOp from '../../../api/aliyun'
@@ -161,38 +159,22 @@
       },
       saveImgToAliyun (formData, file, host, startsWith, saveName) {
         let self = this
-        let reader = new FileReader()
-        reader.onload = function (e) {
-          let data = e.target.result
-          let image = new Image()
-          image.onload = function () {
-            let width = image.width
-            let height = image.height
-            if (width < 480 || height < 480) {
-              this.notifyMsg = '图片尺寸不小于480*480！'
-              this.error(true)
-              return
-            }
-            const xhr = new XMLHttpRequest()
-            xhr.open('post', host, true)
-            xhr.addEventListener('load', (e) => {
-              if (e.target.status !== 200) {
-                this.notifyMsg = '操作失败！'
-                this.error(true)
-                return
-              }
-              if (e.target.status === 200) {
-                let imgUrl = host + '/' + startsWith + saveName
-                userOp.updateUserAccount.avatar(imgUrl, (res) => {
-                  self.$store.dispatch('getUserInfo')
-                })
-              }
-            }, false)
-            xhr.send(formData)
+        aliyunOp.myPromise(host, formData).then((xhr) => {
+          if (xhr.status !== 200) {
+            this.notifyMsg = '操作失败！'
+            this.error(true)
+            return
           }
-          image.src = data
-        }
-        reader.readAsDataURL(file)
+          if (xhr.status === 200) {
+            let imgUrl = host + '/' + startsWith + saveName
+            userOp.updateUserAccount.avatar(imgUrl, () => {
+              self.$store.dispatch('getUserInfo')
+            })
+          }
+        })
+        .catch((err) => {
+          console.log(err)
+        })
       },
       changePwd () {
         let data = {
@@ -245,24 +227,27 @@
         document.getElementById('uploadImg').click()
       },
       changeAvatar2 () {
+        let fd = new FormData()
+        let file = document.getElementById('uploadPhoto').files[0]
+        if (!file) {
+          this.notifyMsg = '请选择文件！'
+          this.error(true)
+          return
+        }
+        if (file.type.indexOf('image/') === -1) {
+          this.notifyMsg = '文件格式不正确！'
+          this.error(true)
+          return
+        }
         aliyunOp.getAliyunKey((res) => {
-          let fd = new FormData()
-          let file = document.getElementById('uploadImg').files[0]
-          if (file) {
-            if (file.type.indexOf('image/') !== -1) {
-              const {accessKeyId, host_user, policy, signature, saveName, startsWith} = res.data.data
-              fd.append('OSSAccessKeyId', accessKeyId)
-              fd.append('policy', policy)
-              fd.append('signature', signature)
-              fd.append('key', startsWith + saveName)
-              fd.append('success_action_status', 200)
-              fd.append('file', file, saveName)
-              this.saveImgToAliyun(fd, file, host_user, startsWith, saveName)
-            } else {
-              this.notifyMsg = '文件格式不正确！'
-              this.error(true)
-            }
-          }
+          const {accessKeyId, host_user, policy, signature, saveName, startsWith} = res.data.data
+          fd.append('OSSAccessKeyId', accessKeyId)
+          fd.append('policy', policy)
+          fd.append('signature', signature)
+          fd.append('key', startsWith + saveName)
+          fd.append('success_action_status', 200)
+          fd.append('file', file, saveName)
+          this.saveImgToAliyun(fd, file, host_user, startsWith, saveName)
         })
       }
     },

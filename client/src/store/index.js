@@ -8,7 +8,9 @@ const store = new Vuex.Store({
   state: {
     emailSettings: '',
     userInfo: {},
-    alreadyLogin: false
+    alreadyLogin: false,
+    photoInfo: {},
+    photoUrl: ''
   },
   mutations: {
     UpdateEmailSettings (state, settings) {
@@ -19,6 +21,12 @@ const store = new Vuex.Store({
     },
     isLogin (state, flag) {
       state.alreadyLogin = flag
+    },
+    getPhotoInfo (state, info) {
+      state.photoInfo = info
+    },
+    getPhotoUrl (state, url) {
+      state.photoUrl = url
     }
   },
   actions: {

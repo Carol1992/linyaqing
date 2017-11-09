@@ -7,6 +7,7 @@ import NotFound from '@/components/NotFound'
 import ServerError from '@/components/ServerError'
 import UserCenter from '@/components/user/UserCenter'
 import UserProfile from '@/components/user/UserProfile'
+import Photo from '@/components/photos/Photo'
 
 Vue.use(Router)
 
@@ -49,6 +50,14 @@ export default new Router({
       path: '/userProfile/*',
       name: 'userProfile',
       component: UserProfile,
+      meta: {
+        requireAuth: true
+      }
+    },
+    {
+      path: '/addPhoto',
+      name: 'addPhoto',
+      component: Photo,
       meta: {
         requireAuth: true
       }

@@ -41,25 +41,26 @@ module.exports = {
 		  console.log(error)
 		});	
 	},
-	uploadUserPhoto () {
+	uploadUserPhoto (data, callback) {
 		axios.post('/api/uploadUserPhoto', {
 			token:localStorage.token,
-			image_md5:'http://my-image-carol.oss-cn-beijing.aliyuncs.com/1509425905335.jpeg',
-			image_tags:'pig, animals',
-			make: '2222',
-			model: '2222',
-			focalLength: '2222',
-			aperture: '2222',
-			iso: '2222',
-			shutterSpeed: '2222',
-			story_title: '雅阁',
-			story_detail: '照片拍摄于今天早上，天气有点冷',
-			location: '广东省深圳市龙华区',
-			display: '0',
-			collection_id: ''
+			image_md5:data.image_md5,
+			image_tags:data.image_tags,
+			make: data.Make,
+			model: data.Model,
+			dateTimeOriginal: data.DateTimeOriginal,
+			focalLength: data.FocalLength,
+			aperture: data.ApertureValue,
+			iso: data.ISOSpeedRatings,
+			shutterSpeed: data.ShutterSpeedValue,
+			story_title: data.story_title,
+			story_detail: data.story_detail,
+			location: data.location,
+			display: '0'
+			//collection_id: data.collection_id
 		})
 		.then(function (response) {
-		  console.log(response)
+		  callback(response)
 		})
 		.catch(function (error) {
 		  console.log(error)

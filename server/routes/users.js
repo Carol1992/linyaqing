@@ -568,6 +568,7 @@ router.post('/uploadUserPhoto', verify_token, (req, res, next) => {
 		image_tags: _user.image_tags,
 		make: _user.make,
 		model: _user.model,
+		dateTimeOriginal: _user.dateTimeOriginal,
 		focalLength: _user.focalLength,
 		aperture: _user.aperture,
 		iso: _user.iso,

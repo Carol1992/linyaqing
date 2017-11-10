@@ -375,6 +375,7 @@
   }
   textarea {
     height: 160px;
+    resize: none;
   }
   #changeIco {
     margin-top: 10px;

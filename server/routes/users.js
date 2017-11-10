@@ -377,8 +377,10 @@ router.all('/search', (req, res, next) => {
 	let q1 = query('SELECT COUNT(DISTINCT user_id) AS all_users, COUNT(DISTINCT image_id) AS all_images, ' + 
 		'COUNT(DISTINCT collection_id) AS all_collections ' + 
 		'FROM images WHERE image_tags LIKE "%' + keyword + '%"', '');
-	let q2 = query('SELECT images.image_id, images.image_md5, images.liked, users.user_id, users.user_name, ' + 
-		'users.image_md5 FROM images, users WHERE images.user_id = users.user_id AND image_tags LIKE "%' + keyword + '%"', '');
+	let q2 = query('SELECT images.image_id, images.image_md5, images.image_tags, ' + 
+		'users.user_id, users.user_name, ' + 'users.image_md5 FROM images, users ' + 
+		'WHERE images.user_id = users.user_id AND images.image_tags LIKE "%' + 
+		keyword + '%"' , '');
 	Promise.all([q1, q2]).then(values => {
 		let response = {
 			basic_info: {
@@ -424,8 +426,8 @@ router.all('/getList/new', (req, res, next) => {
 	let _left = (pageNo - 1) * pageSize;
 	let q1 = query('SELECT COUNT(*) AS totalPage FROM images', '');
 	let q2 = query('SELECT i.display_location, i.location, i.created_time, i.image_md5, i.story_title, ' + 
-		'i.story_detail, i.user_id, i.liked, u.user_name, u.image_md5 AS user_avatar, u.email FROM images i, users u WHERE i.user_id = u.user_id ' + 
-		'ORDER BY created_time DESC LIMIT ?,?', [_left, pageSize]);
+		'i.story_detail, i.user_id, u.user_name, u.image_md5 AS user_avatar, u.email FROM images i, users u WHERE i.user_id = u.user_id ' + 
+		'ORDER BY i.created_time DESC LIMIT ?,?', [_left, pageSize]);
 	Promise.all([q1, q2]).then(values => {
 		let new_data = {
 				pageNo: pageNo,
@@ -444,7 +446,7 @@ router.all('/getList/hot', (req, res, next) => {
 	let _left = (pageNo - 1) * pageSize;
 	let q1 = query('SELECT COUNT(*) AS totalPage FROM images', '');
 	let q2 = query('SELECT i.display_location, i.location, i.created_time, i.image_md5, i.story_title, ' + 
-		'i.story_detail, i.user_id, i.liked, u.user_name, u.image_md5 AS user_avatar, u.email FROM images i, users u WHERE i.user_id = u.user_id ' + 
+		'i.story_detail, i.user_id, u.user_name, u.image_md5 AS user_avatar, u.email FROM images i, users u WHERE i.user_id = u.user_id ' + 
 		'ORDER BY i.liked DESC LIMIT ?,?', [_left, pageSize]);
 	Promise.all([q1, q2]).then(values => {
 		let new_data = {
@@ -465,7 +467,7 @@ router.all('/getList/following', verify_token, (req, res, next) => {
 	let _left = (pageNo - 1) * pageSize;
 	let q1 = query('SELECT COUNT(*) AS totalPage FROM images, (SELECT follower_id FROM relationships WHERE user_id = ?) a WHERE images.user_id = a.follower_id', [user_id]);
 	let q2 = query('SELECT i.display_location, i.location, i.created_time, i.image_md5, i.story_title, ' + 
-		'i.story_detail, i.user_id, i.liked, u.user_name, u.image_md5 AS user_avatar, u.email FROM (SELECT * FROM images, (SELECT follower_id FROM relationships WHERE ' + 
+		'i.story_detail, i.user_id, u.user_name, u.image_md5 AS user_avatar, u.email FROM (SELECT * FROM images, (SELECT follower_id FROM relationships WHERE ' + 
 		'user_id = ?) a WHERE images.user_id = a.follower_id) i, users u WHERE i.user_id = u.user_id LIMIT ?,?', [user_id, _left, pageSize]);
 	Promise.all([q1, q2]).then(values => {
 		let new_data = {
@@ -477,6 +479,51 @@ router.all('/getList/following', verify_token, (req, res, next) => {
 			res.json(formater({code:'0', data:new_data}));
 	});
 });
+// 已登陆用户，获取其所有的图片列表
+router.all('/getList/user', verify_token, (req, res, next) => {
+	let _user = req.body;
+	let user_id = req.api_user.data.user_id;
+	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
+	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
+	let _left = (pageNo - 1) * pageSize;
+	let q1 = query('SELECT COUNT(*) AS totalPage FROM images WHERE user_id = ?', [user_id]);
+	let q2 = query('SELECT i.display_location, i.location, i.created_time, i.image_md5, i.story_title, ' + 
+		'i.story_detail FROM images i, ' + 
+		'users u WHERE i.user_id = u.user_id AND i.user_id = ? ' + 
+		'ORDER BY i.created_time DESC LIMIT ?,?', [user_id, _left, pageSize]);
+	Promise.all([q1, q2]).then(values => {
+		let new_data = {
+				pageNo: pageNo,
+				pageSize: pageSize,
+				totalPage: Math.ceil(values[0].results[0].totalPage / pageSize),
+				lists: values[1].results
+			};
+			res.json(formater({code:'0', data:new_data}))
+	});
+});
+// 已登陆用户，获取其喜欢过的图片列表
+router.all('/getList/liked', verify_token, (req, res, next) => {
+	let _user = req.body;
+	let user_id = req.api_user.data.user_id;
+	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
+	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
+	let _left = (pageNo - 1) * pageSize;
+	let q1 = query('SELECT COUNT(image_id) AS totalPage FROM image_likes WHERE user_id = ?', [user_id]);
+	// let q2 = query('SELECT i.display_location, i.location, i.created_time, i.image_md5, i.story_title, ' + 
+	// 	'i.story_detail, i.user_id, u.user_name, u.image_md5 AS user_avatar, u.email FROM images i, users u WHERE i.user_id = u.user_id ' + 
+	// 	'ORDER BY i.liked DESC LIMIT ?,?', [_left, pageSize]);
+	let q2 = query('SELECT image_id FROM image_likes WHERE user_id = ?', [user_id]);
+	Promise.all([q1, q2]).then(values => {
+		let new_data = {
+				pageNo: pageNo,
+				pageSize: pageSize,
+				totalPage: Math.ceil(values[0].results[0].totalPage / pageSize),
+				lists: values[1].results
+			};
+			res.json(formater({code:'0', data:new_data}))
+	});
+});
+
 // 获取所有图片集
 router.all('/getCollection/all', (req, res, next) => {
 	let _user = req.body;
@@ -502,8 +549,8 @@ router.all('/getCollection/user', verify_token, (req, res, next) => {
 	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
 	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
-	let q1 = query('SELECT COUNT(collection_id) AS totalPage FROM images WHERE user_id = ? GROUP BY collection_id', [user_id]);
-	let q2 = query('SELECT * FROM (SELECT collection_id FROM images WHERE user_id = ? GROUP BY collection_id) a LIMIT ?,?', [user_id, _left, pageSize]);
+	let q1 = query('SELECT COUNT(*) AS totalPage FROM (SELECT c.collection_id FROM collections c, images i WHERE c.collection_id = i.collection_id AND i.user_id = ? GROUP BY i.collection_id) a', [user_id]);
+	let q2 = query('SELECT c.* FROM collections c, images i WHERE c.collection_id = i.collection_id AND i.user_id = ? GROUP BY i.collection_id LIMIT ?,?', [user_id, _left, pageSize]);
 	Promise.all([q1, q2]).then(values => {
 		let new_data = {
 			pageNo: pageNo,
@@ -1078,7 +1125,8 @@ router.post('/placeOrder', verify_token, (req, res, next) => {
 });
 
 // 用户给图片点赞
-router.post('/photoLike', (req, res, next) => {
+router.post('/photoLike', verify_token, (req, res, next) => {
+	let user_id = req.api_user.data.user_id;
 	let image_id = req.body.image_id;
 	let like = req.body.like;
 	if(like !== '0' && like !== '1') {
@@ -1088,18 +1136,32 @@ router.post('/photoLike', (req, res, next) => {
 	.then(data => {
 		if(data.results.length === 0) {
 			return res.json(formater({code:'1', desc:'图片不存在！'}));
-		} else {
-			let liked = parseInt(data.results[0].liked);
-			if(like === '0') {
-				liked -= 1;
-			} else {
-				liked += 1;
-			}
-			query('UPDATE images SET liked = ? WHERE image_id = ?', [liked, image_id])
-			.then(data => {
-				res.json(formater({code:'0', desc:'点赞数更新成功！'}));
-			})
 		}
+		query('SELECT image_id FROM image_likes WHERE image_id = ? AND user_id = ?', [image_id, user_id])
+		.then(data => {
+			let hasRecords = data.results.length === 0 ? false : true;
+			if(like === '0') {
+				// 用户取消点赞，判断image_likes是否已经有点赞记录，有的话才可以取消
+				if (hasRecords) {
+					query('DELETE FROM image_likes WHERE image_id = ? AND user_id = ?', [image_id, user_id])
+					.then(data => {
+						res.json(formater({code:'0', desc:'点赞取消成功！'}));
+					})
+				} else {
+					res.json(formater({code:'1', desc:'用户未给该照片点过赞，无法取消赞！'}));
+				}
+			} else {
+				// 用户给图片点赞，判断image_likes是否不存在该照片的点赞记录，不存在才可以点赞
+				if (hasRecords) {
+					res.json(formater({code:'1', desc:'用户已经给该照片点过赞，无法再次点赞！'}));
+				} else {
+					query('INSERT INTO image_likes SET ?', [{image_id: image_id, user_id: user_id}])
+					.then(data => {
+						res.json(formater({code:'0', desc:'点赞成功！'}));
+					})
+				}
+			}
+		})
 	})
 });
 

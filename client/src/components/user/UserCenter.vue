@@ -12,20 +12,146 @@
       </div>
     </div>
     <div class="bottom">
-      
+      <div class="choices">
+        <span :class='{activated: isActivated1}' @click='getListUser'>{{summary.photos}} 张照片</span>
+        <span :class='{activated: isActivated2}' @click='getListLiked'>{{summary.liked}} 张赞过的照片</span>
+        <span :class='{activated: isActivated3}' @click='getCollectionUser'>{{summary.collections}} 本相册</span>
+      </div>
+      <div class="photos">
+        <Photos :photos="photos"></Photos>
+      </div>
     </div>
+    <BackTop></BackTop>
   </div>
 </template>
 
 <script>
+  import photoOp from '../../../api/photos'
+  import Photos from '../photos/Photos'
   export default {
     name: 'userCenter',
     data () {
-      return {}
+      return {
+        summary: {
+          photos: 0,
+          liked: 0,
+          collections: 0
+        },
+        isActivated1: true,
+        isActivated2: false,
+        isActivated3: false,
+        photos: {
+          group_a: [],
+          group_b: [],
+          group_c: []
+        },
+        currentPage1: 1,
+        currentPage2: 1,
+        currentPage3: 1,
+        pageSize: 18000
+      }
+    },
+    components: {
+      Photos
     },
     methods: {
+      clearData () {
+        this.photos.group_a = []
+        this.photos.group_b = []
+        this.photos.group_c = []
+      },
       gotoProfile () {
         this.$router.push({path: `/userProfile/${this.info.user_name}`})
+      },
+      getListUser () {
+        this.isActivated1 = true
+        this.isActivated2 = false
+        this.isActivated3 = false
+        this.clearData()
+        this.getList_user()
+      },
+      getListLiked () {
+        this.isActivated1 = false
+        this.isActivated2 = true
+        this.isActivated3 = false
+        this.clearData()
+        this.getList_liked()
+      },
+      getCollectionUser () {
+        this.isActivated1 = false
+        this.isActivated2 = false
+        this.isActivated3 = true
+        this.clearData()
+        this.getCollection_user()
+      },
+      getList_user () {
+        let data = {
+          token: localStorage.token,
+          pageNo: this.currentPage1,
+          pageSize: this.pageSize
+        }
+        photoOp.getList.user(data, (res) => {
+          this.summary.photos = res.data.data.totalCount
+          let lists = res.data.data.lists
+          for (let i = 0; i < lists.length; i++) {
+            lists[i].image_md5 += '?x-oss-process=image/auto-orient,1'
+            if (i % 3 === 0) {
+              this.photos.group_a.push(lists[i])
+            }
+            if ((i - 1) % 3 === 0) {
+              this.photos.group_b.push(lists[i])
+            }
+            if ((i - 2) % 3 === 0) {
+              this.photos.group_c.push(lists[i])
+            }
+          }
+        })
+      },
+      getList_liked () {
+        let data = {
+          token: localStorage.token,
+          pageNo: this.currentPage2,
+          pageSize: this.pageSize
+        }
+        photoOp.getList.liked(data, (res) => {
+          this.summary.liked = res.data.data.totalCount
+          let lists = res.data.data.lists
+          for (let i = 0; i < lists.length; i++) {
+            lists[i].image_md5 += '?x-oss-process=image/auto-orient,1'
+            if (i % 3 === 0) {
+              this.photos.group_a.push(lists[i])
+            }
+            if ((i - 1) % 3 === 0) {
+              this.photos.group_b.push(lists[i])
+            }
+            if ((i - 2) % 3 === 0) {
+              this.photos.group_c.push(lists[i])
+            }
+          }
+        })
+      },
+      getCollection_user () {
+        let data = {
+          token: localStorage.token,
+          pageNo: this.currentPage3,
+          pageSize: this.pageSize
+        }
+        photoOp.getCollection.user(data, (res) => {
+          this.summary.collections = res.data.data.totalCount
+          let lists = res.data.data.lists
+          for (let i = 0; i < lists.length; i++) {
+            lists[i].image_md5 += '?x-oss-process=image/auto-orient,1'
+            if (i % 3 === 0) {
+              this.photos.group_a.push(lists[i])
+            }
+            if ((i - 1) % 3 === 0) {
+              this.photos.group_b.push(lists[i])
+            }
+            if ((i - 2) % 3 === 0) {
+              this.photos.group_c.push(lists[i])
+            }
+          }
+        })
       }
     },
     computed: {
@@ -45,6 +171,9 @@
       if (this.login) {
         this.$store.dispatch('getUserInfo')
       }
+      this.getList_user()
+      this.getList_liked()
+      this.getCollection_user()
     }
   }
 </script>
@@ -84,5 +213,44 @@
   }
   .more:hover {
     border: 1px solid #979797;
+  }
+  .bottom {
+    width: 100%;
+    margin: auto;
+    margin-top: 30px;
+  }
+  .choices > span {
+    font-size: 20px;
+    margin-right: 20px;
+    font-weight: bolder;
+    color: #999999;
+    cursor: pointer;
+  }
+  .activated {
+    color: #111 !important;
+  }
+  .choices {
+    margin-left: 5%;
+    margin-top: 40px;
+    margin-bottom: 30px;
+  }
+  @media screen and (max-width: 809px) {
+    .top {
+      margin-top: 110px;
+    }
+    .avatar {
+      width: 120px;
+      height: 120px;
+    }
+    .avatar img {
+      width: 120px;
+      height: 120px;
+    }
+    .name {
+      font-size: 30px;
+    }
+    .choices > span {
+      font-size: 18px;
+    }
   }
 </style>

@@ -31,7 +31,7 @@ export default {
       currentPage1: 1,
       currentPage2: 1,
       currentPage3: 1,
-      pageSize: 18,
+      pageSize: 18000,
       photos: {
         group_a: [],
         group_b: [],
@@ -52,10 +52,12 @@ export default {
         if (this.isActivated) {
           this.currentPage1 ++
           this.getList_hot()
+          return
         }
         if (this.isActivated2) {
           this.currentPage2 ++
           this.getList_new()
+          return
         }
         if (this.isActivated3) {
           this.currentPage3 ++
@@ -64,16 +66,25 @@ export default {
       }
     },
     getHot () {
+      this.isActivated = true
+      this.isActivated2 = false
+      this.isActivated3 = false
       this.currentPage1 = 1
       this.clearData()
       this.getList_hot()
     },
     getNew () {
+      this.isActivated = false
+      this.isActivated2 = true
+      this.isActivated3 = false
       this.currentPage2 = 1
       this.clearData()
       this.getList_new()
     },
     getFollowing () {
+      this.isActivated = false
+      this.isActivated2 = false
+      this.isActivated3 = true
       this.currentPage3 = 1
       this.clearData()
       this.getList_following()
@@ -84,9 +95,6 @@ export default {
       this.photos.group_c = []
     },
     getList_hot () {
-      this.isActivated = true
-      this.isActivated2 = false
-      this.isActivated3 = false
       let data = {
         pageNo: this.currentPage1,
         pageSize: this.pageSize
@@ -94,6 +102,7 @@ export default {
       photosOp.getList.hot(data, (res) => {
         let lists = res.data.data.lists
         for (let i = 0; i < lists.length; i++) {
+          lists[i].image_md5 += '?x-oss-process=image/auto-orient,1'
           if (i % 3 === 0) {
             this.photos.group_a.push(lists[i])
           }
@@ -107,9 +116,6 @@ export default {
       })
     },
     getList_new () {
-      this.isActivated = false
-      this.isActivated2 = true
-      this.isActivated3 = false
       let data = {
         pageNo: this.currentPage2,
         pageSize: this.pageSize
@@ -117,6 +123,7 @@ export default {
       photosOp.getList.new(data, (res) => {
         let lists = res.data.data.lists
         for (let i = 0; i < lists.length; i++) {
+          lists[i].image_md5 += '?x-oss-process=image/auto-orient,1'
           if (i % 3 === 0) {
             this.photos.group_a.push(lists[i])
           }
@@ -130,9 +137,6 @@ export default {
       })
     },
     getList_following () {
-      this.isActivated = false
-      this.isActivated2 = false
-      this.isActivated3 = true
       let data = {
         token: localStorage.token,
         pageNo: this.currentPage3,
@@ -141,6 +145,7 @@ export default {
       photosOp.getList.following(data, (res) => {
         let lists = res.data.data.lists
         for (let i = 0; i < lists.length; i++) {
+          lists[i].image_md5 += '?x-oss-process=image/auto-orient,1'
           if (i % 3 === 0) {
             this.photos.group_a.push(lists[i])
           }
@@ -169,9 +174,9 @@ export default {
       this.$store.dispatch('getUserInfo')
     }
     this.getHot()
-    this.$nextTick(function () {
-      window.addEventListener('scroll', this.onScroll)
-    })
+    // this.$nextTick(function () {
+    //   window.addEventListener('scroll', this.onScroll)
+    // })
   }
 }
 </script>

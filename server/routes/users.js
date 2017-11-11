@@ -93,16 +93,25 @@ router.post('/login', function(req, res, next) {
 // 获取用户信息
 router.all('/getUserInfo', verify_token, (req, res, next) => {
 	let user_id = req.api_user.data.user_id
-	let q1 = query('SELECT * FROM users WHERE user_id = ?', [user_id]);
-	let q2 = query('SELECT settings_id FROM user_email WHERE user_id = ?', [user_id]);
-	Promise.all([q1, q2]).then(values => {
-		let settings = []
-		for(s of values[1].results) {
-			settings.push(s.settings_id)
-		}
-		values[0].results[0].email_settings = settings.toString()
-		res.json(formater({code:'0', data:values[0].results[0]}))
-	})
+	let search_user_id = req.body.user_id || req.query.user_id
+	if (search_user_id) {
+		user_id = search_user_id
+		query('SELECT user_name, email, image_md5, personal_site FROM users WHERE user_id = ?', [user_id])
+		.then(data => {
+			return res.json(formater({code:'0', data:data.results}))
+		})
+	} else {
+		let q1 = query('SELECT * FROM users WHERE user_id = ?', [user_id]);
+		let q2 = query('SELECT settings_id FROM user_email WHERE user_id = ?', [user_id]);
+		Promise.all([q1, q2]).then(values => {
+			let settings = []
+			for(s of values[1].results) {
+				settings.push(s.settings_id)
+			}
+			values[0].results[0].email_settings = settings.toString()
+			res.json(formater({code:'0', data:values[0].results[0]}))
+		})
+	}
 })
 // 修改用户信息
 router.post('/updateUserAccount/info', verify_token, (req, res, next) => {
@@ -142,7 +151,7 @@ router.post('/updateUserAccount/avatar', verify_token, (req, res, next) => {
 	}
 	query('UPDATE users SET image_md5 = ? WHERE user_id = ?', [avatar, user_id])
 	.then((data) => {
-		res.json(formater({code:'0', desc:'用户头像修改成功！'}))
+		res.json(formater({code:'0', desc:'用户头像修改成功！'}));
 	})
 })
 // 修改用户密码
@@ -424,10 +433,15 @@ router.all('/getList/new', (req, res, next) => {
 	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
 	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
-	let q1 = query('SELECT COUNT(*) AS totalPage FROM images', '');
-	let q2 = query('SELECT i.display_location, i.location, i.created_time, i.image_md5, i.story_title, ' + 
-		'i.story_detail, i.user_id, u.user_name, u.image_md5 AS user_avatar, u.email FROM images i, users u WHERE i.user_id = u.user_id ' + 
-		'ORDER BY i.created_time DESC LIMIT ?,?', [_left, pageSize]);
+	let q1 = query('SELECT COUNT(*) AS totalPage FROM (SELECT i.display_location, i.location, i.created_time, i.image_md5, i.story_title, '+
+	'i.story_detail, i.user_id, u.user_name, u.image_md5 AS user_avatar, u.email, likes.total_likes '+
+	'FROM users u, images i LEFT OUTER JOIN (SELECT l.image_id, COUNT(l.user_id) AS total_likes FROM '+
+	'image_likes l GROUP BY image_id) likes ON i.image_id = likes.image_id WHERE i.user_id = u.user_id) a', '');
+	let q2 = query('SELECT i.display_location, i.location, i.created_time, i.image_md5, i.story_title, '+
+	'i.story_detail, i.user_id, u.user_name, u.image_md5 AS user_avatar, u.email, likes.total_likes '+
+	'FROM users u, images i LEFT OUTER JOIN (SELECT l.image_id, COUNT(l.user_id) AS total_likes FROM '+
+	'image_likes l GROUP BY image_id) likes ON i.image_id = likes.image_id WHERE i.user_id = u.user_id '+
+	'ORDER BY i.created_time DESC LIMIT ?,?', [_left, pageSize]);
 	Promise.all([q1, q2]).then(values => {
 		let new_data = {
 				pageNo: pageNo,
@@ -444,10 +458,15 @@ router.all('/getList/hot', (req, res, next) => {
 	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
 	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
-	let q1 = query('SELECT COUNT(*) AS totalPage FROM images', '');
-	let q2 = query('SELECT i.display_location, i.location, i.created_time, i.image_md5, i.story_title, ' + 
-		'i.story_detail, i.user_id, u.user_name, u.image_md5 AS user_avatar, u.email FROM images i, users u WHERE i.user_id = u.user_id ' + 
-		'ORDER BY i.liked DESC LIMIT ?,?', [_left, pageSize]);
+	let q1 = query('SELECT COUNT(*) AS totalPage FROM (SELECT i.display_location, i.location, i.created_time, i.image_md5, i.story_title, '+
+	'i.story_detail, i.user_id, u.user_name, u.image_md5 AS user_avatar, u.email, likes.total_likes '+
+	'FROM users u, images i LEFT OUTER JOIN (SELECT l.image_id, COUNT(l.user_id) AS total_likes FROM '+
+	'image_likes l GROUP BY image_id) likes ON i.image_id = likes.image_id WHERE i.user_id = u.user_id) a', '');
+	let q2 = query('SELECT i.display_location, i.location, i.created_time, i.image_md5, i.story_title, '+
+	'i.story_detail, i.user_id, u.user_name, u.image_md5 AS user_avatar, u.email, likes.total_likes '+
+	'FROM users u, images i LEFT OUTER JOIN (SELECT l.image_id, COUNT(l.user_id) AS total_likes FROM '+
+	'image_likes l GROUP BY image_id) likes ON i.image_id = likes.image_id WHERE i.user_id = u.user_id '+
+	'ORDER BY likes.total_likes DESC LIMIT ?,?', [_left, pageSize]);
 	Promise.all([q1, q2]).then(values => {
 		let new_data = {
 				pageNo: pageNo,
@@ -465,10 +484,20 @@ router.all('/getList/following', verify_token, (req, res, next) => {
 	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
 	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
-	let q1 = query('SELECT COUNT(*) AS totalPage FROM images, (SELECT follower_id FROM relationships WHERE user_id = ?) a WHERE images.user_id = a.follower_id', [user_id]);
-	let q2 = query('SELECT i.display_location, i.location, i.created_time, i.image_md5, i.story_title, ' + 
-		'i.story_detail, i.user_id, u.user_name, u.image_md5 AS user_avatar, u.email FROM (SELECT * FROM images, (SELECT follower_id FROM relationships WHERE ' + 
-		'user_id = ?) a WHERE images.user_id = a.follower_id) i, users u WHERE i.user_id = u.user_id LIMIT ?,?', [user_id, _left, pageSize]);
+	let q1 = query('SELECT COUNT(*) AS totalPage FROM (SELECT i.display_location, i.location, '+
+		'i.created_time, i.image_md5, i.story_title, i.story_detail, i.user_id, u.user_name, '+
+		'u.image_md5 AS user_avatar, u.email, likes.total_likes FROM users u, '+
+		'(SELECT r.follower_id FROM relationships r WHERE r.user_id = ?) follow, images i LEFT OUTER JOIN '+
+		'(SELECT l.image_id, COUNT(l.user_id) AS total_likes FROM image_likes l GROUP BY image_id) '+
+		'likes ON i.image_id = likes.image_id WHERE i.user_id = follow.follower_id AND i.user_id = u.user_id '+
+		'ORDER BY likes.total_likes DESC) a', [user_id])
+	let q2 = query('SELECT i.display_location, i.location, '+
+		'i.created_time, i.image_md5, i.story_title, i.story_detail, i.user_id, u.user_name, '+
+		'u.image_md5 AS user_avatar, u.email, likes.total_likes FROM users u, '+
+		'(SELECT r.follower_id FROM relationships r WHERE r.user_id = ?) follow, images i LEFT OUTER JOIN '+
+		'(SELECT l.image_id, COUNT(l.user_id) AS total_likes FROM image_likes l GROUP BY image_id) '+
+		'likes ON i.image_id = likes.image_id WHERE i.user_id = follow.follower_id AND i.user_id = u.user_id '+
+		'ORDER BY likes.total_likes DESC LIMIT ?,?', [user_id, _left, pageSize])
 	Promise.all([q1, q2]).then(values => {
 		let new_data = {
 				pageNo: pageNo,
@@ -486,16 +515,21 @@ router.all('/getList/user', verify_token, (req, res, next) => {
 	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
 	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
-	let q1 = query('SELECT COUNT(*) AS totalPage FROM images WHERE user_id = ?', [user_id]);
-	let q2 = query('SELECT i.display_location, i.location, i.created_time, i.image_md5, i.story_title, ' + 
-		'i.story_detail FROM images i, ' + 
-		'users u WHERE i.user_id = u.user_id AND i.user_id = ? ' + 
-		'ORDER BY i.created_time DESC LIMIT ?,?', [user_id, _left, pageSize]);
+	let q1 = query('SELECT COUNT(*) AS totalPage FROM (SELECT i.display_location, i.location, i.created_time, i.image_md5, i.story_title, '+
+	'i.story_detail, i.user_id, u.user_name, u.image_md5 AS user_avatar, u.email, likes.total_likes '+
+	'FROM users u, images i LEFT OUTER JOIN (SELECT l.image_id, COUNT(l.user_id) AS total_likes FROM '+
+	'image_likes l GROUP BY image_id) likes ON i.image_id = likes.image_id WHERE i.user_id = u.user_id AND i.user_id = ?) a', [user_id]);
+	let q2 = query('SELECT i.display_location, i.location, i.created_time, i.image_md5, i.story_title, '+
+	'i.story_detail, i.user_id, u.user_name, u.image_md5 AS user_avatar, u.email, likes.total_likes '+
+	'FROM users u, images i LEFT OUTER JOIN (SELECT l.image_id, COUNT(l.user_id) AS total_likes FROM '+
+	'image_likes l GROUP BY image_id) likes ON i.image_id = likes.image_id WHERE i.user_id = u.user_id '+
+	'AND i.user_id = ? ORDER BY i.created_time DESC LIMIT ?,?', [user_id, _left, pageSize]);
 	Promise.all([q1, q2]).then(values => {
 		let new_data = {
 				pageNo: pageNo,
 				pageSize: pageSize,
 				totalPage: Math.ceil(values[0].results[0].totalPage / pageSize),
+				totalCount: values[0].results[0].totalPage,
 				lists: values[1].results
 			};
 			res.json(formater({code:'0', data:new_data}))
@@ -508,16 +542,24 @@ router.all('/getList/liked', verify_token, (req, res, next) => {
 	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
 	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
-	let q1 = query('SELECT COUNT(image_id) AS totalPage FROM image_likes WHERE user_id = ?', [user_id]);
-	// let q2 = query('SELECT i.display_location, i.location, i.created_time, i.image_md5, i.story_title, ' + 
-	// 	'i.story_detail, i.user_id, u.user_name, u.image_md5 AS user_avatar, u.email FROM images i, users u WHERE i.user_id = u.user_id ' + 
-	// 	'ORDER BY i.liked DESC LIMIT ?,?', [_left, pageSize]);
-	let q2 = query('SELECT image_id FROM image_likes WHERE user_id = ?', [user_id]);
+	let q1 = query('SELECT COUNT(*) AS totalPage FROM (SELECT i.image_id, my_likes.total_likes, i.display_location, i.location, '+
+		'i.created_time, i.image_md5, i.story_title, i.story_detail, i.user_id, u.user_name, '+
+		'u.image_md5 AS user_avatar, u.email FROM images i, users u, '+
+		'(SELECT l.image_id, likes.total_likes FROM image_likes l, (SELECT l.image_id, COUNT(l.user_id) AS total_likes '+
+		'FROM image_likes l GROUP BY l.image_id) likes WHERE l.user_id = ? AND l.image_id = likes.image_id) my_likes '+
+		'WHERE i.image_id = my_likes.image_id AND i.user_id = u.user_id) a', [user_id]);
+	let q2 = query('SELECT i.image_id, my_likes.total_likes, i.display_location, i.location, '+
+		'i.created_time, i.image_md5, i.story_title, i.story_detail, i.user_id, u.user_name, '+
+		'u.image_md5 AS user_avatar, u.email FROM images i, users u, '+
+		'(SELECT l.image_id, likes.total_likes FROM image_likes l, (SELECT l.image_id, COUNT(l.user_id) AS total_likes '+
+		'FROM image_likes l GROUP BY l.image_id) likes WHERE l.user_id = ? AND l.image_id = likes.image_id) my_likes '+
+		'WHERE i.image_id = my_likes.image_id AND i.user_id = u.user_id LIMIT ?,?', [user_id, _left, pageSize]);
 	Promise.all([q1, q2]).then(values => {
 		let new_data = {
 				pageNo: pageNo,
 				pageSize: pageSize,
 				totalPage: Math.ceil(values[0].results[0].totalPage / pageSize),
+				totalCount: values[0].results[0].totalPage,
 				lists: values[1].results
 			};
 			res.json(formater({code:'0', data:new_data}))
@@ -549,13 +591,16 @@ router.all('/getCollection/user', verify_token, (req, res, next) => {
 	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
 	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
-	let q1 = query('SELECT COUNT(*) AS totalPage FROM (SELECT c.collection_id FROM collections c, images i WHERE c.collection_id = i.collection_id AND i.user_id = ? GROUP BY i.collection_id) a', [user_id]);
-	let q2 = query('SELECT c.* FROM collections c, images i WHERE c.collection_id = i.collection_id AND i.user_id = ? GROUP BY i.collection_id LIMIT ?,?', [user_id, _left, pageSize]);
+	let q1 = query('SELECT COUNT(*) AS totalPage FROM (SELECT c.collection_id FROM collections c, '+
+		'images i WHERE c.collection_id = i.collection_id AND i.user_id = ? GROUP BY i.collection_id) a', [user_id]);
+	let q2 = query('SELECT c.* FROM collections c, images i WHERE c.collection_id = i.collection_id AND '+
+		'i.user_id = ? GROUP BY i.collection_id LIMIT ?,?', [user_id, _left, pageSize]);
 	Promise.all([q1, q2]).then(values => {
 		let new_data = {
 			pageNo: pageNo,
 			pageSize: pageSize,
 			totalPage: Math.ceil(values[0].results[0].totalPage / pageSize),
+			totalCount: values[0].results[0].totalPage,
 			lists: values[1].results
 		};
 		res.json(formater({code:'0', data:new_data}));

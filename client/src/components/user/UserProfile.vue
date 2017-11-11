@@ -228,7 +228,7 @@
       },
       changeAvatar2 () {
         let fd = new FormData()
-        let file = document.getElementById('uploadPhoto').files[0]
+        let file = document.getElementById('uploadImg').files[0]
         if (!file) {
           this.notifyMsg = '请选择文件！'
           this.error(true)

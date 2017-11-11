@@ -79,14 +79,10 @@ module.exports = {
 			  console.log(error)
 			});	
 		},
-		user () {
-			axios.post('/api/getCollection/user', {
-				token:localStorage.token,
-				pageNo:1,
-				pageSize:3
-			})
+		user (data, callback) {
+			axios.post('/api/getCollection/user', data)
 			.then(function (response) {
-			  console.log(response)
+			  callback(response)
 			})
 			.catch(function (error) {
 			  console.log(error)
@@ -133,7 +129,25 @@ module.exports = {
 			.catch(function (error) {
 			  console.log(error)
 			});	
-		}
+		},
+		liked (data, callback) {
+			axios.post('/api/getList/liked', data)
+			.then(function (response) {
+			  callback(response)
+			})
+			.catch(function (error) {
+			  console.log(error)
+			});	
+		},
+		user (data, callback) {
+			axios.post('/api/getList/user', data)
+			.then(function (response) {
+			  callback(response)
+			})
+			.catch(function (error) {
+			  console.log(error)
+			});	
+		},
 	},
 	search () {
 		axios.post('/api/search', {

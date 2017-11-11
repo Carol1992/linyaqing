@@ -117,14 +117,14 @@
             let width = image.width
             let height = image.height
             if (width < 960 || height < 960) {
-              this.notifyMsg = '图片尺寸不小于960*960！'
-              this.error(true)
+              self.notifyMsg = '图片尺寸不小于960*960！'
+              self.error(true)
               return
             }
             aliyunOp.myPromise(host, formData).then((xhr) => {
               if (xhr.status !== 200) {
-                this.notifyMsg = '操作失败！'
-                this.error(true)
+                self.notifyMsg = '操作失败！'
+                self.error(true)
                 return
               }
               if (xhr.status === 200) {
@@ -271,7 +271,7 @@
     }
   }
   @media screen and (min-width: 992px) {
-
+    
   }
   @media screen and (min-width: 1280px) {
     

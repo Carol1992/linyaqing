@@ -104,7 +104,7 @@
     },
     methods: {
       setBackground () {
-        document.getElementById('container').style.backgroundImage = 'url(' + this.imgUrl + ')'
+        document.getElementById('container').style.backgroundImage = 'url(' + this.imgUrl + '?x-oss-process=image/auto-orient,1)'
       },
       error (nodesc) {
         this.$Notice.error({
@@ -134,6 +134,7 @@
           this.photoInfo.image_md5 = this.imgUrl
           photoOp.uploadUserPhoto(this.photoInfo, (res) => {
             console.log(res)
+            this.$router.push({path: `/userCenter/${this.info.user_name}`})
           })
         }
       },
@@ -159,7 +160,12 @@
         return imgUrl
       },
       photoInfo () {
-        return this.$store.state.photoInfo
+        let photoInfo = this.$store.state.photoInfo
+        if (!photoInfo.GPSTimeStamp) photoInfo.GPSTimeStamp = ['未知', '未知', '未知']
+        return photoInfo
+      },
+      info () {
+        return this.$store.state.userInfo
       }
     }
   }
@@ -263,8 +269,7 @@
   .exif-info {
     display: inline-block;
     width: 50%;
-    height: 50px;
-    line-height: 50px;
+    height: 60px;
     font-size: 16px;
     color: #fff;
     float: left;

@@ -573,7 +573,7 @@ router.all('/getCollection/all', (req, res, next) => {
 	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
 	let q1 = query('SELECT * FROM collections');
-	let q2 = query('SELECT * FROM collections LIMIT ?,?', [_left, pageSize]);
+	let q2 = query('SELECT * FROM collections ORDER BY created_time DESC LIMIT ?,?', [_left, pageSize]);
 	Promise.all([q1, q2]).then(values => {
 		let new_data = {
 			pageNo: pageNo,
@@ -594,7 +594,7 @@ router.all('/getCollection/user', verify_token, (req, res, next) => {
 	let q1 = query('SELECT COUNT(*) AS totalPage FROM (SELECT c.collection_id FROM collections c, '+
 		'images i WHERE c.collection_id = i.collection_id AND i.user_id = ? GROUP BY i.collection_id) a', [user_id]);
 	let q2 = query('SELECT c.* FROM collections c, images i WHERE c.collection_id = i.collection_id AND '+
-		'i.user_id = ? GROUP BY i.collection_id LIMIT ?,?', [user_id, _left, pageSize]);
+		'i.user_id = ? GROUP BY i.collection_id ORDER BY created_time DESC LIMIT ?,?', [user_id, _left, pageSize]);
 	Promise.all([q1, q2]).then(values => {
 		let new_data = {
 			pageNo: pageNo,

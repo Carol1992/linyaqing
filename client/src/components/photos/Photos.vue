@@ -49,6 +49,7 @@
   }
   .images {
     width: calc(33.33% - 1.5%);
+    background-color: #f5f5f5;
   }
   .image img {
     width: 100%;

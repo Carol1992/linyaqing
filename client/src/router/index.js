@@ -8,6 +8,7 @@ import ServerError from '@/components/ServerError'
 import UserCenter from '@/components/user/UserCenter'
 import UserProfile from '@/components/user/UserProfile'
 import Photo from '@/components/photos/Photo'
+import Collections from '@/components/CollectionHome'
 
 Vue.use(Router)
 
@@ -61,6 +62,11 @@ export default new Router({
       meta: {
         requireAuth: true
       }
+    },
+    {
+      path: '/collections',
+      name: 'collections',
+      component: Collections
     }
   ]
 })

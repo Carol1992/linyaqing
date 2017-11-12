@@ -16,14 +16,6 @@ export default {
   },
   data () {
     return {}
-  },
-  methods: {
-    changeTitle () {
-      document.title = 'Sharing Life'
-    }
-  },
-  mounted () {
-    this.changeTitle()
   }
 }
 </script>

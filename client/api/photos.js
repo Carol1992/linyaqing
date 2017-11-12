@@ -67,13 +67,10 @@ module.exports = {
 		});	
 	},
 	getCollection: {
-		all () {
-			axios.post('/api/getCollection/all', {
-				pageNo:1,
-				pageSize:3
-			})
+		all (data, callback) {
+			axios.post('/api/getCollection/all', data)
 			.then(function (response) {
-			  console.log(response)
+			  callback(response)
 			})
 			.catch(function (error) {
 			  console.log(error)

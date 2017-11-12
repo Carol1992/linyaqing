@@ -9,10 +9,10 @@
     </div>
     <div class="hideMore" v-if='!showMore'><span><Icon type="more"></Icon></span></div>
     <div class="more" v-if='showMore'>
-      <div class="collection">
+      <div class="collection" @click='gotoCollections'>
         <span>相册</span>
       </div>
-      <div class="store">
+      <div class="store" @click='gotoStore'>
         <span>Store</span>
       </div>
       <div class="upload" @click='uploadPhoto'>
@@ -76,6 +76,13 @@
       },
       gotoUserCenter () {
         this.$router.push({path: `/userCenter/${this.info.user_name}`})
+      },
+      gotoCollections () {
+        this.$router.push('/collections')
+      },
+      gotoStore () {
+        this.notifyMsg = '商店功能尚未上线，敬请期待~'
+        this.success(true)
       },
       uploadPhoto () {
         document.getElementById('uploadPhoto').click()
@@ -259,7 +266,10 @@
   }
   @media screen and (max-width: 809px) {
     .search {
-      width: 70%;
+      width: 50%;
+    }
+    .more {
+      width: 40%;
     }
   }
   @media screen and (max-width: 1280px) and (min-width: 810px){

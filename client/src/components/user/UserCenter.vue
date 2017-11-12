@@ -18,7 +18,8 @@
         <span :class='{activated: isActivated3}' @click='getCollectionUser'>{{summary.collections}} 本相册</span>
       </div>
       <div class="photos">
-        <Photos :photos="photos"></Photos>
+        <Photos :photos="photos" v-if='!isActivated3'></Photos>
+        <Collections :collections='photos.group_a' v-if='isActivated3'></Collections>
       </div>
     </div>
     <BackTop></BackTop>
@@ -28,6 +29,7 @@
 <script>
   import photoOp from '../../../api/photos'
   import Photos from '../photos/Photos'
+  import Collections from '../photos/Collections'
   export default {
     name: 'userCenter',
     data () {
@@ -52,7 +54,8 @@
       }
     },
     components: {
-      Photos
+      Photos,
+      Collections
     },
     methods: {
       clearData () {
@@ -140,16 +143,8 @@
           this.summary.collections = res.data.data.totalCount
           let lists = res.data.data.lists
           for (let i = 0; i < lists.length; i++) {
-            lists[i].image_md5 += '?x-oss-process=image/auto-orient,1'
-            if (i % 3 === 0) {
-              this.photos.group_a.push(lists[i])
-            }
-            if ((i - 1) % 3 === 0) {
-              this.photos.group_b.push(lists[i])
-            }
-            if ((i - 2) % 3 === 0) {
-              this.photos.group_c.push(lists[i])
-            }
+            lists[i].collection_image_md5 += '?x-oss-process=image/auto-orient,1'
+            this.photos.group_a.push(lists[i])
           }
         })
       }

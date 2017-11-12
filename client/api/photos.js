@@ -64,7 +64,29 @@ module.exports = {
 		})
 		.catch(function (error) {
 		  console.log(error)
-		});	
+		})	
+	},
+	updatePhoto (data, callback) {
+		data.token = localStorage.token
+		axios.post('/api/updatePhoto', data)
+		.then(function (response) {
+		  callback(response)
+		})
+		.catch(function (error) {
+		  console.log(error)
+		});
+	},
+	deleteUserPhoto (data, callback) {
+		axios.post('/api/deleteUserPhoto', {
+			token:localStorage.token,
+			image_id: data.image_id
+		})
+		.then(function (response) {
+		  callback(response)
+		})
+		.catch(function (error) {
+		  console.log(error)
+		});
 	},
 	getCollection: {
 		all (data, callback) {

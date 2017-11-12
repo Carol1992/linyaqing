@@ -147,18 +147,6 @@ module.exports = {
 		  console.log(error)
 		});
 	},
-	deleteUserPhoto () {
-		axios.post('/api/deleteUserPhoto', {
-			token:localStorage.token,
-			image_id:'1'
-		})
-		.then(function (response) {
-		  console.log(response)
-		})
-		.catch(function (error) {
-		  console.log(error)
-		});
-	},
 	addNewApp () {
 		axios.post('/api/addNewApp', {
 			token:localStorage.token,

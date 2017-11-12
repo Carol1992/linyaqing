@@ -9,10 +9,10 @@
     </div>
     <div class="hideMore" v-if='!showMore'><span><Icon type="more"></Icon></span></div>
     <div class="more" v-if='showMore'>
-      <div class="collection" @click='gotoCollections'>
+      <div class="collection" @click='gotoCollections' :class='{activated: headerInfo.isCollections}'>
         <span>相册</span>
       </div>
-      <div class="store" @click='gotoStore'>
+      <div class="store" @click='gotoStore' :class='{activated: headerInfo.isStore}'>
         <span>Store</span>
       </div>
       <div class="upload" @click='uploadPhoto'>
@@ -20,7 +20,7 @@
         <input type="file" id='uploadPhoto' @change='uploadPhoto2'>
       </div>
       <div class="user" @click='tryLogin' v-if='!login'>
-        <span >登录</span>
+        <span>登录</span>
       </div>
       <div class="loginUser" v-if='login' @click='gotoUserCenter'>
         <img :src='info.image_md5' height="49" width="49" alt="">
@@ -54,6 +54,7 @@
         })
       },
       goHome () {
+        this.$store.commit('getHeaderInfo', {isStore: false, isCollections: false})
         this.$router.push('/')
       },
       changeBorder (e) {
@@ -65,6 +66,7 @@
         e.target.style.backgroundColor = '#f1f1f1'
       },
       tryLogin () {
+        this.$store.commit('getHeaderInfo', {isStore: false, isCollections: false})
         this.$router.push('/login')
       },
       onResize () {
@@ -75,16 +77,20 @@
         }
       },
       gotoUserCenter () {
+        this.$store.commit('getHeaderInfo', {isStore: false, isCollections: false})
         this.$router.push({path: `/userCenter/${this.info.user_name}`})
       },
       gotoCollections () {
+        this.$store.commit('getHeaderInfo', {isStore: false, isCollections: true})
         this.$router.push('/collections')
       },
       gotoStore () {
+        // this.$store.commit('getHeaderInfo', {isStore: true, isCollections: false})
         this.notifyMsg = '商店功能尚未上线，敬请期待~'
         this.success(true)
       },
       uploadPhoto () {
+        this.$store.commit('getHeaderInfo', {isStore: false, isCollections: false})
         document.getElementById('uploadPhoto').click()
       },
       uploadPhoto2 () {
@@ -162,7 +168,8 @@
       localComputed () { /* ... */ },
       ...mapState({
         info: 'userInfo',
-        login: 'alreadyLogin'
+        login: 'alreadyLogin',
+        headerInfo: 'headerInfo'
       })
     }
   }
@@ -263,6 +270,9 @@
   }
   #uploadPhoto {
     display: none;
+  }
+  .activated {
+    color: #111;
   }
   @media screen and (max-width: 809px) {
     .search {

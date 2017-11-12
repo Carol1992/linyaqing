@@ -15,9 +15,9 @@
         <div class="password" @click='isProfile = false; isPhoto = false; isEmail = false; isPwd = true; isApp = false; isDelete = false; nowEdit = "更改密码"'>
           <span :class='{activated: isPwd}'>更改密码</span>
         </div>
-        <!-- <div class="photos" @click='isProfile = false; isPhoto = true; isEmail = false; isPwd = false; isApp = false; isDelete = false; nowEdit = "照片信息"'>
-          <span :class='{activated: isPhoto}'>照片信息</span>
-        </div> -->
+        <div class="photos" @click='getList_user'>
+          <span :class='{activated: isPhoto}'>照片管理</span>
+        </div>
         <div class="email" @click='isProfile = false; isPhoto = false; isEmail = true; isPwd = false; isApp = false; isDelete = false; nowEdit = "邮件设置"'>
           <span :class='{activated: isEmail}'>邮件设置</span>
         </div>
@@ -97,7 +97,80 @@
            <input type="button" value='提 交'>
          </div>
       </div>
+      <div class="ifPhoto" v-if='isPhoto'>
+        <div class="image-edit" v-for='photo in photos'>
+          <div class="left-image">
+            <img :src='photo.image_md5_new' alt="">
+          </div>
+          <div class="image-detail">
+            <div class="image-choices">
+              <span :class='{activated_pic: photo.isExif}' @click='getExif(photo)'>EXIF</span>
+              <span :class='{activated_pic: photo.isPic}' @click='getPic(photo)'>关于照片</span>
+              <span :class='{activated_pic: photo.isLoc}' @click='getLoc(photo)'>地理信息</span>
+              <span :class='{activated_pic: photo.isTag}' @click='getTag(photo)'>标签</span>
+              <span :class='{activated_pic: photo.isSet}' @click='getSet(photo)'>设置</span>
+            </div>
+            <div class="image-exif" v-if='photo.isExif'>
+              <div class="image-make">
+                <span>Make</span>
+                <input type="text" maxlength="50" v-model='photo.make'>
+              </div>
+              <div class="image-model">
+                <span>Model</span>
+                <input type="text" maxlength="50" v-model='photo.model'>
+              </div>
+              <div class="image-focal">
+                <span>Focal length (mm)</span>
+                <input type="text" maxlength="50" v-model='photo.focalLength'>
+              </div>
+              <div class="image-aper">
+                <span>Aperture (ƒ)</span>
+                <input type="text" maxlength="50" v-model='photo.aperture'>
+              </div>
+              <div class="image-iso">
+                <span>ISO</span>
+                <input type="text" maxlength="50" v-model='photo.iso'>
+              </div>
+              <div class="image-shutter">
+                <span>Shutter speed (s)</span>
+                <input type="text" maxlength="50" v-model='photo.shutterSpeed'>
+              </div>
+              <div class="created">
+                <span>DateTimeOriginal</span>
+                <input type="text" maxlength="50" v-model='photo.dateTimeOriginal'>
+              </div>
+            </div>
+            <div class="image-pic" v-if='photo.isPic'>
+              <div class="image-title">
+                <span>标题</span>
+                <input type="text" maxlength="50" v-model='photo.story_title'>
+              </div>
+              <div class="image-story">
+                <span>照片故事</span>
+                <textarea name="" id="" cols="30" rows="10" maxlength="600" v-model='photo.story_detail'></textarea>
+              </div>
+            </div>
+            <div class="image-loc" v-if='photo.isLoc'>
+              <span>拍摄地址</span>
+              <input type="text" maxlength="100" v-model='photo.location'>
+            </div>
+            <div class="image-tag" v-if='photo.isTag'>
+              <span>照片标签</span>
+              <input type="text" maxlength="100" v-model='photo.image_tags'>
+            </div>
+            <div class="image-set" v-if='photo.isSet'>
+              <div class="confirmed deletePic" @click='deletePic(photo)'>
+                <span>删除照片</span>
+              </div>
+            </div>
+            <div class="submit" @click='updatePhoto(photo)' v-if='!photo.isSet'>
+             <input type="button" value='更 新'>
+           </div>
+          </div>
+        </div>
+      </div>
     </div>
+  <BackTop></BackTop>
   </div>
 </template>
 
@@ -105,6 +178,7 @@
   import myCheckBox from './Settings/CheckBox'
   import userOp from '../../../api/user'
   import aliyunOp from '../../../api/aliyun'
+  import photoOp from '../../../api/photos'
   export default {
     name: 'userProfile',
     data () {
@@ -119,7 +193,10 @@
         notifyMsg: '',
         password: '',
         password_confirmed: '',
-        imgUrl: ''
+        imgUrl: '',
+        currentPage1: 1,
+        pageSize: 18000,
+        photos: []
       }
     },
     components: {
@@ -136,6 +213,81 @@
         this.$Notice.error({
           title: this.notifyMsg,
           desc: nodesc ? '' : ''
+        })
+      },
+      getExif (photo) {
+        photo.isExif = true
+        photo.isPic = false
+        photo.isLoc = false
+        photo.isTag = false
+        photo.isSet = false
+      },
+      getPic (photo) {
+        photo.isExif = false
+        photo.isPic = true
+        photo.isLoc = false
+        photo.isTag = false
+        photo.isSet = false
+      },
+      getLoc (photo) {
+        photo.isExif = false
+        photo.isPic = false
+        photo.isLoc = true
+        photo.isTag = false
+        photo.isSet = false
+      },
+      getTag (photo) {
+        photo.isExif = false
+        photo.isPic = false
+        photo.isLoc = false
+        photo.isTag = true
+        photo.isSet = false
+      },
+      getSet (photo) {
+        photo.isExif = false
+        photo.isPic = false
+        photo.isLoc = false
+        photo.isTag = false
+        photo.isSet = true
+      },
+      deletePic (photo) {
+        photoOp.deleteUserPhoto({image_id: photo.image_id}, (res) => {
+          this.getList_user()
+          this.notifyMsg = '图片删除成功！'
+          this.success(true)
+        })
+      },
+      updatePhoto (photo) {
+        photoOp.updatePhoto(photo, (res) => {
+          this.notifyMsg = '图片信息更新成功！'
+          this.success(true)
+        })
+      },
+      getList_user () {
+        this.isProfile = false
+        this.isPhoto = true
+        this.isEmail = false
+        this.isPwd = false
+        this.isApp = false
+        this.isDelete = false
+        this.nowEdit = '照片信息'
+        let data = {
+          token: localStorage.token,
+          pageNo: this.currentPage1,
+          pageSize: this.pageSize
+        }
+        photoOp.getList.user(data, (res) => {
+          let lists = res.data.data.lists
+          this.photos = []
+          for (let i = 0; i < lists.length; i++) {
+            lists[i].image_md5_new = lists[i].image_md5 + '?x-oss-process=image/auto-orient,1'
+            lists[i].isExif = true
+            lists[i].isPic = false
+            lists[i].isLoc = false
+            lists[i].isTag = false
+            lists[i].isSet = false
+            this.photos.push(lists[i])
+          }
         })
       },
       changeInfo () {
@@ -307,6 +459,11 @@
     font-weight: bolder;
     border-bottom: 1px solid #ddd !important;
   }
+  .activated_pic {
+    color: #000 !important;
+    font-weight: bolder;
+    border-bottom: 1px solid #111 !important;
+  }
   .part1 > div {
     display: inline-block;
     float: left;
@@ -415,6 +572,52 @@
   .hidden-file-upload {
     display: none;
   }
+  .ifPhoto {
+    margin-top: 30px;
+  }
+  .image-edit {
+    width: 100%;
+    clear: both;
+    margin-bottom: 40px;
+  }
+  .left-image {
+    width: 35%;
+    display: inline-block;
+    float: left;
+    margin-right: 5%;
+  }
+  .image-detail {
+    width: 60%;
+    display: inline-block;
+  }
+  .left-image img {
+    width: 100%;
+    margin-top: 5px;
+  }
+  .image-choices span {
+    font-size: 16px;
+    color: #979797;
+    margin-right: 20px;
+    cursor: pointer;
+    border-bottom: 1px solid #979797;
+  }
+  .image-choices {
+    margin-bottom: 20px;
+  }
+  .image-exif > div, .image-pic > div {
+    margin-bottom: 10px;
+  }
+  span {
+    font-size: 16px;
+  }
+  .deletePic span {
+    color: orangered;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  .image-story textarea{
+    min-height: 200px;
+  }
   @media screen and (max-width: 809px) {
     .left {
       display: block;
@@ -438,6 +641,16 @@
     .myavatar > img {
       width: 120px;
       height: 120px;
+    }
+  }
+  @media screen and (max-width: 1280px){
+   .left-image {
+      width: 100%;
+      display: block;
+      margin-right: 0
+    }
+    .image-detail {
+      width: 100%;
     }
   }
 </style>

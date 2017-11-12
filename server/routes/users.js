@@ -491,7 +491,7 @@ router.all('/getList/following', verify_token, (req, res, next) => {
 		'(SELECT l.image_id, COUNT(l.user_id) AS total_likes FROM image_likes l GROUP BY image_id) '+
 		'likes ON i.image_id = likes.image_id WHERE i.user_id = follow.follower_id AND i.user_id = u.user_id '+
 		'ORDER BY likes.total_likes DESC) a', [user_id])
-	let q2 = query('SELECT i.display_location, i.location, '+
+	let q2 = query('SELECT i.image_id, i.image_tags, i.display_location, i.location, '+
 		'i.created_time, i.image_md5, i.story_title, i.story_detail, i.user_id, u.user_name, '+
 		'u.image_md5 AS user_avatar, u.email, likes.total_likes FROM users u, '+
 		'(SELECT r.follower_id FROM relationships r WHERE r.user_id = ?) follow, images i LEFT OUTER JOIN '+
@@ -516,11 +516,11 @@ router.all('/getList/user', verify_token, (req, res, next) => {
 	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
 	let q1 = query('SELECT COUNT(*) AS totalPage FROM (SELECT i.display_location, i.location, i.created_time, i.image_md5, i.story_title, '+
-	'i.story_detail, i.user_id, u.user_name, u.image_md5 AS user_avatar, u.email, likes.total_likes '+
+	'i.story_detail, i.make, i.model, i.focalLength, i.aperture, i.dateTimeOriginal, i.iso, i.shutterSpeed, i.user_id, u.user_name, u.image_md5 AS user_avatar, u.email, likes.total_likes '+
 	'FROM users u, images i LEFT OUTER JOIN (SELECT l.image_id, COUNT(l.user_id) AS total_likes FROM '+
 	'image_likes l GROUP BY image_id) likes ON i.image_id = likes.image_id WHERE i.user_id = u.user_id AND i.user_id = ?) a', [user_id]);
-	let q2 = query('SELECT i.display_location, i.location, i.created_time, i.image_md5, i.story_title, '+
-	'i.story_detail, i.user_id, u.user_name, u.image_md5 AS user_avatar, u.email, likes.total_likes '+
+	let q2 = query('SELECT i.image_id, i.display_location, i.image_tags, i.location, i.created_time, i.image_md5, i.story_title, '+
+	'i.story_detail, i.make, i.model, i.focalLength, i.aperture, i.dateTimeOriginal, i.iso, i.shutterSpeed, i.user_id, u.user_name, u.image_md5 AS user_avatar, u.email, likes.total_likes '+
 	'FROM users u, images i LEFT OUTER JOIN (SELECT l.image_id, COUNT(l.user_id) AS total_likes FROM '+
 	'image_likes l GROUP BY image_id) likes ON i.image_id = likes.image_id WHERE i.user_id = u.user_id '+
 	'AND i.user_id = ? ORDER BY i.created_time DESC LIMIT ?,?', [user_id, _left, pageSize]);
@@ -665,9 +665,9 @@ router.post('/uploadUserPhoto', verify_token, (req, res, next) => {
 		aperture: _user.aperture,
 		iso: _user.iso,
 		shutterSpeed: _user.shutterSpeed,
-		story_title: _user.title,
-		story_detail: _user.story,
-		location: _user.address,
+		story_title: _user.story_title,
+		story_detail: _user.story_detail,
+		location: _user.location,
 		display_location: _user.display,
 		collection_id: _user.collection_id
 	};
@@ -694,6 +694,41 @@ router.post('/uploadUserPhoto', verify_token, (req, res, next) => {
 		});
 	}
 });
+// 用户修改图片
+router.post('/updatePhoto', verify_token, (req, res, next) => {
+	let _user = req.body;
+	let user_id = req.api_user.data.user_id;
+	let post = {
+		image_id: _user.image_id,
+		image_md5: _user.image_md5,
+		image_tags: _user.image_tags,
+		make: _user.make,
+		model: _user.model,
+		dateTimeOriginal: _user.dateTimeOriginal,
+		focalLength: _user.focalLength,
+		aperture: _user.aperture,
+		iso: _user.iso,
+		shutterSpeed: _user.shutterSpeed,
+		story_title: _user.story_title,
+		story_detail: _user.story_detail,
+		location: _user.location,
+		display_location: _user.display
+	};
+	query('SELECT image_id FROM images WHERE image_id = ? AND user_id = ?', [post.image_id, user_id])
+	.then(data => {
+		if (data.results.length === 0) {
+			return res.json(formater({code:'1', desc:'该照片不属于该用户，无法更新！'}));
+		}
+		query('UPDATE images SET image_md5 = ?, image_tags = ?, make = ?, model = ?, dateTimeOriginal = ?, ' + 
+			'focalLength = ?, aperture = ?, iso = ?, shutterSpeed = ?, story_title = ?, story_detail = ?, ' + 
+			'location = ?, display_location = ? WHERE image_id = ?', [post.image_md5, post.image_tags, post.make, 
+			post.model, post.dateTimeOriginal, post.focalLength, post.aperture, post.iso, post.shutterSpeed, 
+			post.story_title, post.story_detail, post.location, post.display_location, post.image_id])
+		.then(data => {
+			res.json(formater({code:'0', desc:'照片信息更新成功！'}));
+		})
+	})
+})
 // 上传图片到服务器
 router.post('/uploadPhotoToAliyun', (req, res, next) => {
 	if(req.headers['content-length'] === '0') {

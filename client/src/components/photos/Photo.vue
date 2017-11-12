@@ -133,7 +133,6 @@
           this.$store.commit('getPhotoInfo', this.photoInfo)
           this.photoInfo.image_md5 = this.imgUrl
           photoOp.uploadUserPhoto(this.photoInfo, (res) => {
-            console.log(res)
             this.$router.push({path: `/userCenter/${this.info.user_name}`})
           })
         }

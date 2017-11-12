@@ -10,7 +10,11 @@ const store = new Vuex.Store({
     userInfo: {},
     alreadyLogin: false,
     photoInfo: {},
-    photoUrl: ''
+    photoUrl: '',
+    headerInfo: {
+      isStore: false,
+      isCollections: false
+    }
   },
   mutations: {
     UpdateEmailSettings (state, settings) {
@@ -27,6 +31,10 @@ const store = new Vuex.Store({
     },
     getPhotoUrl (state, url) {
       state.photoUrl = url
+    },
+    getHeaderInfo (state, flag) {
+      state.headerInfo.isStore = flag.isStore
+      state.headerInfo.isCollections = flag.isCollections
     }
   },
   actions: {

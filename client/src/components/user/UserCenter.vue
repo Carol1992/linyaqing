@@ -7,7 +7,7 @@
         </div>
         <div class="name">
           <span>{{info.user_name}}</span>
-          <span class="more" @click='gotoProfile'><Icon type="ios-more-outline"></Icon></span>
+          <span class="more" @click='gotoProfile'><span>账户设置</span></span>
         </div>
       </div>
     </div>
@@ -195,19 +195,19 @@
     font-weight: bolder;
   }
   .more {
-    font-size: 30px;
+    font-size: 16px;
     position: absolute;
     margin-left: 20px;
-    margin-top: 2px;
+    margin-top: 20px;
     display: inline-block;
-    width: 50px;
-    height: 42px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
+    width: 100px;
     cursor: pointer;
+    color: #979797;
+    text-decoration: underline;
+    font-style: italic;
   }
   .more:hover {
-    border: 1px solid #979797;
+    color:#111;
   }
   .bottom {
     width: 100%;
@@ -246,6 +246,9 @@
     }
     .choices > span {
       font-size: 18px;
+    }
+    .more{
+      margin-top: 15px;
     }
   }
 </style>

@@ -780,13 +780,13 @@ post: data: {
 	is_private: 1 // 0代表私有，1代表公开，默认为公开
 }
 
-48.用户更改相册名称或首页
+48.用户更改相册名称或是否公开
 url:'/updateCollection'
 post: data: {
 	token:'',
 	collection_id: '',
-	collection_name:'',
-	collection_image_md5: ''
+	collection_name:'', // 可选
+	is_private: 0/1 // 可选，默认是0，即不公开
 }
 
 49.用户更改照片的信息
@@ -805,5 +805,13 @@ post: data: {
 	story_detail: '照片拍摄于今天早上，天气有点冷',
 	location: '广东省深圳市龙华区',
 	display_location: '0',
+	collection_id: ''
+}
+
+50. 将照片加入自己的相册
+url:'/addToCollection'
+data: post: {
+	token: '',
+	image_id: '',
 	collection_id: ''
 }

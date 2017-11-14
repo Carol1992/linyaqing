@@ -372,9 +372,13 @@ router.post('/updatePhotographers', verify_token, (req, res, next) => {
 });
 // 获取推荐的摄影师
 router.all('/getPhotographers', (req, res, next) => {
-	query('SELECT users.user_id, users.user_name, users.image_md5, users.wechat, ' + 
-			'a.follower_nums FROM users, (SELECT user_id, COUNT(follower_id) AS follower_nums ' + 
-				' FROM relationships GROUP BY user_id ORDER BY follower_nums DESC LIMIT 0,25) a WHERE a.user_id = users.user_id', '')
+	let _user = req.body;
+	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
+	let pageSize = +_user.pageSize || +req.query.pageSize || 25;
+	let _left = (pageNo - 1) * pageSize;
+	query('SELECT users.user_id, users.user_name, users.image_md5, users.wechat, a.follower_nums FROM '+
+		'users LEFT OUTER JOIN (SELECT user_id, COUNT(follower_id) AS follower_nums FROM relationships '+
+		'GROUP BY user_id) a ON a.user_id = users.user_id ORDER BY a.follower_nums DESC LIMIT ?,?', [_left, pageSize])
 	.then(function(data) {
 		res.json(formater({code:'0', data: data.results}));
 	});
@@ -572,10 +576,9 @@ router.all('/getCollection/all', (req, res, next) => {
 	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
 	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
-	let q2 = query('SELECT c_table.collection_id, c_table.collection_name, '+
-		'i.image_id, i.image_md5 FROM (SELECT c.collection_id, c.collection_name, c.created_time FROM collections c '+
-		'WHERE c.is_private = 1) c_table, images i WHERE c_table.collection_id = i.collection_id '+
-		'ORDER BY c_table.created_time DESC', '');
+	let q2 = query('SELECT ic.collection_id, c.collection_name, ic.image_id, i.image_md5 FROM '+
+		'image_collection ic, collections c, images i WHERE ic.collection_id = c.collection_id AND '+
+		'ic.image_id = i.image_id AND c.is_private = 1 ORDER BY ic.collection_id DESC', '');
 	Promise.all([q2]).then(values => {
 		let collections = values[0].results
 		let newCollections = []
@@ -618,10 +621,9 @@ router.all('/getCollection/user', verify_token, (req, res, next) => {
 	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
 	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
-	let q2 = query('SELECT c_table.collection_id, c_table.collection_name, '+
-		'i.image_id, i.image_md5 FROM (SELECT c.collection_id, c.collection_name, c.created_time FROM collections c '+
-		'WHERE c.is_private = 1) c_table, images i WHERE c_table.collection_id = i.collection_id AND '+
-		'i.user_id = ? ORDER BY c_table.created_time DESC', [user_id]);
+	let q2 = query('SELECT ic.collection_id, c.collection_name, ic.image_id, i.image_md5 FROM '+
+		'image_collection ic, collections c, images i WHERE ic.collection_id = c.collection_id AND '+
+		'ic.image_id = i.image_id AND i.user_id = ? ORDER BY ic.collection_id DESC', [user_id]);
 	Promise.all([q2]).then(values => {
 		let collections = values[0].results
 		let newCollections = []
@@ -657,15 +659,17 @@ router.all('/getCollection/user', verify_token, (req, res, next) => {
 		res.json(formater({code:'0', data:new_data}));
 	});
 });
-// 获取每个图片集里面的图片
+// 获取每个图片集里面的图片(如果是私密的要验证用户)
 router.all('/getCollection/one', (req, res, next) => {
 	let _user = req.body;
 	let collection_id = _user.collection_id || req.query.collection_id;
 	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
 	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
-	let q1 = query('SELECT COUNT(*) AS totalPage FROM images WHERE collection_id = ?', [collection_id]);
-	let q2 = query('SELECT * FROM (SELECT * FROM images WHERE collection_id = ?) a LIMIT ?,?', [collection_id, _left, pageSize]);
+	let q1 = query('SELECT COUNT(*) AS totalPage FROM (SELECT i.* FROM images i, image_collection ic '+
+		'WHERE i.image_id = ic.image_id AND ic.collection_id = ?) a', [collection_id]);
+	let q2 = query('SELECT i.* FROM images i, image_collection ic WHERE i.image_id = ic.image_id AND '+
+		'ic.collection_id = ? LIMIT ?,?', [collection_id, _left, pageSize]);
 	Promise.all([q1, q2]).then(values => {
 		let new_data = {
 			pageNo: pageNo,
@@ -676,6 +680,57 @@ router.all('/getCollection/one', (req, res, next) => {
 		res.json(formater({code:'0', data:new_data}));
 	});
 });
+//将照片加入自己的相册
+router.all('/addToCollection', verify_token, (req, res, next) => {
+	let user_id = req.api_user.data.user_id;
+	let post = {
+		image_id: req.body.image_id || req.query.image_id,
+		collection_id: req.body.collection_id || req.query.collection_id
+	}
+	if (!post.image_id || !post.collection_id){
+		return res.json(formater({code: '1', desc:'需要图片id和相册id'}))
+	}
+	query('SELECT collection_id FROM collections WHERE user_id = ? AND collection_id = ?', [user_id, post.collection_id])
+	.then(data => {
+		console.log(data)
+		if (data.results.length === 0) {
+			return res.json(formater({code: '1', desc: '该相册不属于该用户！'}))
+		}
+		query('DELETE FROM image_collection WHERE image_id = ? AND collection_id = ?', [post.image_id, post.collection_id])
+		.then(data => {
+			query('INSERT INTO image_collection SET ?', [post])
+			.then(data2 => {
+				res.json(formater({code: '0', desc:'成功将指定相片加入指定相册！'}))
+			})
+		})
+	})
+})
+// 修改相册名称或简介或是否公开
+router.all('/updateCollection', verify_token, (req, res, next) => {
+	let user_id = req.api_user.data.user_id
+	let collection_id = req.body.collection_id || req.query.collection_id
+	let collection_name = req.body.collection_name || req.query.collection_name
+	let is_private = (req.body.is_private).toString() || (req.query.is_private).toString()
+	let collection_desc = req.body.collection_desc || req.query.collection_desc
+	if (!collection_id) {
+		return res.json(formater({code: '1', desc:'相册id不能为空！'}))
+	}
+	query('SELECT collection_id FROM collections WHERE user_id = ? AND collection_id = ?', [user_id, collection_id])
+	.then(data => {
+		if (data.results.length === 0) {
+			return res.json(formater({code: '1', desc: '该相册不属于该用户！'}))
+		}
+		query('UPDATE collections SET collection_name = ?, is_private = ?, collection_desc = ? '+
+			'WHERE collection_id = ?', [collection_name, is_private, collection_desc, collection_id])
+		.then(data => {
+			if (data.results.affectedRows === 1) {
+				res.json(formater({code: '0', desc:'相册信息修改成功！'}))
+			} else {
+				res.json(formater({code: '0', desc:'该相册不存在！'}))
+			}
+		})
+	})
+})
 // 向服务端请求签名然后直接上传到阿里云
 router.all('/getAliyunKey', verify_token, (req, res, next) => {
 	let upload_dir = 'users/';
@@ -705,6 +760,9 @@ router.all('/getAliyunKey', verify_token, (req, res, next) => {
 router.post('/uploadUserPhoto', verify_token, (req, res, next) => {
 	let _user = req.body;
 	let user_id = req.api_user.data.user_id;
+	let collection_name = new Date().getFullYear() + '/' + new Date().getMonth() + '/' + 
+	new Date().getDate() + ' ' + new Date().getHours() + ':' + new Date().getMinutes() + 
+	':' + new Date().getSeconds() + ' 创建的新相册'
 	let post = {
 		user_id: user_id,
 		image_md5: _user.image_md5,
@@ -723,12 +781,17 @@ router.post('/uploadUserPhoto', verify_token, (req, res, next) => {
 		collection_id: _user.collection_id
 	};
 	if(!post.collection_id) {
-		query('INSERT INTO collections SET collection_image_md5 = ?', [post.image_md5])
+		query('INSERT INTO collections SET user_id = ?, collection_name = ?', 
+			[post.user_id, collection_name])
 	  .then(data => {
 			post.collection_id = data.results.insertId;
 			query('INSERT INTO images SET ?', [post])
-			.then(values => {
-				res.json(formater({code:'0', desc:'图片上传成功！', data:{collection_id: data.results.insertId}}));
+			.then(data => {
+				let image_id = data.results.insertId
+				query('INSERT INTO image_collection SET ?', [{image_id: image_id, collection_id: post.collection_id}])
+				.then(data => {
+					res.json(formater({code:'0', desc:'图片上传成功！', data:{collection_id: post.collection_id}}));
+				})
 			})
 		});
 	} else {
@@ -738,8 +801,12 @@ router.post('/uploadUserPhoto', verify_token, (req, res, next) => {
 				return res.json(formater({code:'1', desc:'插入失败，该id对应的图片集不存在！'}));
 			} else {
 				query('INSERT INTO images SET ?', [post])
-				.then(values => {
-					res.json(formater({code:'0', desc:'图片上传成功！', data:{collection_id: post.collection_id}}));
+				.then(data => {
+					let image_id = data.results.insertId
+					query('INSERT INTO image_collection SET ?', [{image_id: image_id, collection_id: post.collection_id}])
+					.then(data => {
+						res.json(formater({code:'0', desc:'图片上传成功！', data:{collection_id: post.collection_id}}));
+					})
 				})
 			}
 		});

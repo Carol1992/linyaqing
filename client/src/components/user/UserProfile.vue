@@ -3,10 +3,6 @@
     <div class="left">
       <div class="title">
         <span>账户设置</span>
-        <!-- <form action="/api/uploadPhotoToAliyun" method="post">
-         <input type="file">
-          <input type="submit" value="Submit">
-        </form> -->
       </div>
       <div class="details">
         <div class="profile" @click='isProfile = true; isPhoto = false; isEmail = false; isPwd = false; isApp = false; isDelete = false; nowEdit = "个人信息"' >
@@ -98,6 +94,9 @@
          </div>
       </div>
       <div class="ifPhoto" v-if='isPhoto'>
+        <div class="noData" v-if='noData'>
+          <span>您还没有上传过照片:)</span>
+        </div>
         <div class="image-edit" v-for='photo in photos'>
           <div class="left-image">
             <img :src='photo.image_md5_new' alt="">
@@ -196,7 +195,8 @@
         imgUrl: '',
         currentPage1: 1,
         pageSize: 18000,
-        photos: []
+        photos: [],
+        noData: false
       }
     },
     components: {
@@ -279,6 +279,11 @@
         photoOp.getList.user(data, (res) => {
           let lists = res.data.data.lists
           this.photos = []
+          if (lists.length === 0) {
+            this.noData = true
+            return
+          }
+          this.noData = false
           for (let i = 0; i < lists.length; i++) {
             lists[i].image_md5_new = lists[i].image_md5 + '?x-oss-process=image/auto-orient,1'
             lists[i].isExif = true
@@ -617,6 +622,15 @@
   }
   .image-story textarea{
     min-height: 200px;
+  }
+  .noData {
+    width: 100%;
+    height: 200px;
+    text-align: center;
+  }
+  .noData > span {
+    line-height: 200px;
+    font-size: 18px;
   }
   @media screen and (max-width: 809px) {
     .left {

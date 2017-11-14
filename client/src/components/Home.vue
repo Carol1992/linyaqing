@@ -10,12 +10,14 @@
       <span class="nav" v-if='login' :class="{activated: isActivated3}" @click='getFollowing'>关注</span>
     </div>
     <Photos :photos="photos"></Photos>
+    <div class="noFollowing" v-if='noFollowing'>
+      <span>目前没有关注任何人哦:）</span>
+    </div>
     <BackTop></BackTop>
   </div>
 </template>
 
 <script>
-// import $ from 'jquery'
 import photosOp from '../../api/photos'
 import Photos from './photos/Photos'
 export default {
@@ -36,7 +38,8 @@ export default {
         group_a: [],
         group_b: [],
         group_c: []
-      }
+      },
+      noFollowing: false
     }
   },
   methods: {
@@ -144,6 +147,11 @@ export default {
       }
       photosOp.getList.following(data, (res) => {
         let lists = res.data.data.lists
+        if (lists.length === 0) {
+          this.noFollowing = true
+          return
+        }
+        this.noFollowing = false
         for (let i = 0; i < lists.length; i++) {
           lists[i].image_md5 += '?x-oss-process=image/auto-orient,1'
           if (i % 3 === 0) {
@@ -181,7 +189,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .introduction {
   width: 90%;
   margin: auto;
@@ -213,6 +221,15 @@ export default {
 }
 .nav:hover {
   color: #111;
+}
+.noFollowing {
+  width: 100%;
+  height: 200px;
+  text-align: center;
+}
+.noFollowing > span {
+  line-height: 200px;
+  font-size: 18px;
 }
 @media screen and (max-width: 809px) {
   .introduction h1 {

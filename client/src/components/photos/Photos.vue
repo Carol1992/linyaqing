@@ -49,7 +49,6 @@
   }
   .images {
     width: calc(33.33% - 1.5%);
-    background-color: #f5f5f5;
   }
   .image img {
     width: 100%;
@@ -57,6 +56,7 @@
   .image {
     margin-bottom: 4.5%;
     width: 100%;
+    background-color: #f5f5f5;
   }
   .imageCover {
     background-color: rgba(0,0,0,0.1);

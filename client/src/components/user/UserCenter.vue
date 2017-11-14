@@ -21,6 +21,9 @@
         <Photos :photos="photos" v-if='!isActivated3'></Photos>
         <Collections :collections='collections' v-if='isActivated3'></Collections>
       </div>
+      <div class="noData" v-if='noData'>
+        <span>{{noDataMsg}}</span>
+      </div>
     </div>
     <BackTop></BackTop>
   </div>
@@ -51,7 +54,9 @@
         currentPage2: 1,
         currentPage3: 1,
         pageSize: 18000,
-        collections: []
+        collections: [],
+        noData: false,
+        noDataMsg: '您还没有上传过照片:)'
       }
     },
     components: {
@@ -97,6 +102,12 @@
         photoOp.getList.user(data, (res) => {
           this.summary.photos = res.data.data.totalCount
           let lists = res.data.data.lists
+          if (lists.length === 0) {
+            this.noData = true
+            this.noDataMsg = '您还没有上传过照片哦:)'
+            return
+          }
+          this.noData = false
           for (let i = 0; i < lists.length; i++) {
             lists[i].image_md5 += '?x-oss-process=image/auto-orient,1'
             if (i % 3 === 0) {
@@ -120,6 +131,12 @@
         photoOp.getList.liked(data, (res) => {
           this.summary.liked = res.data.data.totalCount
           let lists = res.data.data.lists
+          if (lists.length === 0) {
+            this.noData = true
+            this.noDataMsg = '您还没有赞过任何一张照片:)'
+            return
+          }
+          this.noData = false
           for (let i = 0; i < lists.length; i++) {
             lists[i].image_md5 += '?x-oss-process=image/auto-orient,1'
             if (i % 3 === 0) {
@@ -143,6 +160,12 @@
         photoOp.getCollection.user(data, (res) => {
           this.summary.collections = res.data.data.totalCount
           let lists = res.data.data.lists
+          if (lists.length === 0) {
+            this.noData = true
+            this.noDataMsg = '您还没有新建过相册:)'
+            return
+          }
+          this.noData = false
           for (let l of lists) {
             let newArr = []
             for (let image of l.images_list) {
@@ -234,6 +257,15 @@
     margin-left: 5%;
     margin-top: 40px;
     margin-bottom: 30px;
+  }
+  .noData {
+    width: 100%;
+    height: 200px;
+    text-align: center;
+  }
+  .noData > span {
+    line-height: 200px;
+    font-size: 18px;
   }
   @media screen and (max-width: 809px) {
     .top {

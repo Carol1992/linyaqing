@@ -17,7 +17,7 @@
       </div>
       <div class="password">
         <span><Icon type="locked"></Icon> 密 码 <span class="info">(6-20位数字/字母/下划线/中划线)</span></span>
-        <input type="password" maxlength="20" v-model='password'>
+        <input type="password" maxlength="20" v-model='password' @keyup.enter='goRegister'>
       </div>
       <div class="submit">
         <input type="button" value="注 册" @click='goRegister'>

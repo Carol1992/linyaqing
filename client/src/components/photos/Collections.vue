@@ -3,14 +3,16 @@
     <div class="images">
       <div class="image" v-for='collection in collections'>
         <div class="left">
-          <img :src='collection.images_list[0]' alt="">
+          <img :src='collection.images_list[0]' alt="" @error='imgError'>
         </div>
         <div class="right">
           <div class="right-top">
-            <img :src='collection.images_list[1]' alt="">
+            <img :src='collection.images_list[1]' alt="" @error='imgError' 
+            v-if='collection.images_list.length >= 2'>
           </div>
           <div class="right-bottom">
-            <img :src='collection.images_list[2]' alt="">
+            <img :src='collection.images_list[2]' alt="" @error='imgError' 
+            v-if='collection.images_list.length >= 3'>
           </div>
         </div>
       </div>
@@ -26,7 +28,12 @@
         msg: ''
       }
     },
-    props: ['collections']
+    props: ['collections'],
+    methods: {
+      imgError (e) {
+        e.target.src = require('../../assets/img/white.png')
+      }
+    }
   }
 </script>
 
@@ -44,7 +51,7 @@
   .image {
     width: calc(100% / 3 - 20px);
     margin-bottom: 30px;
-    background-color: #f5f5f5;
+    background-color: #fff;
     height: 310px;
     border-radius: 8px;
     overflow: hidden;
@@ -54,6 +61,7 @@
     display: inline-block;
     float: left;
     height: 100%;
+    background-color: #f5f5f5;
   }
   .right {
     width: 30%;
@@ -63,6 +71,7 @@
   }
   .right-top, .right-bottom {
     height: 49.5%;
+    background-color: #f5f5f5;
   }
   .right-bottom {
     margin-top: 2%;

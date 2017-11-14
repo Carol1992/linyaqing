@@ -13,7 +13,7 @@
       </div>
       <div class="password">
         <span><Icon type="locked"></Icon> 密 码</span>
-        <input type="password" maxlength="20" v-model='password'>
+        <input type="password" maxlength="20" v-model='password' @keyup.enter='goLogin'>
       </div>
       <div class="submit">
         <input type="button" value="登 录" @click='goLogin'>

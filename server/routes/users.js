@@ -662,23 +662,30 @@ router.all('/getCollection/user', verify_token, (req, res, next) => {
 // 获取每个图片集里面的图片(如果是私密的要验证用户)
 router.all('/getCollection/one', (req, res, next) => {
 	let _user = req.body;
+	let user_id = _user.user_id || req.query.user_id
 	let collection_id = _user.collection_id || req.query.collection_id;
 	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
 	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
-	let q1 = query('SELECT COUNT(*) AS totalPage FROM (SELECT i.* FROM images i, image_collection ic '+
-		'WHERE i.image_id = ic.image_id AND ic.collection_id = ?) a', [collection_id]);
-	let q2 = query('SELECT i.* FROM images i, image_collection ic WHERE i.image_id = ic.image_id AND '+
-		'ic.collection_id = ? LIMIT ?,?', [collection_id, _left, pageSize]);
-	Promise.all([q1, q2]).then(values => {
-		let new_data = {
-			pageNo: pageNo,
-			pageSize: pageSize,
-			totalPage: Math.ceil(values[0].results[0].totalPage / pageSize),
-			lists: values[1].results
-		};
-		res.json(formater({code:'0', data:new_data}));
-	});
+	query('SELECT is_private, user_id FROM collections WHERE collection_id = ?', [collection_id])
+	.then(data => {
+		if (data.results[0].is_private == '0' && data.results[0].user_id != user_id) {
+			return res.json(formater({code: '1', desc: '该私密相册不属于该用户，不能被访问！'}))
+		}
+		let q1 = query('SELECT COUNT(*) AS totalPage FROM (SELECT i.* FROM images i, image_collection ic '+
+			'WHERE i.image_id = ic.image_id AND ic.collection_id = ?) a', [collection_id]);
+		let q2 = query('SELECT i.* FROM images i, image_collection ic WHERE i.image_id = ic.image_id AND '+
+			'ic.collection_id = ? LIMIT ?,?', [collection_id, _left, pageSize]);
+		Promise.all([q1, q2]).then(values => {
+			let new_data = {
+				pageNo: pageNo,
+				pageSize: pageSize,
+				totalPage: Math.ceil(values[0].results[0].totalPage / pageSize),
+				lists: values[1].results
+			};
+			res.json(formater({code:'0', data:new_data}));
+		});
+	})
 });
 //将照片加入自己的相册
 router.all('/addToCollection', verify_token, (req, res, next) => {

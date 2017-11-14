@@ -46,7 +46,7 @@
               <input type="text" maxlength="20" v-model='info.user_name'>
             </div>
             <div class="website">
-              <span><Icon type="link"></Icon> 个人网站</span>
+              <span><Icon type="link"></Icon> 微 信</span>
               <input type="text" maxlength="100" v-model='info.personal_site'>
             </div>
           </div>
@@ -58,7 +58,7 @@
           </div>
           <div class="user_bio">
             <span><Icon type="information-circled"></Icon> 个人简介</span>
-            <textarea name="" id="" cols="30" rows="10" v-model='info.bio'></textarea>
+            <textarea name="" id="" cols="30" rows="10" v-model='info.bio' maxlength="300"></textarea>
           </div>
           <div class="submit" @click='changeInfo'>
             <input type="button" value='提 交'>

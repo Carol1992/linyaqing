@@ -815,3 +815,19 @@ data: post: {
 	image_id: '',
 	collection_id: ''
 }
+
+51. 给图片添加评论
+url:'/photoComment'
+data: post: {
+	token: '',
+	image_id: '',
+	comment: ''
+}
+
+52. 获取图片的评论列表
+url:'/getPhotoComments'
+data: post: {
+	image_id:''
+}
+
+53. 点赞、评论图片，将图片加入收藏，用websocket通知图片的所有者

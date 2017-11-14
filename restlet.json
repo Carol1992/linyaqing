@@ -1,0 +1,2316 @@
+{
+  "front-version": "2.10.1",
+  "version": 3,
+  "nodes": [
+    {
+      "type": "Project",
+      "description": "",
+      "id": "0b866162-ffa3-4622-b17c-0ff5588de6b7",
+      "lastModified": "2017-11-14T16:13:15.596+08:00",
+      "name": "linyaqing"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/uploadProductImageToAliyun/"
+      },
+      "id": "85adf4fd-5964-4d52-9ca4-a26c79e1dc58",
+      "lastModified": "2017-10-31T17:59:15.554+08:00",
+      "name": "上传商品图片到阿里云",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "enabled": true,
+          "name": "x-access-token",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjMsImlzX2RldmVsb3BlciI6IjAiLCJpc19hZG1pbiI6IjEiLCJ1c2VyX25hbWUiOiLlpKfoi49sbGzmiZMiLCJmaXJzdF9uYW1lIjoiIiwibGFzdF9uYW1lIjoiIiwicGhvbmUiOm51bGwsImVtYWlsIjoibTBAZ21haWwuY29tIiwicGFzc3dvcmQiOiJoaCIsInByb3ZpbmNlIjpudWxsLCJjaXR5IjpudWxsLCJ0b3duIjpudWxsLCJpbWFnZV9tZDUiOm51bGwsInBlcnNvbmFsX3NpdGUiOm51bGwsImluc3RhZ3JhbSI6bnVsbCwidHdpdHRlciI6bnVsbCwibG9jYXRpb24iOm51bGwsImJpbyI6bnVsbCwiY3JlYXRlZF90aW1lIjpudWxsLCJkZXZfdXJsIjoiaHR0cHM6Ly9iYWlkdS5jb20iLCJkZXZfZGVzYyI6IkkgQU0gQU4gRVhDRUxMRU5UIERFVkVMT1BFUiJ9LCJpYXQiOjE1MDk0MTgyMDYsImV4cCI6MTUwOTUwNDYwNn0.COCuZtuPDz0eD-q3SkeBs6VDg-2fr2TPsWq144QjrNc"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true,
+        "textBody": "{\"image_md5\": \"http://my-image-carol.oss-cn-beijing.aliyuncs.com/1509406044609.gif\", \"image_tags\": \"bird, nice\", \"collection_id\":19, \"location\":\"广东深圳罗湖区\", \"display\":\"1\", \"story_title\":\"哈哈哈哈哈哈\"}"
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/uploadUserPhoto/"
+      },
+      "id": "e3e28d6f-331c-45e4-aa98-393dd74b6fec",
+      "lastModified": "2017-11-14T11:23:14.948+08:00",
+      "name": "上传图片",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "enabled": true,
+          "name": "x-access-token",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjMsImlzX2RldmVsb3BlciI6IjAiLCJpc19hZG1pbiI6IjEiLCJ1c2VyX25hbWUiOiLlpKfoi4_miZMiLCJwaG9uZSI6bnVsbCwiZW1haWwiOiJtZWxpQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiaGgiLCJwcm92aW5jZSI6IuW5v-S4nCIsImNpdHkiOiLmt7HlnLMiLCJ0b3duIjoi56aP55SwIiwiaW1hZ2VfbWQ1IjpudWxsLCJwZXJzb25hbF9zaXRlIjpudWxsLCJ3ZWNoYXQiOm51bGwsImFkZHJlc3MiOm51bGwsImJpbyI6bnVsbCwiY3JlYXRlZF90aW1lIjoiMjAxNy0xMS0wOVQwMToxODoxMi4wMDBaIiwiZGV2X3VybCI6Imh0dHBzOi8vYmFpZHUuY29tIiwiZGV2X2Rlc2MiOiJJIEFNIEFOIEVYQ0VMTEVOVCBERVZFTE9QRVIiLCJkZWxpdmVyeV9hZGRyZXNzIjpudWxsLCJkZWxpdmVyeV9jaXR5IjpudWxsLCJkZWxpdmVyeV9wcm92aW5jZSI6bnVsbCwiZGVsaXZlcnlfdG93biI6bnVsbCwiY29uc2lnbmVlIjpudWxsLCJjb25zaWduZWVfcGhvbmUiOm51bGx9LCJpYXQiOjE1MTA2Mjk3NzQsImV4cCI6MTUxMzIyMTc3NH0.DqBv66Baohdyg7KyEoEx3DnbRfGDEaNDa75T_NlW0mg"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "File",
+        "autoSetLength": true
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/uploadPhotoToAliyun/"
+      },
+      "id": "7642fb1d-3289-44ef-8198-5b0792ff995b",
+      "lastModified": "2017-10-31T17:59:09.044+08:00",
+      "name": "上传图片到阿里云服务器",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "image/jpeg"
+        },
+        {
+          "enabled": true,
+          "name": "x-access-token",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjMsImlzX2RldmVsb3BlciI6IjAiLCJpc19hZG1pbiI6IjEiLCJ1c2VyX25hbWUiOiLlpKfoi49sbGzmiZMiLCJmaXJzdF9uYW1lIjoiIiwibGFzdF9uYW1lIjoiIiwicGhvbmUiOm51bGwsImVtYWlsIjoibTBAZ21haWwuY29tIiwicGFzc3dvcmQiOiJoaCIsInByb3ZpbmNlIjpudWxsLCJjaXR5IjpudWxsLCJ0b3duIjpudWxsLCJpbWFnZV9tZDUiOm51bGwsInBlcnNvbmFsX3NpdGUiOm51bGwsImluc3RhZ3JhbSI6bnVsbCwidHdpdHRlciI6bnVsbCwibG9jYXRpb24iOm51bGwsImJpbyI6bnVsbCwiY3JlYXRlZF90aW1lIjpudWxsLCJkZXZfdXJsIjoiaHR0cHM6Ly9iYWlkdS5jb20iLCJkZXZfZGVzYyI6IkkgQU0gQU4gRVhDRUxMRU5UIERFVkVMT1BFUiJ9LCJpYXQiOjE1MDk0MTgyMDYsImV4cCI6MTUwOTUwNDYwNn0.COCuZtuPDz0eD-q3SkeBs6VDg-2fr2TPsWq144QjrNc"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true,
+        "textBody": "{\"inventory_id\":\"5\",\"product_id\":\"6\", \"stocks\":\"80\", \"unit\":\"件\", \"province\":\"广东\",\"city\":\"深圳\",\"town\":\"龙华\"}"
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/changeStocks/"
+      },
+      "id": "9dadaa81-a9b5-4f0b-802b-732984c5c74f",
+      "lastModified": "2017-11-01T17:05:04.025+08:00",
+      "name": "修改产品库存",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "enabled": true,
+          "name": "x-access-token",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjMsImlzX2RldmVsb3BlciI6IjAiLCJpc19hZG1pbiI6IjEiLCJ1c2VyX25hbWUiOiLlpKfoi4_miZMiLCJwaG9uZSI6bnVsbCwiZW1haWwiOiJtZWxpQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiaGgiLCJwcm92aW5jZSI6bnVsbCwiY2l0eSI6Iua3seWcsyIsInRvd24iOiLnpo_nlLAiLCJpbWFnZV9tZDUiOm51bGwsInBlcnNvbmFsX3NpdGUiOm51bGwsIndlY2hhdCI6bnVsbCwiYWRkcmVzcyI6bnVsbCwiYmlvIjpudWxsLCJjcmVhdGVkX3RpbWUiOiIyMDE3LTEwLTMxVDIzOjE0OjMyLjAwMFoiLCJkZXZfdXJsIjoiaHR0cHM6Ly9iYWlkdS5jb20iLCJkZXZfZGVzYyI6IkkgQU0gQU4gRVhDRUxMRU5UIERFVkVMT1BFUiIsImRlbGl2ZXJ5X2FkZHJlc3MiOm51bGwsImRlbGl2ZXJ5X2NpdHkiOm51bGwsImRlbGl2ZXJ5X3Byb3ZpbmNlIjpudWxsLCJkZWxpdmVyeV90b3duIjpudWxsLCJjb25zaWduZWUiOm51bGwsImNvbnNpZ25lZV9waG9uZSI6bnVsbH0sImlhdCI6MTUwOTUxMzcyMCwiZXhwIjoxNTA5NjAwMTIwfQ.2fkPRft2bB-m037ZxTGnxl9-2e8jPQImdHeMibIR5t0"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true,
+        "textBody": "{\"first_name\":\"\",\"last_name\":\"\",\"user_name\":\"大苏打\",\"email\":\"meli@gmail.com\",\"password\":\"hh\", \"province\":\"广东\",\"city\":\"深圳\",\"town\":\"福田\"}"
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/updateUserAccount/info"
+      },
+      "id": "7d63ab01-d90c-4979-8c6a-a3e3313ff3be",
+      "lastModified": "2017-10-31T13:13:37.963+08:00",
+      "name": "修改用户信息",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "enabled": true,
+          "name": "x-access-token",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjMsImlzX2RldmVsb3BlciI6IjAiLCJpc19hZG1pbiI6IjEiLCJ1c2VyX25hbWUiOiLlpKfoi49sbGzmiZMiLCJmaXJzdF9uYW1lIjoiIiwibGFzdF9uYW1lIjoiIiwicGhvbmUiOm51bGwsImVtYWlsIjoibTBAZ21haWwuY29tIiwicGFzc3dvcmQiOiJoaCIsInByb3ZpbmNlIjpudWxsLCJjaXR5IjpudWxsLCJ0b3duIjpudWxsLCJpbWFnZV9tZDUiOm51bGwsInBlcnNvbmFsX3NpdGUiOm51bGwsImluc3RhZ3JhbSI6bnVsbCwidHdpdHRlciI6bnVsbCwibG9jYXRpb24iOm51bGwsImJpbyI6bnVsbCwiY3JlYXRlZF90aW1lIjpudWxsLCJkZXZfdXJsIjoiaHR0cHM6Ly9iYWlkdS5jb20iLCJkZXZfZGVzYyI6IkkgQU0gQU4gRVhDRUxMRU5UIERFVkVMT1BFUiJ9LCJpYXQiOjE1MDk0MTgyMDYsImV4cCI6MTUwOTUwNDYwNn0.COCuZtuPDz0eD-q3SkeBs6VDg-2fr2TPsWq144QjrNc"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true,
+        "textBody": "{\"password\":\"kiju\"}"
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/updateUserAccount/password"
+      },
+      "id": "4eac0d76-6895-43be-be49-f034e8fda8c4",
+      "lastModified": "2017-10-24T23:45:45.344+08:00",
+      "name": "修改用户密码",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "enabled": true,
+          "name": "x-access-token",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjMxLCJ1c2VyX25hbWUiOiLlpKfoi4_miZMiLCJmaXJzdF9uYW1lIjoiIiwibGFzdF9uYW1lIjoiIiwicGhvbmUiOm51bGwsImVtYWlsIjoiYWFAZ21haWwuY29tIiwicGFzc3dvcmQiOiJhYSIsInByb3ZpbmNlX2NvZGUiOm51bGwsImNpdHlfY29kZSI6bnVsbCwidG93bl9jb2RlIjpudWxsLCJpbWFnZV9tZDUiOm51bGwsInBlcnNvbmFsX3NpdGUiOm51bGwsImluc3RhZ3JhbSI6bnVsbCwidHdpdHRlciI6bnVsbCwibG9jYXRpb24iOm51bGwsImJpbyI6bnVsbCwiZW1haWxfc2V0dGluZ3MiOiIxLDIsMyw0LDUsNiw3LDgiLCJjcmVhdGVkX3RpbWUiOm51bGx9LCJpYXQiOjE1MDg4NTg5NTUsImV4cCI6MTUwODk0NTM1NX0.Z163Q5djF2bF1HP7tOODs6KOWqEJ8YUaoMBWzE5Od1I"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/updateUserAccount/delivery/"
+      },
+      "id": "88de0aff-23f3-4972-a49c-d7a5ed0de446",
+      "lastModified": "2017-11-02T17:24:29.566+08:00",
+      "name": "修改用户收货地址",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "enabled": true,
+          "name": "x-access-token",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjMsImlzX2RldmVsb3BlciI6IjAiLCJpc19hZG1pbiI6IjEiLCJ1c2VyX25hbWUiOiLlpKfoi4_miZMiLCJwaG9uZSI6bnVsbCwiZW1haWwiOiJtZWxpQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiaGgiLCJwcm92aW5jZSI6bnVsbCwiY2l0eSI6Iua3seWcsyIsInRvd24iOiLnpo_nlLAiLCJpbWFnZV9tZDUiOm51bGwsInBlcnNvbmFsX3NpdGUiOm51bGwsIndlY2hhdCI6bnVsbCwiYWRkcmVzcyI6bnVsbCwiYmlvIjpudWxsLCJjcmVhdGVkX3RpbWUiOiIyMDE3LTEwLTMxVDIzOjE0OjMyLjAwMFoiLCJkZXZfdXJsIjoiaHR0cHM6Ly9iYWlkdS5jb20iLCJkZXZfZGVzYyI6IkkgQU0gQU4gRVhDRUxMRU5UIERFVkVMT1BFUiIsImRlbGl2ZXJ5X2FkZHJlc3MiOm51bGwsImRlbGl2ZXJ5X2NpdHkiOm51bGwsImRlbGl2ZXJ5X3Byb3ZpbmNlIjpudWxsLCJkZWxpdmVyeV90b3duIjpudWxsLCJjb25zaWduZWUiOm51bGwsImNvbnNpZ25lZV9waG9uZSI6bnVsbH0sImlhdCI6MTUwOTU5OTYyMiwiZXhwIjoxNTA5Njg2MDIyfQ.bC_Y7jQu_gtFmMOmsrWdnU6zlvL5wPjBXH30C46ksZU"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true,
+        "textBody": "{\"collection_id\":19, \"collection_name\":\"我是skjH\", \"collection_desc\":\"家啊空间和慷慨就发个快递就和德国空军和\",\"is_private\":0}"
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/updateCollection"
+      },
+      "id": "0adea6d6-d60c-4b9b-b255-a83677baceb6",
+      "lastModified": "2017-11-14T15:30:57.141+08:00",
+      "name": "修改相册名称",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "enabled": true,
+          "name": "x-access-token",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjMsImlzX2RldmVsb3BlciI6IjAiLCJpc19hZG1pbiI6IjEiLCJ1c2VyX25hbWUiOiLlpKfoi4_miZMiLCJwaG9uZSI6bnVsbCwiZW1haWwiOiJtZWxpQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiaGgiLCJwcm92aW5jZSI6IuW5v-S4nCIsImNpdHkiOiLmt7HlnLMiLCJ0b3duIjoi56aP55SwIiwiaW1hZ2VfbWQ1IjpudWxsLCJwZXJzb25hbF9zaXRlIjpudWxsLCJ3ZWNoYXQiOm51bGwsImFkZHJlc3MiOm51bGwsImJpbyI6bnVsbCwiY3JlYXRlZF90aW1lIjoiMjAxNy0xMS0wOVQwMToxODoxMi4wMDBaIiwiZGV2X3VybCI6Imh0dHBzOi8vYmFpZHUuY29tIiwiZGV2X2Rlc2MiOiJJIEFNIEFOIEVYQ0VMTEVOVCBERVZFTE9QRVIiLCJkZWxpdmVyeV9hZGRyZXNzIjpudWxsLCJkZWxpdmVyeV9jaXR5IjpudWxsLCJkZWxpdmVyeV9wcm92aW5jZSI6bnVsbCwiZGVsaXZlcnlfdG93biI6bnVsbCwiY29uc2lnbmVlIjpudWxsLCJjb25zaWduZWVfcGhvbmUiOm51bGx9LCJpYXQiOjE1MTA2Mjk3NzQsImV4cCI6MTUxMzIyMTc3NH0.DqBv66Baohdyg7KyEoEx3DnbRfGDEaNDa75T_NlW0mg"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/updatePhotographers/"
+      },
+      "id": "7718dab7-122b-490e-afae-5c61ac2c6b4d",
+      "lastModified": "2017-10-30T09:09:28.867+08:00",
+      "name": "关注某用户",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "enabled": true,
+          "name": "x-access-token",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjIsImlzX2RldmVsb3BlciI6IjAiLCJpc19hZG1pbiI6IjEiLCJ1c2VyX25hbWUiOiLlpKfoi4_miZMiLCJmaXJzdF9uYW1lIjoiIiwibGFzdF9uYW1lIjoiIiwicGhvbmUiOm51bGwsImVtYWlsIjoibUBnbWFpbC5jb20iLCJwYXNzd29yZCI6Imtpamtqa2pranUiLCJwcm92aW5jZSI6bnVsbCwiY2l0eSI6bnVsbCwidG93biI6bnVsbCwiaW1hZ2VfbWQ1IjpudWxsLCJwZXJzb25hbF9zaXRlIjpudWxsLCJpbnN0YWdyYW0iOm51bGwsInR3aXR0ZXIiOm51bGwsImxvY2F0aW9uIjpudWxsLCJiaW8iOm51bGwsImNyZWF0ZWRfdGltZSI6bnVsbCwiZGV2X3VybCI6Imh0dHBzOi8vYmFpZHUuY29tIiwiZGV2X2Rlc2MiOiJJIEFNIEFOIEVYQ0VMTEVOVCBERVZFTE9QRVIifSwiaWF0IjoxNTA5MzI1NzI0LCJleHAiOjE1MDk0MTIxMjR9.yKz7jG5pTs1dEe4cc6INWou-SCfsMGOeapwSf5g05N0"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true,
+        "textBody": "{\"keyword\":\"ddd\"}"
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/search/"
+      },
+      "id": "06fc01f9-95d9-49bc-86d8-00144627da23",
+      "lastModified": "2017-10-30T14:08:52.759+08:00",
+      "name": "关键字搜索",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true,
+        "textBody": "{\"image_id\":2}"
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/deleteUserPhoto/"
+      },
+      "id": "a9090160-d156-4ea9-9d59-79fe904dd7da",
+      "lastModified": "2017-10-30T07:32:47.987+08:00",
+      "name": "删除图片",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "enabled": true,
+          "name": "x-access-token",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjIsImlzX2RldmVsb3BlciI6IjEiLCJpc19hZG1pbiI6IjEiLCJ1c2VyX25hbWUiOiLlpKfoi4_miZMiLCJmaXJzdF9uYW1lIjoiIiwibGFzdF9uYW1lIjoiIiwicGhvbmUiOm51bGwsImVtYWlsIjoibUBnbWFpbC5jb20iLCJwYXNzd29yZCI6Imtpamtqa2pranUiLCJwcm92aW5jZSI6bnVsbCwiY2l0eSI6bnVsbCwidG93biI6bnVsbCwiaW1hZ2VfbWQ1IjpudWxsLCJwZXJzb25hbF9zaXRlIjpudWxsLCJpbnN0YWdyYW0iOm51bGwsInR3aXR0ZXIiOm51bGwsImxvY2F0aW9uIjpudWxsLCJiaW8iOm51bGwsImNyZWF0ZWRfdGltZSI6bnVsbCwiZGV2X3VybCI6bnVsbCwiZGV2X2Rlc2MiOm51bGx9LCJpYXQiOjE1MDkyODgzNjUsImV4cCI6MTUwOTM3NDc2NX0.bnxEekH7yKXUxxAfuwmw9yqJsGU8Sdb0ftpqg-fkckY"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true,
+        "textBody": ""
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/updateUserAccount/delete"
+      },
+      "id": "a80aac38-c349-4703-a625-0ba18aaedac7",
+      "lastModified": "2017-10-29T18:34:29.233+08:00",
+      "name": "删除账户",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "enabled": true,
+          "name": "x-access-token",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjUsImlzX2RldmVsb3BlciI6IjEiLCJpc19hZG1pbiI6IjEiLCJ1c2VyX25hbWUiOiLlpKfoi4_miZMiLCJmaXJzdF9uYW1lIjoiIiwibGFzdF9uYW1lIjoiIiwicGhvbmUiOm51bGwsImVtYWlsIjoibXNzQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiaGgiLCJwcm92aW5jZSI6bnVsbCwiY2l0eSI6bnVsbCwidG93biI6bnVsbCwiaW1hZ2VfbWQ1IjpudWxsLCJwZXJzb25hbF9zaXRlIjpudWxsLCJpbnN0YWdyYW0iOm51bGwsInR3aXR0ZXIiOm51bGwsImxvY2F0aW9uIjpudWxsLCJiaW8iOm51bGwsImNyZWF0ZWRfdGltZSI6bnVsbCwiZGV2X3VybCI6bnVsbCwiZGV2X2Rlc2MiOm51bGx9LCJpYXQiOjE1MDkyNzMxNTIsImV4cCI6MTUwOTM1OTU1Mn0.M81HTWIPbux64phVwl-d8aeQ6SGOQ4-thEh-DV_amVc"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "uriEditor": true,
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true,
+        "textBody": "{\"image_id\":\"153\", \"collection_id\":\"21\"}"
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": [
+            {
+              "name": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjMsImlzX2RldmVsb3BlciI6IjAiLCJpc19hZG1pbiI6IjEiLCJ1c2VyX25hbWUiOiLlpKfoi4_miZMiLCJwaG9uZSI6bnVsbCwiZW1haWwiOiJtZWxpQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiaGgiLCJwcm92aW5jZSI6IuW5v-S4nCIsImNpdHkiOiLmt7HlnLMiLCJ0b3duIjoi56aP55SwIiwiaW1hZ2VfbWQ1IjpudWxsLCJwZXJzb25hbF9zaXRlIjpudWxsLCJ3ZWNoYXQiOm51bGwsImFkZHJlc3MiOm51bGwsImJpbyI6bnVsbCwiY3JlYXRlZF90aW1lIjoiMjAxNy0xMS0wOVQwMToxODoxMi4wMDBaIiwiZGV2X3VybCI6Imh0dHBzOi8vYmFpZHUuY29tIiwiZGV2X2Rlc2MiOiJJIEFNIEFOIEVYQ0VMTEVOVCBERVZFTE9QRVIiLCJkZWxpdmVyeV9hZGRyZXNzIjpudWxsLCJkZWxpdmVyeV9jaXR5IjpudWxsLCJkZWxpdmVyeV9wcm92aW5jZSI6bnVsbCwiZGVsaXZlcnlfdG93biI6bnVsbCwiY29uc2lnbmVlIjpudWxsLCJjb25zaWduZWVfcGhvbmUiOm51bGx9LCJpYXQiOjE1MTA2Mjk3NzQsImV4cCI6MTUxMzIyMTc3NH0.DqBv66Baohdyg7KyEoEx3DnbRfGDEaNDa75T_NlW0mg"
+            },
+            {
+              "name": "image_id",
+              "value": "153"
+            },
+            {
+              "name": "collection_id",
+              "value": "19"
+            }
+          ]
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/addToCollection/"
+      },
+      "id": "1a9e8474-4923-4a43-b2de-e312268f9ed0",
+      "lastModified": "2017-11-14T15:35:34.263+08:00",
+      "name": "将照片加入相册",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "x-access-token",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjMsImlzX2RldmVsb3BlciI6IjAiLCJpc19hZG1pbiI6IjEiLCJ1c2VyX25hbWUiOiLlpKfoi4_miZMiLCJwaG9uZSI6bnVsbCwiZW1haWwiOiJtZWxpQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiaGgiLCJwcm92aW5jZSI6IuW5v-S4nCIsImNpdHkiOiLmt7HlnLMiLCJ0b3duIjoi56aP55SwIiwiaW1hZ2VfbWQ1IjpudWxsLCJwZXJzb25hbF9zaXRlIjpudWxsLCJ3ZWNoYXQiOm51bGwsImFkZHJlc3MiOm51bGwsImJpbyI6bnVsbCwiY3JlYXRlZF90aW1lIjoiMjAxNy0xMS0wOVQwMToxODoxMi4wMDBaIiwiZGV2X3VybCI6Imh0dHBzOi8vYmFpZHUuY29tIiwiZGV2X2Rlc2MiOiJJIEFNIEFOIEVYQ0VMTEVOVCBERVZFTE9QRVIiLCJkZWxpdmVyeV9hZGRyZXNzIjpudWxsLCJkZWxpdmVyeV9jaXR5IjpudWxsLCJkZWxpdmVyeV9wcm92aW5jZSI6bnVsbCwiZGVsaXZlcnlfdG93biI6bnVsbCwiY29uc2lnbmVlIjpudWxsLCJjb25zaWduZWVfcGhvbmUiOm51bGx9LCJpYXQiOjE1MTA2Mjk3NzQsImV4cCI6MTUxMzIyMTc3NH0.DqBv66Baohdyg7KyEoEx3DnbRfGDEaNDa75T_NlW0mg"
+        },
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true,
+        "textBody": "{\"url\":\"https://baidu.com\", \"description\":\"I AM AN EXCELLENT DEVELOPER\"}"
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/updateUserAccount/developer/"
+      },
+      "id": "5607f586-596c-4418-aad7-37965ccee4d6",
+      "lastModified": "2017-10-29T22:46:56.228+08:00",
+      "name": "开发者注册",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "enabled": true,
+          "name": "x-access-token",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjIsImlzX2RldmVsb3BlciI6IjEiLCJpc19hZG1pbiI6IjEiLCJ1c2VyX25hbWUiOiLlpKfoi4_miZMiLCJmaXJzdF9uYW1lIjoiIiwibGFzdF9uYW1lIjoiIiwicGhvbmUiOm51bGwsImVtYWlsIjoibUBnbWFpbC5jb20iLCJwYXNzd29yZCI6Imtpamtqa2pranUiLCJwcm92aW5jZSI6bnVsbCwiY2l0eSI6bnVsbCwidG93biI6bnVsbCwiaW1hZ2VfbWQ1IjpudWxsLCJwZXJzb25hbF9zaXRlIjpudWxsLCJpbnN0YWdyYW0iOm51bGwsInR3aXR0ZXIiOm51bGwsImxvY2F0aW9uIjpudWxsLCJiaW8iOm51bGwsImNyZWF0ZWRfdGltZSI6bnVsbCwiZGV2X3VybCI6bnVsbCwiZGV2X2Rlc2MiOm51bGx9LCJpYXQiOjE1MDkyODgzNjUsImV4cCI6MTUwOTM3NDc2NX0.bnxEekH7yKXUxxAfuwmw9yqJsGU8Sdb0ftpqg-fkckY"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/updatePhotoTag/"
+      },
+      "id": "21e77cff-5922-4a4e-b06c-0e28be2d7d11",
+      "lastModified": "2017-10-30T08:49:06.832+08:00",
+      "name": "提交标注结果",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true,
+        "textBody": "{\"categories\": \"15,16,17,18,23\"}"
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/updateUserCategories/"
+      },
+      "id": "5e1ece69-31e2-4c7e-9970-86c48dc0fc70",
+      "lastModified": "2017-10-30T14:17:39.553+08:00",
+      "name": "更新用户关注的类别",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "enabled": true,
+          "name": "x-access-token",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjMsImlzX2RldmVsb3BlciI6IjAiLCJpc19hZG1pbiI6IjEiLCJ1c2VyX25hbWUiOiLlpKfoi49sbGzmiZMiLCJmaXJzdF9uYW1lIjoiIiwibGFzdF9uYW1lIjoiIiwicGhvbmUiOm51bGwsImVtYWlsIjoibTBAZ21haWwuY29tIiwicGFzc3dvcmQiOiJoaCIsInByb3ZpbmNlIjpudWxsLCJjaXR5IjpudWxsLCJ0b3duIjpudWxsLCJpbWFnZV9tZDUiOm51bGwsInBlcnNvbmFsX3NpdGUiOm51bGwsImluc3RhZ3JhbSI6bnVsbCwidHdpdHRlciI6bnVsbCwibG9jYXRpb24iOm51bGwsImJpbyI6bnVsbCwiY3JlYXRlZF90aW1lIjpudWxsLCJkZXZfdXJsIjoiaHR0cHM6Ly9iYWlkdS5jb20iLCJkZXZfZGVzYyI6IkkgQU0gQU4gRVhDRUxMRU5UIERFVkVMT1BFUiJ9LCJpYXQiOjE1MDkzNDQxNDgsImV4cCI6MTUwOTQzMDU0OH0.6sMs6djV582DJ3M-t8D8aw8oShiStE0N5rIC-lPi25g"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true,
+        "textBody": "{\"first_name\":\"\",\"last_name\":\"\",\"user_name\":\"大苏打\",\"email\":\"m@gmail.com\",\"password\":\"hh\", \"province\":\"广东\",\"city\":\"深圳\",\"town\":\"福田\"}"
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/register/"
+      },
+      "id": "eb7a5944-8f95-4238-a13b-6421f7464e2b",
+      "lastModified": "2017-10-29T18:13:48.815+08:00",
+      "name": "注册",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true,
+        "textBody": "{\"app_name\":\"app1\", \"app_desc\":\"my first app\", \"callback_url\":\"http://baidu.com\", \"permissions\":\"1,2\"}"
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/addNewApp/"
+      },
+      "id": "ded2e20f-52fd-4084-b0e8-5d97a5b2c74f",
+      "lastModified": "2017-10-29T22:47:55.176+08:00",
+      "name": "添加应用",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "enabled": true,
+          "name": "x-access-token",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjIsImlzX2RldmVsb3BlciI6IjEiLCJpc19hZG1pbiI6IjEiLCJ1c2VyX25hbWUiOiLlpKfoi4_miZMiLCJmaXJzdF9uYW1lIjoiIiwibGFzdF9uYW1lIjoiIiwicGhvbmUiOm51bGwsImVtYWlsIjoibUBnbWFpbC5jb20iLCJwYXNzd29yZCI6Imtpamtqa2pranUiLCJwcm92aW5jZSI6bnVsbCwiY2l0eSI6bnVsbCwidG93biI6bnVsbCwiaW1hZ2VfbWQ1IjpudWxsLCJwZXJzb25hbF9zaXRlIjpudWxsLCJpbnN0YWdyYW0iOm51bGwsInR3aXR0ZXIiOm51bGwsImxvY2F0aW9uIjpudWxsLCJiaW8iOm51bGwsImNyZWF0ZWRfdGltZSI6bnVsbCwiZGV2X3VybCI6bnVsbCwiZGV2X2Rlc2MiOm51bGx9LCJpYXQiOjE1MDkyODgzNjUsImV4cCI6MTUwOTM3NDc2NX0.bnxEekH7yKXUxxAfuwmw9yqJsGU8Sdb0ftpqg-fkckY"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/placeOrder/"
+      },
+      "id": "bfda5cc7-d2c0-4cd0-a233-c0a9aa49a974",
+      "lastModified": "2017-11-02T18:21:09.283+08:00",
+      "name": "添加用户订单",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "enabled": true,
+          "name": "x-access-token",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjMsImlzX2RldmVsb3BlciI6IjAiLCJpc19hZG1pbiI6IjEiLCJ1c2VyX25hbWUiOiLlpKfoi4_miZMiLCJwaG9uZSI6bnVsbCwiZW1haWwiOiJtZWxpQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiaGgiLCJwcm92aW5jZSI6bnVsbCwiY2l0eSI6Iua3seWcsyIsInRvd24iOiLnpo_nlLAiLCJpbWFnZV9tZDUiOm51bGwsInBlcnNvbmFsX3NpdGUiOm51bGwsIndlY2hhdCI6bnVsbCwiYWRkcmVzcyI6bnVsbCwiYmlvIjpudWxsLCJjcmVhdGVkX3RpbWUiOiIyMDE3LTEwLTMxVDIzOjE0OjMyLjAwMFoiLCJkZXZfdXJsIjoiaHR0cHM6Ly9iYWlkdS5jb20iLCJkZXZfZGVzYyI6IkkgQU0gQU4gRVhDRUxMRU5UIERFVkVMT1BFUiIsImRlbGl2ZXJ5X2FkZHJlc3MiOm51bGwsImRlbGl2ZXJ5X2NpdHkiOm51bGwsImRlbGl2ZXJ5X3Byb3ZpbmNlIjpudWxsLCJkZWxpdmVyeV90b3duIjpudWxsLCJjb25zaWduZWUiOm51bGwsImNvbnNpZ25lZV9waG9uZSI6bnVsbH0sImlhdCI6MTUwOTU5OTYyMiwiZXhwIjoxNTA5Njg2MDIyfQ.bC_Y7jQu_gtFmMOmsrWdnU6zlvL5wPjBXH30C46ksZU"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true,
+        "textBody": "{\"product_id\":\"2\"}"
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/removeFromCart/"
+      },
+      "id": "9221d159-b0c2-4575-a82c-86c8fd420fd0",
+      "lastModified": "2017-11-02T13:26:50.434+08:00",
+      "name": "用户将商品从购物车删除",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "enabled": true,
+          "name": "x-access-token",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjMsImlzX2RldmVsb3BlciI6IjAiLCJpc19hZG1pbiI6IjEiLCJ1c2VyX25hbWUiOiLlpKfoi4_miZMiLCJwaG9uZSI6bnVsbCwiZW1haWwiOiJtZWxpQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiaGgiLCJwcm92aW5jZSI6bnVsbCwiY2l0eSI6Iua3seWcsyIsInRvd24iOiLnpo_nlLAiLCJpbWFnZV9tZDUiOm51bGwsInBlcnNvbmFsX3NpdGUiOm51bGwsIndlY2hhdCI6bnVsbCwiYWRkcmVzcyI6bnVsbCwiYmlvIjpudWxsLCJjcmVhdGVkX3RpbWUiOiIyMDE3LTEwLTMxVDIzOjE0OjMyLjAwMFoiLCJkZXZfdXJsIjoiaHR0cHM6Ly9iYWlkdS5jb20iLCJkZXZfZGVzYyI6IkkgQU0gQU4gRVhDRUxMRU5UIERFVkVMT1BFUiIsImRlbGl2ZXJ5X2FkZHJlc3MiOm51bGwsImRlbGl2ZXJ5X2NpdHkiOm51bGwsImRlbGl2ZXJ5X3Byb3ZpbmNlIjpudWxsLCJkZWxpdmVyeV90b3duIjpudWxsLCJjb25zaWduZWUiOm51bGwsImNvbnNpZ25lZV9waG9uZSI6bnVsbH0sImlhdCI6MTUwOTU5OTYyMiwiZXhwIjoxNTA5Njg2MDIyfQ.bC_Y7jQu_gtFmMOmsrWdnU6zlvL5wPjBXH30C46ksZU"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true,
+        "textBody": "{\"product_id\":\"3\", \"quantity\":\"20\"}"
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/addToCart/"
+      },
+      "id": "1e524def-c27d-4887-aea7-fdb7d3ca4d83",
+      "lastModified": "2017-11-02T13:23:04.338+08:00",
+      "name": "用户将商品加入购物车",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "enabled": true,
+          "name": "x-access-token",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjMsImlzX2RldmVsb3BlciI6IjAiLCJpc19hZG1pbiI6IjEiLCJ1c2VyX25hbWUiOiLlpKfoi4_miZMiLCJwaG9uZSI6bnVsbCwiZW1haWwiOiJtZWxpQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiaGgiLCJwcm92aW5jZSI6bnVsbCwiY2l0eSI6Iua3seWcsyIsInRvd24iOiLnpo_nlLAiLCJpbWFnZV9tZDUiOm51bGwsInBlcnNvbmFsX3NpdGUiOm51bGwsIndlY2hhdCI6bnVsbCwiYWRkcmVzcyI6bnVsbCwiYmlvIjpudWxsLCJjcmVhdGVkX3RpbWUiOiIyMDE3LTEwLTMxVDIzOjE0OjMyLjAwMFoiLCJkZXZfdXJsIjoiaHR0cHM6Ly9iYWlkdS5jb20iLCJkZXZfZGVzYyI6IkkgQU0gQU4gRVhDRUxMRU5UIERFVkVMT1BFUiIsImRlbGl2ZXJ5X2FkZHJlc3MiOm51bGwsImRlbGl2ZXJ5X2NpdHkiOm51bGwsImRlbGl2ZXJ5X3Byb3ZpbmNlIjpudWxsLCJkZWxpdmVyeV90b3duIjpudWxsLCJjb25zaWduZWUiOm51bGwsImNvbnNpZ25lZV9waG9uZSI6bnVsbH0sImlhdCI6MTUwOTU5OTYyMiwiZXhwIjoxNTA5Njg2MDIyfQ.bC_Y7jQu_gtFmMOmsrWdnU6zlvL5wPjBXH30C46ksZU"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true,
+        "textBody": "{\"product_md5\":\"sssssssssssssss\",\"product_name\":\"ddddd\",\"product_price\":\"12\"}"
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/uploadProducts/"
+      },
+      "id": "9e78f7c6-0926-4756-8eac-79443384e45c",
+      "lastModified": "2017-11-01T17:15:43.361+08:00",
+      "name": "用户添加商品(分admin和普通用户)",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "enabled": true,
+          "name": "x-access-token",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjgsImlzX2RldmVsb3BlciI6IjAiLCJpc19hZG1pbiI6IjAiLCJ1c2VyX25hbWUiOiLmnpfmmbQiLCJwaG9uZSI6IjE4ODI2NDE3NTgzIiwiZW1haWwiOiJscUBnbWFpbC5jb20iLCJwYXNzd29yZCI6IjEyMzMyMSIsInByb3ZpbmNlIjpudWxsLCJjaXR5IjpudWxsLCJ0b3duIjpudWxsLCJpbWFnZV9tZDUiOm51bGwsInBlcnNvbmFsX3NpdGUiOm51bGwsIndlY2hhdCI6bnVsbCwiYWRkcmVzcyI6bnVsbCwiYmlvIjpudWxsLCJjcmVhdGVkX3RpbWUiOiIyMDE3LTExLTAxVDA5OjEzOjI3LjAwMFoiLCJkZXZfdXJsIjpudWxsLCJkZXZfZGVzYyI6bnVsbCwiZGVsaXZlcnlfYWRkcmVzcyI6bnVsbCwiZGVsaXZlcnlfY2l0eSI6bnVsbCwiZGVsaXZlcnlfcHJvdmluY2UiOm51bGwsImRlbGl2ZXJ5X3Rvd24iOm51bGwsImNvbnNpZ25lZSI6bnVsbCwiY29uc2lnbmVlX3Bob25lIjpudWxsfSwiaWF0IjoxNTA5NTI3NjM4LCJleHAiOjE1MDk2MTQwMzh9.c13VQqqlZ0QJ_JkQuiJsC7U3xtMRakdeiWuJMPVlYg8"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true,
+        "textBody": "{\"image_name\":\"hajhjahjs\",\"image_url\":\"sahkjhakhd\", \"product_id\":\"5\"}"
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/addProductImages/"
+      },
+      "id": "a0c4ebb2-619d-438d-8fdc-3e73ba7feb10",
+      "lastModified": "2017-11-01T22:28:56.715+08:00",
+      "name": "用户给商品添加图片",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "enabled": true,
+          "name": "x-access-token",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjMsImlzX2RldmVsb3BlciI6IjAiLCJpc19hZG1pbiI6IjEiLCJ1c2VyX25hbWUiOiLlpKfoi4_miZMiLCJwaG9uZSI6bnVsbCwiZW1haWwiOiJtZWxpQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiaGgiLCJwcm92aW5jZSI6bnVsbCwiY2l0eSI6Iua3seWcsyIsInRvd24iOiLnpo_nlLAiLCJpbWFnZV9tZDUiOm51bGwsInBlcnNvbmFsX3NpdGUiOm51bGwsIndlY2hhdCI6bnVsbCwiYWRkcmVzcyI6bnVsbCwiYmlvIjpudWxsLCJjcmVhdGVkX3RpbWUiOiIyMDE3LTEwLTMxVDIzOjE0OjMyLjAwMFoiLCJkZXZfdXJsIjoiaHR0cHM6Ly9iYWlkdS5jb20iLCJkZXZfZGVzYyI6IkkgQU0gQU4gRVhDRUxMRU5UIERFVkVMT1BFUiIsImRlbGl2ZXJ5X2FkZHJlc3MiOm51bGwsImRlbGl2ZXJ5X2NpdHkiOm51bGwsImRlbGl2ZXJ5X3Byb3ZpbmNlIjpudWxsLCJkZWxpdmVyeV90b3duIjpudWxsLCJjb25zaWduZWUiOm51bGwsImNvbnNpZ25lZV9waG9uZSI6bnVsbH0sImlhdCI6MTUwOTUxMzcyMCwiZXhwIjoxNTA5NjAwMTIwfQ.2fkPRft2bB-m037ZxTGnxl9-2e8jPQImdHeMibIR5t0"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "uriEditor": true,
+      "type": "Request",
+      "method": {
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
+        "name": "GET"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": [
+            {
+              "enabled": true,
+              "name": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjMsImlzX2RldmVsb3BlciI6IjAiLCJpc19hZG1pbiI6IjEiLCJ1c2VyX25hbWUiOiLlpKfoi4_miZMiLCJwaG9uZSI6bnVsbCwiZW1haWwiOiJtZWxpQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiaGgiLCJwcm92aW5jZSI6bnVsbCwiY2l0eSI6Iua3seWcsyIsInRvd24iOiLnpo_nlLAiLCJpbWFnZV9tZDUiOm51bGwsInBlcnNvbmFsX3NpdGUiOm51bGwsIndlY2hhdCI6bnVsbCwiYWRkcmVzcyI6bnVsbCwiYmlvIjpudWxsLCJjcmVhdGVkX3RpbWUiOiIyMDE3LTEwLTMxVDIzOjE0OjMyLjAwMFoiLCJkZXZfdXJsIjoiaHR0cHM6Ly9iYWlkdS5jb20iLCJkZXZfZGVzYyI6IkkgQU0gQU4gRVhDRUxMRU5UIERFVkVMT1BFUiIsImRlbGl2ZXJ5X2FkZHJlc3MiOm51bGwsImRlbGl2ZXJ5X2NpdHkiOm51bGwsImRlbGl2ZXJ5X3Byb3ZpbmNlIjpudWxsLCJkZWxpdmVyeV90b3duIjpudWxsLCJjb25zaWduZWUiOm51bGwsImNvbnNpZ25lZV9waG9uZSI6bnVsbH0sImlhdCI6MTUwOTY5MDM5NywiZXhwIjoxNTA5Nzc2Nzk3fQ.iJg8joeAMS6aSFh9qX6N99P2vxCM88_Pa8PJnA1SLv0"
+            },
+            {
+              "enabled": true,
+              "name": "pageNo",
+              "value": "1"
+            },
+            {
+              "enabled": true,
+              "name": "pageSize",
+              "value": "111"
+            }
+          ]
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/getProductsInCart/"
+      },
+      "id": "ebfe4868-8be7-40c6-93d4-ceb87b80d896",
+      "lastModified": "2017-11-03T15:03:20.071+08:00",
+      "name": "用户获取购物车中的商品",
+      "headers": [
+        {
+          "name": "x-access-token",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjMsImlzX2RldmVsb3BlciI6IjAiLCJpc19hZG1pbiI6IjEiLCJ1c2VyX25hbWUiOiLlpKfoi4_miZMiLCJwaG9uZSI6bnVsbCwiZW1haWwiOiJtZWxpQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiaGgiLCJwcm92aW5jZSI6bnVsbCwiY2l0eSI6Iua3seWcsyIsInRvd24iOiLnpo_nlLAiLCJpbWFnZV9tZDUiOm51bGwsInBlcnNvbmFsX3NpdGUiOm51bGwsIndlY2hhdCI6bnVsbCwiYWRkcmVzcyI6bnVsbCwiYmlvIjpudWxsLCJjcmVhdGVkX3RpbWUiOiIyMDE3LTEwLTMxVDIzOjE0OjMyLjAwMFoiLCJkZXZfdXJsIjoiaHR0cHM6Ly9iYWlkdS5jb20iLCJkZXZfZGVzYyI6IkkgQU0gQU4gRVhDRUxMRU5UIERFVkVMT1BFUiIsImRlbGl2ZXJ5X2FkZHJlc3MiOm51bGwsImRlbGl2ZXJ5X2NpdHkiOm51bGwsImRlbGl2ZXJ5X3Byb3ZpbmNlIjpudWxsLCJkZWxpdmVyeV90b3duIjpudWxsLCJjb25zaWduZWUiOm51bGwsImNvbnNpZ25lZV9waG9uZSI6bnVsbH0sImlhdCI6MTUwOTY5MDM5NywiZXhwIjoxNTA5Nzc2Nzk3fQ.iJg8joeAMS6aSFh9qX6N99P2vxCM88_Pa8PJnA1SLv0"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true,
+        "textBody": "{\"email_settings\":\"1,2,3,4,5,6\"}"
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/updateUserAccount/emailSettings/"
+      },
+      "id": "772871e6-29d8-497c-9d96-09811f877d4c",
+      "lastModified": "2017-10-29T18:54:58.113+08:00",
+      "name": "用户邮件设置",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "enabled": true,
+          "name": "x-access-token",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjMsImlzX2RldmVsb3BlciI6IjEiLCJpc19hZG1pbiI6IjEiLCJ1c2VyX25hbWUiOiLlpKfoi49sbGzmiZMiLCJmaXJzdF9uYW1lIjoiIiwibGFzdF9uYW1lIjoiIiwicGhvbmUiOm51bGwsImVtYWlsIjoibTBAZ21haWwuY29tIiwicGFzc3dvcmQiOiJoaCIsInByb3ZpbmNlIjpudWxsLCJjaXR5IjpudWxsLCJ0b3duIjpudWxsLCJpbWFnZV9tZDUiOm51bGwsInBlcnNvbmFsX3NpdGUiOm51bGwsImluc3RhZ3JhbSI6bnVsbCwidHdpdHRlciI6bnVsbCwibG9jYXRpb24iOm51bGwsImJpbyI6bnVsbCwiY3JlYXRlZF90aW1lIjpudWxsLCJkZXZfdXJsIjpudWxsLCJkZXZfZGVzYyI6bnVsbH0sImlhdCI6MTUwOTI3MzMwNiwiZXhwIjoxNTA5MzU5NzA2fQ.D8KHl0QQjpbi658PhhV7B7ctqQkU2Jt5TiHS6lxdM6U"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded",
+          "items": [
+            {
+              "enabled": true,
+              "type": "Text",
+              "name": "firstName",
+              "value": "carol"
+            },
+            {
+              "enabled": true,
+              "type": "Text",
+              "name": "lastName",
+              "value": "lynn"
+            }
+          ]
+        },
+        "bodyType": "Text",
+        "autoSetLength": true,
+        "textBodyEditorHeight": 240,
+        "textBody": "{\"first_name\":\"\",\"last_name\":\"\",\"user_name\":\"大苏打\",\"email\":\"meli@gmail.com\",\"password\":\"hh\", \"province\":\"广东\",\"city\":\"深圳\",\"town\":\"福田\"}"
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/login/"
+      },
+      "id": "1fe1079f-cba5-4f30-9df8-71cdc472cb3e",
+      "lastModified": "2017-11-01T13:22:05.813+08:00",
+      "name": "登录",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true,
+        "textBody": "{\"image_id\":\"8\", \"like\":\"1\"}"
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/photoLike"
+      },
+      "id": "ca568328-b758-4642-81be-74c51b7c9ade",
+      "lastModified": "2017-11-10T14:59:04.791+08:00",
+      "name": "给图片点赞",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "enabled": true,
+          "name": "x-access-token",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjMsImlzX2RldmVsb3BlciI6IjAiLCJpc19hZG1pbiI6IjEiLCJ1c2VyX25hbWUiOiLlpKfoi4_miZMiLCJwaG9uZSI6bnVsbCwiZW1haWwiOiJtZWxpQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiaGgiLCJwcm92aW5jZSI6IuW5v-S4nCIsImNpdHkiOiLmt7HlnLMiLCJ0b3duIjoi56aP55SwIiwiaW1hZ2VfbWQ1IjpudWxsLCJwZXJzb25hbF9zaXRlIjpudWxsLCJ3ZWNoYXQiOm51bGwsImFkZHJlc3MiOm51bGwsImJpbyI6bnVsbCwiY3JlYXRlZF90aW1lIjoiMjAxNy0xMS0wOVQwMToxODoxMi4wMDBaIiwiZGV2X3VybCI6Imh0dHBzOi8vYmFpZHUuY29tIiwiZGV2X2Rlc2MiOiJJIEFNIEFOIEVYQ0VMTEVOVCBERVZFTE9QRVIiLCJkZWxpdmVyeV9hZGRyZXNzIjpudWxsLCJkZWxpdmVyeV9jaXR5IjpudWxsLCJkZWxpdmVyeV9wcm92aW5jZSI6bnVsbCwiZGVsaXZlcnlfdG93biI6bnVsbCwiY29uc2lnbmVlIjpudWxsLCJjb25zaWduZWVfcGhvbmUiOm51bGx9LCJpYXQiOjE1MTAyOTQ2OTYsImV4cCI6MTUxMjg4NjY5Nn0.otFs_4hWS_C9-Wpo6I0vb0hhcVvQUN5zDeG8pjT7FXM"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "uriEditor": true,
+      "type": "Request",
+      "method": {
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
+        "name": "GET"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true,
+        "textBody": "{\"product_id\":\"6\"}"
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": [
+            {
+              "enabled": true,
+              "name": "product_id",
+              "value": "6"
+            }
+          ]
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/getAllImages"
+      },
+      "id": "21ffd4ba-31b9-4f64-ab1e-35a3a7e01859",
+      "lastModified": "2017-11-04T08:00:00.561+08:00",
+      "name": "获取单件产品的所有图片",
+      "headers": [],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true,
+        "textBody": "{\"product_id\":\"1\"}"
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/getProductDetails/"
+      },
+      "id": "7160979c-e394-4242-bc19-f05a46c26119",
+      "lastModified": "2017-11-02T13:27:57.213+08:00",
+      "name": "获取单件商品的具体信息",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true,
+        "textBody": "{\"collection_id\":66,\"user_id\":3}"
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/getCollection/one/"
+      },
+      "id": "957d3b05-8be1-4f84-b67b-b7c704f68ced",
+      "lastModified": "2017-11-14T16:13:15.598+08:00",
+      "name": "获取图片集里面的图片",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/getProducts/all/"
+      },
+      "id": "fcd84876-9fd9-44b1-b313-cf47b3b2aaf4",
+      "lastModified": "2017-10-31T15:31:37.701+08:00",
+      "name": "获取所有产品列表",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
+        "name": "GET"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/getCategories/"
+      },
+      "id": "a5e7ee24-31cf-4e9b-88a9-4fe363d1f92e",
+      "lastModified": "2017-11-03T13:10:20.648+08:00",
+      "name": "获取所有图片类别",
+      "headers": [],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/getCollection/all"
+      },
+      "id": "e0ac596d-5589-4f61-a7d9-49a07c926e6c",
+      "lastModified": "2017-10-30T17:14:23.883+08:00",
+      "name": "获取所有图片集",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/getPhotographers/"
+      },
+      "id": "4974bd87-6c57-4cc5-acfe-10c1d3490026",
+      "lastModified": "2017-10-30T13:52:16.816+08:00",
+      "name": "获取推荐的作者",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/getProducts/new/"
+      },
+      "id": "a6b4023f-cdb9-430d-ab35-953395a3c652",
+      "lastModified": "2017-10-31T15:31:59.119+08:00",
+      "name": "获取最新产品列表",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/getList/new/"
+      },
+      "id": "75ed6d5b-ab3b-4ddf-919a-51f479484881",
+      "lastModified": "2017-11-11T07:47:02.262+08:00",
+      "name": "获取最新图片列表",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/getProducts/hot/"
+      },
+      "id": "3640aef7-a47f-4ded-a72d-78de0220da51",
+      "lastModified": "2017-10-31T15:32:14.891+08:00",
+      "name": "获取最热产品列表",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/getList/hot/"
+      },
+      "id": "21937222-8e03-4159-bee8-aa1771ea3c8f",
+      "lastModified": "2017-11-11T07:56:50.435+08:00",
+      "name": "获取最热图片列表",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/getUntagedPhoto/"
+      },
+      "id": "eac60e51-40e0-46d4-8139-7f30efc53a6e",
+      "lastModified": "2017-10-30T07:31:37.074+08:00",
+      "name": "获取用于标注的图片",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "enabled": true,
+          "name": "x-access-token",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjIsImlzX2RldmVsb3BlciI6IjEiLCJpc19hZG1pbiI6IjEiLCJ1c2VyX25hbWUiOiLlpKfoi4_miZMiLCJmaXJzdF9uYW1lIjoiIiwibGFzdF9uYW1lIjoiIiwicGhvbmUiOm51bGwsImVtYWlsIjoibUBnbWFpbC5jb20iLCJwYXNzd29yZCI6Imtpamtqa2pranUiLCJwcm92aW5jZSI6bnVsbCwiY2l0eSI6bnVsbCwidG93biI6bnVsbCwiaW1hZ2VfbWQ1IjpudWxsLCJwZXJzb25hbF9zaXRlIjpudWxsLCJpbnN0YWdyYW0iOm51bGwsInR3aXR0ZXIiOm51bGwsImxvY2F0aW9uIjpudWxsLCJiaW8iOm51bGwsImNyZWF0ZWRfdGltZSI6bnVsbCwiZGV2X3VybCI6bnVsbCwiZGV2X2Rlc2MiOm51bGx9LCJpYXQiOjE1MDkyODgzNjUsImV4cCI6MTUwOTM3NDc2NX0.bnxEekH7yKXUxxAfuwmw9yqJsGU8Sdb0ftpqg-fkckY"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/getUserInfo"
+      },
+      "id": "2486efe7-5065-4a13-b872-00ea41c2a163",
+      "lastModified": "2017-11-08T12:57:59.850+08:00",
+      "name": "获取用户信息",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "enabled": true,
+          "name": "x-access-token",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjMsImlzX2RldmVsb3BlciI6IjAiLCJpc19hZG1pbiI6IjEiLCJ1c2VyX25hbWUiOiLlpKfoi4_miZMiLCJwaG9uZSI6bnVsbCwiZW1haWwiOiJtZWxpQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoia2lqdSIsInByb3ZpbmNlIjoi5bm_5LicIiwiY2l0eSI6Iua3seWcsyIsInRvd24iOiLnpo_nlLAiLCJpbWFnZV9tZDUiOm51bGwsInBlcnNvbmFsX3NpdGUiOm51bGwsIndlY2hhdCI6bnVsbCwiYWRkcmVzcyI6bnVsbCwiYmlvIjpudWxsLCJjcmVhdGVkX3RpbWUiOiIyMDE3LTExLTA3VDA2OjEwOjA5LjAwMFoiLCJkZXZfdXJsIjoiaHR0cHM6Ly9iYWlkdS5jb20iLCJkZXZfZGVzYyI6IkkgQU0gQU4gRVhDRUxMRU5UIERFVkVMT1BFUiIsImRlbGl2ZXJ5X2FkZHJlc3MiOm51bGwsImRlbGl2ZXJ5X2NpdHkiOm51bGwsImRlbGl2ZXJ5X3Byb3ZpbmNlIjpudWxsLCJkZWxpdmVyeV90b3duIjpudWxsLCJjb25zaWduZWUiOm51bGwsImNvbnNpZ25lZV9waG9uZSI6bnVsbH0sImlhdCI6MTUxMDExNjcxOSwiZXhwIjoxNTEyNzA4NzE5fQ.kQOppNzvGhUESWd4kpcgMUQ0__bufP5M6VaFUExOJSo"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/getList/liked"
+      },
+      "id": "83ccb607-b1e3-4d04-8a4f-30f63c982ad7",
+      "lastModified": "2017-11-11T08:55:03.469+08:00",
+      "name": "获取用户喜欢过的所有图片列表",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "enabled": true,
+          "name": "x-access-token",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjMsImlzX2RldmVsb3BlciI6IjAiLCJpc19hZG1pbiI6IjEiLCJ1c2VyX25hbWUiOiLlpKfoi4_miZMiLCJwaG9uZSI6bnVsbCwiZW1haWwiOiJtZWxpQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiaGgiLCJwcm92aW5jZSI6IuW5v-S4nCIsImNpdHkiOiLmt7HlnLMiLCJ0b3duIjoi56aP55SwIiwiaW1hZ2VfbWQ1IjpudWxsLCJwZXJzb25hbF9zaXRlIjpudWxsLCJ3ZWNoYXQiOm51bGwsImFkZHJlc3MiOm51bGwsImJpbyI6bnVsbCwiY3JlYXRlZF90aW1lIjoiMjAxNy0xMS0wOVQwMToxODoxMi4wMDBaIiwiZGV2X3VybCI6Imh0dHBzOi8vYmFpZHUuY29tIiwiZGV2X2Rlc2MiOiJJIEFNIEFOIEVYQ0VMTEVOVCBERVZFTE9QRVIiLCJkZWxpdmVyeV9hZGRyZXNzIjpudWxsLCJkZWxpdmVyeV9jaXR5IjpudWxsLCJkZWxpdmVyeV9wcm92aW5jZSI6bnVsbCwiZGVsaXZlcnlfdG93biI6bnVsbCwiY29uc2lnbmVlIjpudWxsLCJjb25zaWduZWVfcGhvbmUiOm51bGx9LCJpYXQiOjE1MTAyOTQ2OTYsImV4cCI6MTUxMjg4NjY5Nn0.otFs_4hWS_C9-Wpo6I0vb0hhcVvQUN5zDeG8pjT7FXM"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/getList/following/"
+      },
+      "id": "b83cb44d-8cf3-495b-a433-f7d58fdb4994",
+      "lastModified": "2017-11-06T15:35:40.749+08:00",
+      "name": "获取用户所关注的作者的图片",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "enabled": true,
+          "name": "x-access-token",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjMsImlzX2RldmVsb3BlciI6IjAiLCJpc19hZG1pbiI6IjEiLCJ1c2VyX25hbWUiOiLlpKfoi4_miZMiLCJwaG9uZSI6bnVsbCwiZW1haWwiOiJtZWxpQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiaGgiLCJwcm92aW5jZSI6IuW5v-S4nCIsImNpdHkiOiLmt7HlnLMiLCJ0b3duIjoi56aP55SwIiwiaW1hZ2VfbWQ1IjpudWxsLCJwZXJzb25hbF9zaXRlIjpudWxsLCJ3ZWNoYXQiOm51bGwsImFkZHJlc3MiOm51bGwsImJpbyI6bnVsbCwiY3JlYXRlZF90aW1lIjoiMjAxNy0xMS0wM1QwNzozNDo1NS4wMDBaIiwiZGV2X3VybCI6Imh0dHBzOi8vYmFpZHUuY29tIiwiZGV2X2Rlc2MiOiJJIEFNIEFOIEVYQ0VMTEVOVCBERVZFTE9QRVIiLCJkZWxpdmVyeV9hZGRyZXNzIjpudWxsLCJkZWxpdmVyeV9jaXR5IjpudWxsLCJkZWxpdmVyeV9wcm92aW5jZSI6bnVsbCwiZGVsaXZlcnlfdG93biI6bnVsbCwiY29uc2lnbmVlIjpudWxsLCJjb25zaWduZWVfcGhvbmUiOm51bGx9LCJpYXQiOjE1MDk5NTM3MTMsImV4cCI6MTUxMjU0NTcxM30.qV3PmmKAB3g5Dr28xU7kB--k8J5ucNRpJW1Ps7LCbpU"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "uriEditor": true,
+      "type": "Request",
+      "method": {
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
+        "name": "GET"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": [
+            {
+              "enabled": true,
+              "name": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjMsImlzX2RldmVsb3BlciI6IjAiLCJpc19hZG1pbiI6IjEiLCJ1c2VyX25hbWUiOiLlpKfoi4_miZMiLCJwaG9uZSI6bnVsbCwiZW1haWwiOiJtZWxpQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiaGgiLCJwcm92aW5jZSI6bnVsbCwiY2l0eSI6Iua3seWcsyIsInRvd24iOiLnpo_nlLAiLCJpbWFnZV9tZDUiOm51bGwsInBlcnNvbmFsX3NpdGUiOm51bGwsIndlY2hhdCI6bnVsbCwiYWRkcmVzcyI6bnVsbCwiYmlvIjpudWxsLCJjcmVhdGVkX3RpbWUiOiIyMDE3LTEwLTMxVDIzOjE0OjMyLjAwMFoiLCJkZXZfdXJsIjoiaHR0cHM6Ly9iYWlkdS5jb20iLCJkZXZfZGVzYyI6IkkgQU0gQU4gRVhDRUxMRU5UIERFVkVMT1BFUiIsImRlbGl2ZXJ5X2FkZHJlc3MiOm51bGwsImRlbGl2ZXJ5X2NpdHkiOm51bGwsImRlbGl2ZXJ5X3Byb3ZpbmNlIjpudWxsLCJkZWxpdmVyeV90b3duIjpudWxsLCJjb25zaWduZWUiOm51bGwsImNvbnNpZ25lZV9waG9uZSI6bnVsbH0sImlhdCI6MTUwOTY5MDM5NywiZXhwIjoxNTA5Nzc2Nzk3fQ.iJg8joeAMS6aSFh9qX6N99P2vxCM88_Pa8PJnA1SLv0"
+            },
+            {
+              "enabled": true,
+              "name": "pageNo",
+              "value": "1"
+            },
+            {
+              "enabled": true,
+              "name": "pageSize",
+              "value": "2"
+            }
+          ]
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/getDeliveryAddress/"
+      },
+      "id": "9e289827-ad37-4f30-a16d-573c053d9084",
+      "lastModified": "2017-11-03T15:02:31.945+08:00",
+      "name": "获取用户所有收货地址",
+      "headers": [
+        {
+          "name": "x-access-token",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjMsImlzX2RldmVsb3BlciI6IjAiLCJpc19hZG1pbiI6IjEiLCJ1c2VyX25hbWUiOiLlpKfoi4_miZMiLCJwaG9uZSI6bnVsbCwiZW1haWwiOiJtZWxpQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiaGgiLCJwcm92aW5jZSI6bnVsbCwiY2l0eSI6Iua3seWcsyIsInRvd24iOiLnpo_nlLAiLCJpbWFnZV9tZDUiOm51bGwsInBlcnNvbmFsX3NpdGUiOm51bGwsIndlY2hhdCI6bnVsbCwiYWRkcmVzcyI6bnVsbCwiYmlvIjpudWxsLCJjcmVhdGVkX3RpbWUiOiIyMDE3LTEwLTMxVDIzOjE0OjMyLjAwMFoiLCJkZXZfdXJsIjoiaHR0cHM6Ly9iYWlkdS5jb20iLCJkZXZfZGVzYyI6IkkgQU0gQU4gRVhDRUxMRU5UIERFVkVMT1BFUiIsImRlbGl2ZXJ5X2FkZHJlc3MiOm51bGwsImRlbGl2ZXJ5X2NpdHkiOm51bGwsImRlbGl2ZXJ5X3Byb3ZpbmNlIjpudWxsLCJkZWxpdmVyeV90b3duIjpudWxsLCJjb25zaWduZWUiOm51bGwsImNvbnNpZ25lZV9waG9uZSI6bnVsbH0sImlhdCI6MTUwOTY5MDM5NywiZXhwIjoxNTA5Nzc2Nzk3fQ.iJg8joeAMS6aSFh9qX6N99P2vxCM88_Pa8PJnA1SLv0"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/getList/user"
+      },
+      "id": "f215c106-2251-4c70-a739-3defcc8bea0b",
+      "lastModified": "2017-11-11T08:40:11.214+08:00",
+      "name": "获取用户的所有图片列表",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "enabled": true,
+          "name": "x-access-token",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjMsImlzX2RldmVsb3BlciI6IjAiLCJpc19hZG1pbiI6IjEiLCJ1c2VyX25hbWUiOiLlpKfoi4_miZMiLCJwaG9uZSI6bnVsbCwiZW1haWwiOiJtZWxpQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiaGgiLCJwcm92aW5jZSI6IuW5v-S4nCIsImNpdHkiOiLmt7HlnLMiLCJ0b3duIjoi56aP55SwIiwiaW1hZ2VfbWQ1IjpudWxsLCJwZXJzb25hbF9zaXRlIjpudWxsLCJ3ZWNoYXQiOm51bGwsImFkZHJlc3MiOm51bGwsImJpbyI6bnVsbCwiY3JlYXRlZF90aW1lIjoiMjAxNy0xMS0wOVQwMToxODoxMi4wMDBaIiwiZGV2X3VybCI6Imh0dHBzOi8vYmFpZHUuY29tIiwiZGV2X2Rlc2MiOiJJIEFNIEFOIEVYQ0VMTEVOVCBERVZFTE9QRVIiLCJkZWxpdmVyeV9hZGRyZXNzIjpudWxsLCJkZWxpdmVyeV9jaXR5IjpudWxsLCJkZWxpdmVyeV9wcm92aW5jZSI6bnVsbCwiZGVsaXZlcnlfdG93biI6bnVsbCwiY29uc2lnbmVlIjpudWxsLCJjb25zaWduZWVfcGhvbmUiOm51bGx9LCJpYXQiOjE1MTAyOTQ2OTYsImV4cCI6MTUxMjg4NjY5Nn0.otFs_4hWS_C9-Wpo6I0vb0hhcVvQUN5zDeG8pjT7FXM"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/getCollection/user"
+      },
+      "id": "64d7d761-7050-4ccd-a0c2-aa30179f4943",
+      "lastModified": "2017-11-14T13:04:29.755+08:00",
+      "name": "获取用户自建的图片集",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "enabled": true,
+          "name": "x-access-token",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjMsImlzX2RldmVsb3BlciI6IjAiLCJpc19hZG1pbiI6IjEiLCJ1c2VyX25hbWUiOiLlpKfoi4_miZMiLCJwaG9uZSI6bnVsbCwiZW1haWwiOiJtZWxpQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiaGgiLCJwcm92aW5jZSI6IuW5v-S4nCIsImNpdHkiOiLmt7HlnLMiLCJ0b3duIjoi56aP55SwIiwiaW1hZ2VfbWQ1IjpudWxsLCJwZXJzb25hbF9zaXRlIjpudWxsLCJ3ZWNoYXQiOm51bGwsImFkZHJlc3MiOm51bGwsImJpbyI6bnVsbCwiY3JlYXRlZF90aW1lIjoiMjAxNy0xMS0wOVQwMToxODoxMi4wMDBaIiwiZGV2X3VybCI6Imh0dHBzOi8vYmFpZHUuY29tIiwiZGV2X2Rlc2MiOiJJIEFNIEFOIEVYQ0VMTEVOVCBERVZFTE9QRVIiLCJkZWxpdmVyeV9hZGRyZXNzIjpudWxsLCJkZWxpdmVyeV9jaXR5IjpudWxsLCJkZWxpdmVyeV9wcm92aW5jZSI6bnVsbCwiZGVsaXZlcnlfdG93biI6bnVsbCwiY29uc2lnbmVlIjpudWxsLCJjb25zaWduZWVfcGhvbmUiOm51bGx9LCJpYXQiOjE1MTAyOTQ2OTYsImV4cCI6MTUxMjg4NjY5Nn0.otFs_4hWS_C9-Wpo6I0vb0hhcVvQUN5zDeG8pjT7FXM"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true,
+        "textBody": "{\"pageNo\":2, \"pageSize\":6}"
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/getUserApplication/"
+      },
+      "id": "cd23c4f5-e65f-423f-9ced-f4cc7ef71d6d",
+      "lastModified": "2017-10-29T22:50:06.329+08:00",
+      "name": "获取用户连接的应用",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "enabled": true,
+          "name": "x-access-token",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjMsImlzX2RldmVsb3BlciI6IjEiLCJpc19hZG1pbiI6IjEiLCJ1c2VyX25hbWUiOiLlpKfoi49sbGzmiZMiLCJmaXJzdF9uYW1lIjoiIiwibGFzdF9uYW1lIjoiIiwicGhvbmUiOm51bGwsImVtYWlsIjoibTBAZ21haWwuY29tIiwicGFzc3dvcmQiOiJoaCIsInByb3ZpbmNlIjpudWxsLCJjaXR5IjpudWxsLCJ0b3duIjpudWxsLCJpbWFnZV9tZDUiOm51bGwsInBlcnNvbmFsX3NpdGUiOm51bGwsImluc3RhZ3JhbSI6bnVsbCwidHdpdHRlciI6bnVsbCwibG9jYXRpb24iOm51bGwsImJpbyI6bnVsbCwiY3JlYXRlZF90aW1lIjpudWxsLCJkZXZfdXJsIjpudWxsLCJkZXZfZGVzYyI6bnVsbH0sImlhdCI6MTUwOTI3MzMwNiwiZXhwIjoxNTA5MzU5NzA2fQ.D8KHl0QQjpbi658PhhV7B7ctqQkU2Jt5TiHS6lxdM6U"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/getProducts/self/"
+      },
+      "id": "cd436fae-b5bc-4055-8192-8e6026794e3e",
+      "lastModified": "2017-10-31T15:32:33.648+08:00",
+      "name": "获取自营的产品列表",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/getAliyunKey"
+      },
+      "id": "1580b2b1-deee-4b20-82e0-457750b79f2b",
+      "lastModified": "2017-11-10T14:18:47.642+08:00",
+      "name": "获取阿里云签名",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "enabled": true,
+          "name": "x-access-token",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjMsImlzX2RldmVsb3BlciI6IjAiLCJpc19hZG1pbiI6IjEiLCJ1c2VyX25hbWUiOiLlpKfoi4_miZMiLCJwaG9uZSI6bnVsbCwiZW1haWwiOiJtZWxpQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiaGgiLCJwcm92aW5jZSI6IuW5v-S4nCIsImNpdHkiOiLmt7HlnLMiLCJ0b3duIjoi56aP55SwIiwiaW1hZ2VfbWQ1IjpudWxsLCJwZXJzb25hbF9zaXRlIjpudWxsLCJ3ZWNoYXQiOm51bGwsImFkZHJlc3MiOm51bGwsImJpbyI6bnVsbCwiY3JlYXRlZF90aW1lIjoiMjAxNy0xMS0wOVQwMToxODoxMi4wMDBaIiwiZGV2X3VybCI6Imh0dHBzOi8vYmFpZHUuY29tIiwiZGV2X2Rlc2MiOiJJIEFNIEFOIEVYQ0VMTEVOVCBERVZFTE9QRVIiLCJkZWxpdmVyeV9hZGRyZXNzIjpudWxsLCJkZWxpdmVyeV9jaXR5IjpudWxsLCJkZWxpdmVyeV9wcm92aW5jZSI6bnVsbCwiZGVsaXZlcnlfdG93biI6bnVsbCwiY29uc2lnbmVlIjpudWxsLCJjb25zaWduZWVfcGhvbmUiOm51bGx9LCJpYXQiOjE1MTAyOTQ2OTYsImV4cCI6MTUxMjg4NjY5Nn0.otFs_4hWS_C9-Wpo6I0vb0hhcVvQUN5zDeG8pjT7FXM"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Context",
+      "id": "fd03c333-8928-4635-b40c-95cdf5a2c3a3",
+      "lastModified": "2017-10-15T10:26:13.536+08:00",
+      "name": "linyaqing",
+      "variables": [
+        {
+          "enabled": true,
+          "name": "host",
+          "value": "http://localhost:3000/"
+        }
+      ]
+    }
+  ]
+}

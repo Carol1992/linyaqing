@@ -3,14 +3,14 @@
     <div class="images">
       <div class="image" v-for='collection in collections'>
         <div class="left">
-          <img :src='collection.collection_image_md5' alt="">
+          <img :src='collection.images_list[0]' alt="">
         </div>
         <div class="right">
           <div class="right-top">
-            <img :src='collection.collection_image_md5' alt="">
+            <img :src='collection.images_list[1]' alt="">
           </div>
           <div class="right-bottom">
-            <img :src='collection.collection_image_md5' alt="">
+            <img :src='collection.images_list[2]' alt="">
           </div>
         </div>
       </div>
@@ -69,7 +69,7 @@
   }
   .image img {
     width: 99%;
-    height: 100%;
+    min-height: 100%;
   }
   @media screen and (max-width: 809px) {
     .image {

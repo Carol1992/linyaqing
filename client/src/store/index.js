@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import userOp from '../../api/user'
+import photoOp from '../../api/photos'
 
 Vue.use(Vuex)
 
@@ -14,7 +15,9 @@ const store = new Vuex.Store({
     headerInfo: {
       isStore: false,
       isCollections: false
-    }
+    },
+    showAddToCollection: false,
+    userCollections: []
   },
   mutations: {
     UpdateEmailSettings (state, settings) {
@@ -35,6 +38,12 @@ const store = new Vuex.Store({
     getHeaderInfo (state, flag) {
       state.headerInfo.isStore = flag.isStore
       state.headerInfo.isCollections = flag.isCollections
+    },
+    updateShowAddToCollection (state, flag) {
+      state.showAddToCollection = flag
+    },
+    updateUserCollections (state, collections) {
+      state.userCollections = collections
     }
   },
   actions: {
@@ -46,6 +55,17 @@ const store = new Vuex.Store({
         }
         commit('UpdateEmailSettings', info.email_settings)
         commit('updateUserInfo', info)
+      })
+    },
+    getUserCollections ({commit}) {
+      let data = {
+        token: localStorage.token,
+        pageNo: 1,
+        pageSize: 18000
+      }
+      photoOp.getCollection.user(data, (res) => {
+        let collections = res.data.data.lists
+        commit('updateUserCollections', collections)
       })
     }
   },

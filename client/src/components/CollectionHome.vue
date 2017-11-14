@@ -33,9 +33,14 @@
         photoOp.getCollection.all(data, (res) => {
           let lists = res.data.data.lists
           this.collections = []
-          for (let i = 0; i < lists.length; i++) {
-            lists[i].collection_image_md5 += '?x-oss-process=image/auto-orient,1'
-            this.collections.push(lists[i])
+          for (let l of lists) {
+            let newArr = []
+            for (let image of l.images_list) {
+              image += '?x-oss-process=image/auto-orient,1'
+              newArr.push(image)
+            }
+            l.images_list = newArr
+            this.collections.push(l)
           }
         })
       }

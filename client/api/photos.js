@@ -56,8 +56,8 @@ module.exports = {
 			story_title: data.story_title,
 			story_detail: data.story_detail,
 			location: data.location,
-			display: '0'
-			//collection_id: data.collection_id
+			display: '0',
+			collection_id: data.collection_id
 		})
 		.then(function (response) {
 		  callback(response)

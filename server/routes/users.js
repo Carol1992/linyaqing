@@ -572,14 +572,41 @@ router.all('/getCollection/all', (req, res, next) => {
 	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
 	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
-	let q1 = query('SELECT * FROM collections');
-	let q2 = query('SELECT * FROM collections ORDER BY created_time DESC LIMIT ?,?', [_left, pageSize]);
-	Promise.all([q1, q2]).then(values => {
+	let q2 = query('SELECT c_table.collection_id, c_table.collection_name, '+
+		'i.image_id, i.image_md5 FROM (SELECT c.collection_id, c.collection_name, c.created_time FROM collections c '+
+		'WHERE c.is_private = 1) c_table, images i WHERE c_table.collection_id = i.collection_id '+
+		'ORDER BY c_table.created_time DESC', '');
+	Promise.all([q2]).then(values => {
+		let collections = values[0].results
+		let newCollections = []
+		let hashTable = {};
+		let newArr = [];
+		if (collections.length > 0) {
+	    for (let c1 of collections) {
+	    	let newCollection = {}
+	    	newCollection.collection_id = c1.collection_id
+	    	newCollection.collection_name = c1.collection_name
+	    	newCollection.images_list = []
+	    	for (let c2 of collections) {
+	    		if (newCollection.collection_id === c2.collection_id) {
+	    			newCollection.images_list.push(c2.image_md5)
+	    		}
+	    	}
+	    	newCollections.push(newCollection)
+	    }
+		  for(let nc of newCollections) {
+		    if(!hashTable[nc.collection_id]) {
+		      hashTable[nc.collection_id] = true;
+		      newArr.push(nc);
+		    }
+		  }
+		}
 		let new_data = {
 			pageNo: pageNo,
 			pageSize: pageSize,
-			totalPage: Math.ceil(values[0].results[0].totalPage / pageSize),
-			lists: values[1].results
+			totalPage: Math.ceil(newArr.length / pageSize),
+			totalCount: newArr.length,
+			lists: newArr.slice(_left, _left+pageSize)
 		};
 		res.json(formater({code:'0', data:new_data}));
 	});
@@ -591,17 +618,41 @@ router.all('/getCollection/user', verify_token, (req, res, next) => {
 	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
 	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
-	let q1 = query('SELECT COUNT(*) AS totalPage FROM (SELECT c.collection_id FROM collections c, '+
-		'images i WHERE c.collection_id = i.collection_id AND i.user_id = ? GROUP BY i.collection_id) a', [user_id]);
-	let q2 = query('SELECT c.* FROM collections c, images i WHERE c.collection_id = i.collection_id AND '+
-		'i.user_id = ? GROUP BY i.collection_id ORDER BY created_time DESC LIMIT ?,?', [user_id, _left, pageSize]);
-	Promise.all([q1, q2]).then(values => {
+	let q2 = query('SELECT c_table.collection_id, c_table.collection_name, '+
+		'i.image_id, i.image_md5 FROM (SELECT c.collection_id, c.collection_name, c.created_time FROM collections c '+
+		'WHERE c.is_private = 1) c_table, images i WHERE c_table.collection_id = i.collection_id AND '+
+		'i.user_id = ? ORDER BY c_table.created_time DESC', [user_id]);
+	Promise.all([q2]).then(values => {
+		let collections = values[0].results
+		let newCollections = []
+		let hashTable = {};
+		let newArr = [];
+		if (collections.length > 0) {
+	    for (let c1 of collections) {
+	    	let newCollection = {}
+	    	newCollection.collection_id = c1.collection_id
+	    	newCollection.collection_name = c1.collection_name
+	    	newCollection.images_list = []
+	    	for (let c2 of collections) {
+	    		if (newCollection.collection_id === c2.collection_id) {
+	    			newCollection.images_list.push(c2.image_md5)
+	    		}
+	    	}
+	    	newCollections.push(newCollection)
+	    }
+		  for(let nc of newCollections) {
+		    if(!hashTable[nc.collection_id]) {
+		      hashTable[nc.collection_id] = true;
+		      newArr.push(nc);
+		    }
+		  }
+		}
 		let new_data = {
 			pageNo: pageNo,
 			pageSize: pageSize,
-			totalPage: Math.ceil(values[0].results[0].totalPage / pageSize),
-			totalCount: values[0].results[0].totalPage,
-			lists: values[1].results
+			totalPage: Math.ceil(newArr.length / pageSize),
+			totalCount: newArr.length,
+			lists: newArr.slice(_left, _left+pageSize)
 		};
 		res.json(formater({code:'0', data:new_data}));
 	});

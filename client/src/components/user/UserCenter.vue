@@ -19,7 +19,7 @@
       </div>
       <div class="photos">
         <Photos :photos="photos" v-if='!isActivated3'></Photos>
-        <Collections :collections='photos.group_a' v-if='isActivated3'></Collections>
+        <Collections :collections='collections' v-if='isActivated3'></Collections>
       </div>
     </div>
     <BackTop></BackTop>
@@ -50,7 +50,8 @@
         currentPage1: 1,
         currentPage2: 1,
         currentPage3: 1,
-        pageSize: 18000
+        pageSize: 18000,
+        collections: []
       }
     },
     components: {
@@ -84,7 +85,7 @@
         this.isActivated1 = false
         this.isActivated2 = false
         this.isActivated3 = true
-        this.clearData()
+        this.collections = []
         this.getCollection_user()
       },
       getList_user () {
@@ -142,9 +143,14 @@
         photoOp.getCollection.user(data, (res) => {
           this.summary.collections = res.data.data.totalCount
           let lists = res.data.data.lists
-          for (let i = 0; i < lists.length; i++) {
-            lists[i].collection_image_md5 += '?x-oss-process=image/auto-orient,1'
-            this.photos.group_a.push(lists[i])
+          for (let l of lists) {
+            let newArr = []
+            for (let image of l.images_list) {
+              image += '?x-oss-process=image/auto-orient,1'
+              newArr.push(image)
+            }
+            l.images_list = newArr
+            this.collections.push(l)
           }
         })
       }

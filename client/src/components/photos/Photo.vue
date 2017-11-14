@@ -12,7 +12,10 @@
           <span>GPS</span>
         </div>
         <div class="story" :class='{activated: isStory}'>
-          <div>简介</div>
+          <span>简介</span>
+        </div>
+        <div class="intoCollection" :class='{activated: isCollection}'>
+          <span>相册</span>
         </div>
       </div>
       <div class="details detail-tag" v-if='isTag'>
@@ -82,6 +85,30 @@
           @focus='changeBorder' @blur='changeBorder2'></textarea>
         </div>
       </div>
+      <div class="details detail-collection" v-if='isCollection'>
+        <div class="collections">
+          <p>请选择存放该图片的相册</p>
+          <div class="select-collection">
+            <div class="collection" v-for='collection in userCollections' 
+            @click='selectCollection($event, collection)'>
+              <div class="collection-img">
+                <img :src='collection.images_list[0]' alt="">
+              </div>
+              <div class="collection-name">
+                <span>{{collection.collection_name}}</span>
+              </div>
+            </div>
+            <div class="collection" @click='selectCollection($event)'>
+              <div class="collection-img">
+                <img src='../../assets/img/album.jpg' alt="">
+              </div>
+              <div class="collection-name">
+                <span>创建新相册</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="next">
         <span @click='goNext'>{{btnMsg}}</span>
       </div>
@@ -99,7 +126,9 @@
         isExif: false,
         isGps: false,
         isStory: false,
-        btnMsg: '下一项'
+        isCollection: false,
+        btnMsg: '下一项',
+        collectionId: ''
       }
     },
     methods: {
@@ -111,6 +140,17 @@
           title: this.notifyMsg,
           desc: nodesc ? '' : ''
         })
+      },
+      selectCollection (e, collection) {
+        let collections = document.getElementsByClassName('collection')
+        for (let c of collections) {
+          c.style.backgroundColor = '#fff'
+          c.style.color = '#111'
+        }
+        e.target.style.backgroundColor = '#999'
+        e.target.style.color = '#fff'
+        if (collection) this.collectionId = collection.collection_id
+        else this.collectionId = ''
       },
       goNext () {
         if (this.isTag && !this.isExif) {
@@ -126,12 +166,20 @@
         if (this.isGps && !this.isStory) {
           this.isGps = false
           this.isStory = true
+          return
+        }
+        if (this.isStory && !this.isCollection) {
+          this.isStory = false
+          this.isCollection = true
           this.btnMsg = '提 交'
           return
         }
-        if (this.isStory) {
+        if (this.isCollection) {
           this.$store.commit('getPhotoInfo', this.photoInfo)
           this.photoInfo.image_md5 = this.imgUrl
+          this.photoInfo.collection_id = this.collectionId
+          this.$store.dispatch('getUserCollections')
+          this.$store.commit('updateShowAddToCollection', true)
           photoOp.uploadUserPhoto(this.photoInfo, (res) => {
             this.$router.push({path: `/userCenter/${this.info.user_name}`})
           })
@@ -146,6 +194,7 @@
     },
     mounted () {
       this.setBackground()
+      this.$store.dispatch('getUserCollections')
     },
     computed: {
       imgUrl () {
@@ -165,6 +214,20 @@
       },
       info () {
         return this.$store.state.userInfo
+      },
+      userCollections () {
+        let lists = this.$store.state.userCollections
+        let collections = []
+        for (let l of lists) {
+          let newArr = []
+          for (let image of l.images_list) {
+            image += '?x-oss-process=image/auto-orient,1'
+            newArr.push(image)
+          }
+          l.images_list = newArr
+          collections.push(l)
+        }
+        return collections
       }
     }
   }
@@ -312,6 +375,61 @@
     border: 1px solid #999999;
     border-radius: 6px;
   }
+  .collections {
+    margin-top: 40px;
+  }
+  .select-collection {
+    max-height: 400px;
+    margin-top: 20px;
+    overflow-y: auto;
+    border:1px solid #999;
+    border-radius: 10px 0px 0px 10px;
+    padding: 10px 20px;
+  }
+  .select-collection::-webkit-scrollbar{
+    width: 10px;
+    height: 0px;
+  }
+  /* 设置滚动条的滑轨 */
+  .select-collection::-webkit-scrollbar-track {
+    background-color: white;
+  }
+  /* 滑块 */
+  .select-collection::-webkit-scrollbar-thumb {
+    background-color: #999;
+  }
+  /* 滑轨两头的监听按钮 */
+  .select-collection::-webkit-scrollbar-button {
+    background-color: #999;
+    display: none;
+  }
+  .collection {
+    height: 50px;
+    margin-bottom: 10px;
+    background-color: #fff;
+    color: #111;
+    font-style: italic;
+    cursor: pointer;
+  }
+  .collection:hover{
+    background-color: #ddd;
+  }
+  .collection-img {
+    width: 50px;
+    display: inline-block;
+    float: left;
+  }
+  .collection-img img {
+    width: 50px;
+    height: 50px;
+  }
+  .collection-name {
+    display: inline-block;
+  }
+  .collection-name span {
+    line-height: 50px;
+    margin-left: 30px;
+  }
   @media screen and (max-width: 809px) {
     .details, .next {
       width: 90%;
@@ -328,6 +446,9 @@
     }
     .tags > div {
       font-size: 18px;
+    }
+    .select-collection {
+      max-height: 300px;
     }
   }
 </style>

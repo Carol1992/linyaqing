@@ -107,14 +107,10 @@ module.exports = {
 			  console.log(error)
 			});	
 		},
-		one () {
-			axios.post('/api/getCollection/one', {
-				collection_id:'19',
-				pageNo:1,
-				pageSize:3
-			})
+		one (data, callback) {
+			axios.post('/api/getCollection/one', data)
 			.then(function (response) {
-			  console.log(response)
+			  callback(response)
 			})
 			.catch(function (error) {
 			  console.log(error)

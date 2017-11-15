@@ -95,7 +95,8 @@
       },
       getList_user () {
         let data = {
-          token: localStorage.token,
+          user_id: this.info.user_id,
+          request_user_id: this.info.user_id,
           pageNo: this.currentPage1,
           pageSize: this.pageSize
         }
@@ -124,7 +125,8 @@
       },
       getList_liked () {
         let data = {
-          token: localStorage.token,
+          user_id: this.info.user_id,
+          request_user_id: this.info.user_id,
           pageNo: this.currentPage2,
           pageSize: this.pageSize
         }
@@ -153,7 +155,8 @@
       },
       getCollection_user () {
         let data = {
-          token: localStorage.token,
+          user_id: this.info.user_id,
+          request_user_id: this.info.user_id,
           pageNo: this.currentPage3,
           pageSize: this.pageSize
         }

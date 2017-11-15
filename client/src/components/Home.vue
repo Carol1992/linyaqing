@@ -104,6 +104,7 @@ export default {
       }
       photosOp.getList.hot(data, (res) => {
         let lists = res.data.data.lists
+        this.noFollowing = false
         for (let i = 0; i < lists.length; i++) {
           lists[i].image_md5 += '?x-oss-process=image/auto-orient,1'
           if (i % 3 === 0) {
@@ -125,6 +126,7 @@ export default {
       }
       photosOp.getList.new(data, (res) => {
         let lists = res.data.data.lists
+        this.noFollowing = false
         for (let i = 0; i < lists.length; i++) {
           lists[i].image_md5 += '?x-oss-process=image/auto-orient,1'
           if (i % 3 === 0) {

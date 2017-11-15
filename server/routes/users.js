@@ -359,6 +359,7 @@ router.post('/updatePhotographers', verify_token, (req, res, next) => {
 	let settings = req.body.followings.split(',');
 	let user_settings = [];
 	for(let setting of settings) {
+		if (user_id === setting) continue;
 		let s = [user_id, setting];
 		user_settings.push(s);
 	}
@@ -437,15 +438,18 @@ router.all('/getList/new', (req, res, next) => {
 	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
 	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
-	let q1 = query('SELECT COUNT(*) AS totalPage FROM (SELECT i.display_location, i.location, i.created_time, i.image_md5, i.story_title, '+
-	'i.story_detail, i.user_id, u.user_name, u.image_md5 AS user_avatar, u.email, likes.total_likes '+
-	'FROM users u, images i LEFT OUTER JOIN (SELECT l.image_id, COUNT(l.user_id) AS total_likes FROM '+
-	'image_likes l GROUP BY image_id) likes ON i.image_id = likes.image_id WHERE i.user_id = u.user_id) a', '');
-	let q2 = query('SELECT i.display_location, i.location, i.created_time, i.image_md5, i.story_title, '+
-	'i.story_detail, i.user_id, u.user_name, u.image_md5 AS user_avatar, u.email, likes.total_likes '+
-	'FROM users u, images i LEFT OUTER JOIN (SELECT l.image_id, COUNT(l.user_id) AS total_likes FROM '+
-	'image_likes l GROUP BY image_id) likes ON i.image_id = likes.image_id WHERE i.user_id = u.user_id '+
-	'ORDER BY i.created_time DESC LIMIT ?,?', [_left, pageSize]);
+	let q1 = query('SELECT COUNT(*) AS totalPage FROM (SELECT i.*, u.user_name, u.image_md5 AS avatar, '+
+		'u.email, c.is_private, likes.total_likes FROM image_collection ic JOIN collections c ON '+
+		'ic.collection_id = c.collection_id JOIN images i ON ic.image_id = i.image_id JOIN users u ON '+
+		'i.user_id = u.user_id LEFT OUTER JOIN (SELECT l.image_id, COUNT(l.user_id) AS total_likes FROM '+
+		'image_likes l GROUP BY image_id) likes ON i.image_id = likes.image_id WHERE c.is_private = 1 '+
+		'GROUP BY ic.image_id ORDER BY i.created_time DESC) a', '');
+	let q2 = query('SELECT i.*, u.user_name, u.image_md5 AS avatar, '+
+		'u.email, c.is_private, likes.total_likes FROM image_collection ic JOIN collections c ON '+
+		'ic.collection_id = c.collection_id JOIN images i ON ic.image_id = i.image_id JOIN users u ON '+
+		'i.user_id = u.user_id LEFT OUTER JOIN (SELECT l.image_id, COUNT(l.user_id) AS total_likes FROM '+
+		'image_likes l GROUP BY image_id) likes ON i.image_id = likes.image_id WHERE c.is_private = 1 '+
+		'GROUP BY ic.image_id ORDER BY i.created_time DESC LIMIT ?,?', [_left, pageSize]);
 	Promise.all([q1, q2]).then(values => {
 		let new_data = {
 				pageNo: pageNo,
@@ -462,15 +466,18 @@ router.all('/getList/hot', (req, res, next) => {
 	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
 	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
-	let q1 = query('SELECT COUNT(*) AS totalPage FROM (SELECT i.display_location, i.location, i.created_time, i.image_md5, i.story_title, '+
-	'i.story_detail, i.user_id, u.user_name, u.image_md5 AS user_avatar, u.email, likes.total_likes '+
-	'FROM users u, images i LEFT OUTER JOIN (SELECT l.image_id, COUNT(l.user_id) AS total_likes FROM '+
-	'image_likes l GROUP BY image_id) likes ON i.image_id = likes.image_id WHERE i.user_id = u.user_id) a', '');
-	let q2 = query('SELECT i.display_location, i.location, i.created_time, i.image_md5, i.story_title, '+
-	'i.story_detail, i.user_id, u.user_name, u.image_md5 AS user_avatar, u.email, likes.total_likes '+
-	'FROM users u, images i LEFT OUTER JOIN (SELECT l.image_id, COUNT(l.user_id) AS total_likes FROM '+
-	'image_likes l GROUP BY image_id) likes ON i.image_id = likes.image_id WHERE i.user_id = u.user_id '+
-	'ORDER BY likes.total_likes DESC LIMIT ?,?', [_left, pageSize]);
+	let q1 = query('SELECT COUNT(*) AS totalPage FROM (SELECT i.*, u.user_name, u.image_md5 AS avatar, '+
+		'u.email, c.is_private, likes.total_likes FROM image_collection ic JOIN collections c ON '+
+		'ic.collection_id = c.collection_id JOIN images i ON ic.image_id = i.image_id JOIN users u ON '+
+		'i.user_id = u.user_id LEFT OUTER JOIN (SELECT l.image_id, COUNT(l.user_id) AS total_likes FROM '+
+		'image_likes l GROUP BY image_id) likes ON i.image_id = likes.image_id WHERE c.is_private = 1 '+
+		'GROUP BY ic.image_id) a', '');
+	let q2 = query('SELECT i.*, u.user_name, u.image_md5 AS avatar, '+
+		'u.email, c.is_private, likes.total_likes FROM image_collection ic JOIN collections c ON '+
+		'ic.collection_id = c.collection_id JOIN images i ON ic.image_id = i.image_id JOIN users u ON '+
+		'i.user_id = u.user_id LEFT OUTER JOIN (SELECT l.image_id, COUNT(l.user_id) AS total_likes FROM '+
+		'image_likes l GROUP BY image_id) likes ON i.image_id = likes.image_id WHERE c.is_private = 1 '+
+		'GROUP BY ic.image_id ORDER BY likes.total_likes DESC LIMIT ?,?', [_left, pageSize]);
 	Promise.all([q1, q2]).then(values => {
 		let new_data = {
 				pageNo: pageNo,
@@ -488,20 +495,20 @@ router.all('/getList/following', verify_token, (req, res, next) => {
 	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
 	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
-	let q1 = query('SELECT COUNT(*) AS totalPage FROM (SELECT i.display_location, i.location, '+
-		'i.created_time, i.image_md5, i.story_title, i.story_detail, i.user_id, u.user_name, '+
-		'u.image_md5 AS user_avatar, u.email, likes.total_likes FROM users u, '+
-		'(SELECT r.follower_id FROM relationships r WHERE r.user_id = ?) follow, images i LEFT OUTER JOIN '+
-		'(SELECT l.image_id, COUNT(l.user_id) AS total_likes FROM image_likes l GROUP BY image_id) '+
-		'likes ON i.image_id = likes.image_id WHERE i.user_id = follow.follower_id AND i.user_id = u.user_id '+
-		'ORDER BY likes.total_likes DESC) a', [user_id])
-	let q2 = query('SELECT i.image_id, i.image_tags, i.display_location, i.location, '+
-		'i.created_time, i.image_md5, i.story_title, i.story_detail, i.user_id, u.user_name, '+
-		'u.image_md5 AS user_avatar, u.email, likes.total_likes FROM users u, '+
-		'(SELECT r.follower_id FROM relationships r WHERE r.user_id = ?) follow, images i LEFT OUTER JOIN '+
-		'(SELECT l.image_id, COUNT(l.user_id) AS total_likes FROM image_likes l GROUP BY image_id) '+
-		'likes ON i.image_id = likes.image_id WHERE i.user_id = follow.follower_id AND i.user_id = u.user_id '+
-		'ORDER BY likes.total_likes DESC LIMIT ?,?', [user_id, _left, pageSize])
+	let q1 = query('SELECT COUNT(*) AS totalPage FROM (SELECT i.*, u.user_name, u.image_md5 AS avatar, '+
+		'u.email, c.is_private, likes.total_likes FROM images i JOIN (SELECT r.follower_id FROM relationships r '+
+		'WHERE r.user_id = ?) follow ON i.user_id = follow.follower_id JOIN users u ON i.user_id = u.user_id '+
+		'JOIN image_collection ic ON i.image_id = ic.collection_id JOIN collections c ON '+
+		'ic.collection_id = c.collection_id LEFT OUTER JOIN (SELECT l.image_id, COUNT(l.user_id) AS '+
+		'total_likes FROM image_likes l GROUP BY image_id) likes ON i.image_id = likes.image_id '+
+		'WHERE c.is_private = 1 GROUP BY ic.image_id ORDER BY likes.total_likes DESC) a', [user_id])
+	let q2 = query('SELECT i.*, u.user_name, u.image_md5 AS avatar, '+
+		'u.email, c.is_private, likes.total_likes FROM images i JOIN (SELECT r.follower_id FROM relationships r '+
+		'WHERE r.user_id = ?) follow ON i.user_id = follow.follower_id JOIN users u ON i.user_id = u.user_id '+
+		'JOIN image_collection ic ON i.image_id = ic.collection_id JOIN collections c ON '+
+		'ic.collection_id = c.collection_id LEFT OUTER JOIN (SELECT l.image_id, COUNT(l.user_id) AS '+
+		'total_likes FROM image_likes l GROUP BY image_id) likes ON i.image_id = likes.image_id '+
+		'WHERE c.is_private = 1 GROUP BY ic.image_id ORDER BY likes.total_likes DESC LIMIT ?,?', [user_id, _left, pageSize])
 	Promise.all([q1, q2]).then(values => {
 		let new_data = {
 				pageNo: pageNo,
@@ -512,59 +519,90 @@ router.all('/getList/following', verify_token, (req, res, next) => {
 			res.json(formater({code:'0', data:new_data}));
 	});
 });
-// 已登陆用户，获取其所有的图片列表
-router.all('/getList/user', verify_token, (req, res, next) => {
+// 获取某个用户的所有图片列表
+router.all('/getList/user', (req, res, next) => {
 	let _user = req.body;
-	let user_id = req.api_user.data.user_id;
+	let token = req.body.token || req.query.token || req.headers['x-access-token'] || '';
+	let request_user_id = req.body.request_user_id || req.query.request_user_id;
 	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
 	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
-	let q1 = query('SELECT COUNT(*) AS totalPage FROM (SELECT i.display_location, i.location, i.created_time, i.image_md5, i.story_title, '+
-	'i.story_detail, i.make, i.model, i.focalLength, i.aperture, i.dateTimeOriginal, i.iso, i.shutterSpeed, i.user_id, u.user_name, u.image_md5 AS user_avatar, u.email, likes.total_likes '+
-	'FROM users u, images i LEFT OUTER JOIN (SELECT l.image_id, COUNT(l.user_id) AS total_likes FROM '+
-	'image_likes l GROUP BY image_id) likes ON i.image_id = likes.image_id WHERE i.user_id = u.user_id AND i.user_id = ?) a', [user_id]);
-	let q2 = query('SELECT i.image_id, i.display_location, i.image_tags, i.location, i.created_time, i.image_md5, i.story_title, '+
-	'i.story_detail, i.make, i.model, i.focalLength, i.aperture, i.dateTimeOriginal, i.iso, i.shutterSpeed, i.user_id, u.user_name, u.image_md5 AS user_avatar, u.email, likes.total_likes '+
-	'FROM users u, images i LEFT OUTER JOIN (SELECT l.image_id, COUNT(l.user_id) AS total_likes FROM '+
-	'image_likes l GROUP BY image_id) likes ON i.image_id = likes.image_id WHERE i.user_id = u.user_id '+
-	'AND i.user_id = ? ORDER BY i.created_time DESC LIMIT ?,?', [user_id, _left, pageSize]);
-	Promise.all([q1, q2]).then(values => {
+	let q2 = query('SELECT i.*, c.is_private, likes.total_likes FROM image_collection ic JOIN collections c '+
+		'ON ic.collection_id = c.collection_id JOIN images i ON ic.image_id = i.image_id LEFT OUTER JOIN '+
+		'(SELECT l.image_id, COUNT(l.user_id) AS total_likes FROM image_likes l GROUP BY image_id) likes '+
+		'ON i.image_id = likes.image_id WHERE c.is_private = 1 AND i.user_id = ? GROUP BY ic.image_id '+
+		'ORDER BY likes.total_likes DESC', [request_user_id])
+	if (!request_user_id) {
+		return res.json(formater({code: '1', desc: 'id是必须的！'}))
+	}
+	jwt.verify(token, 'secret', function(err, decoded) {
+    if (!err) {
+      // 如果没问题就把解码后的信息保存到请求中，供后面的路由使用
+      req.api_user = decoded;
+      console.log('_user_id: ', req.api_user.data.user_id);
+      if (req.api_user.data.user_id == request_user_id) {
+      	q2 = query('SELECT i.*, c.is_private, likes.total_likes FROM image_collection ic JOIN collections c '+
+				'ON ic.collection_id = c.collection_id JOIN images i ON ic.image_id = i.image_id LEFT OUTER JOIN '+
+				'(SELECT l.image_id, COUNT(l.user_id) AS total_likes FROM image_likes l GROUP BY image_id) likes '+
+				'ON i.image_id = likes.image_id WHERE i.user_id = ? GROUP BY ic.image_id '+
+				'ORDER BY likes.total_likes DESC', [request_user_id])
+	     }
+    }
+  })
+	Promise.all([q2]).then(values => {
 		let new_data = {
-				pageNo: pageNo,
-				pageSize: pageSize,
-				totalPage: Math.ceil(values[0].results[0].totalPage / pageSize),
-				totalCount: values[0].results[0].totalPage,
-				lists: values[1].results
-			};
-			res.json(formater({code:'0', data:new_data}))
+			pageNo: pageNo,
+			pageSize: pageSize,
+			totalPage: Math.ceil(values[0].results.length / pageSize),
+			totalCount: values[0].results.length,
+			lists: values[0].results
+		};
+		res.json(formater({code:'0', data:new_data}))
 	});
 });
-// 已登陆用户，获取其喜欢过的图片列表
-router.all('/getList/liked', verify_token, (req, res, next) => {
+// 获取某个用户喜欢过的图片列表
+router.all('/getList/liked', (req, res, next) => {
 	let _user = req.body;
-	let user_id = req.api_user.data.user_id;
+	let token = req.body.token || req.query.token || req.headers['x-access-token'] || '';
+	let request_user_id = req.body.request_user_id || req.query.request_user_id;
 	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
 	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
-	let q1 = query('SELECT COUNT(*) AS totalPage FROM (SELECT i.image_id, my_likes.total_likes, i.display_location, i.location, '+
-		'i.created_time, i.image_md5, i.story_title, i.story_detail, i.user_id, u.user_name, '+
-		'u.image_md5 AS user_avatar, u.email FROM images i, users u, '+
-		'(SELECT l.image_id, likes.total_likes FROM image_likes l, (SELECT l.image_id, COUNT(l.user_id) AS total_likes '+
-		'FROM image_likes l GROUP BY l.image_id) likes WHERE l.user_id = ? AND l.image_id = likes.image_id) my_likes '+
-		'WHERE i.image_id = my_likes.image_id AND i.user_id = u.user_id) a', [user_id]);
-	let q2 = query('SELECT i.image_id, my_likes.total_likes, i.display_location, i.location, '+
-		'i.created_time, i.image_md5, i.story_title, i.story_detail, i.user_id, u.user_name, '+
-		'u.image_md5 AS user_avatar, u.email FROM images i, users u, '+
-		'(SELECT l.image_id, likes.total_likes FROM image_likes l, (SELECT l.image_id, COUNT(l.user_id) AS total_likes '+
-		'FROM image_likes l GROUP BY l.image_id) likes WHERE l.user_id = ? AND l.image_id = likes.image_id) my_likes '+
-		'WHERE i.image_id = my_likes.image_id AND i.user_id = u.user_id LIMIT ?,?', [user_id, _left, pageSize]);
-	Promise.all([q1, q2]).then(values => {
+	let q2 = query('SELECT i.image_id, my_likes.total_likes, i.display_location, i.location, i.created_time, '+
+	'i.image_md5, i.story_title, i.story_detail, i.user_id, u.user_name, u.image_md5 AS user_avatar, '+
+	'u.email, c.collection_id, c.collection_name, c.is_private, c.user_id AS collection_owner_id '+
+	'FROM images i JOIN users u ON i.user_id = u.user_id JOIN (SELECT l.image_id, likes.total_likes '+
+	'FROM image_likes l, (SELECT l.image_id, COUNT(l.user_id) AS total_likes FROM image_likes l '+
+	'GROUP BY l.image_id) likes WHERE l.user_id = ? AND l.image_id = likes.image_id) my_likes ON '+
+	'i.image_id = my_likes.image_id JOIN image_collection ic ON i.image_id = ic.image_id JOIN '+
+	'collections c ON ic.collection_id = c.collection_id AND c.is_private = 1 GROUP BY i.image_id', [request_user_id])
+	if (!request_user_id) {
+		return res.json(formater({code: '1', desc: 'id是必须的！'}))
+	}
+	jwt.verify(token, 'secret', function(err, decoded) {
+    if (!err) {
+      // 如果没问题就把解码后的信息保存到请求中，供后面的路由使用
+      req.api_user = decoded;
+      console.log('_user_id: ', req.api_user.data.user_id);
+      if (req.api_user.data.user_id == request_user_id) {
+      	q2 = query('SELECT i.image_id, my_likes.total_likes, i.display_location, i.location, i.created_time, '+
+				'i.image_md5, i.story_title, i.story_detail, i.user_id, u.user_name, u.image_md5 AS user_avatar, '+
+				'u.email, c.collection_id, c.collection_name, c.is_private, c.user_id AS collection_owner_id '+
+				'FROM images i JOIN users u ON i.user_id = u.user_id JOIN (SELECT l.image_id, likes.total_likes '+
+				'FROM image_likes l, (SELECT l.image_id, COUNT(l.user_id) AS total_likes FROM image_likes l '+
+				'GROUP BY l.image_id) likes WHERE l.user_id = ? AND l.imasge_id = likes.image_id) my_likes ON '+
+				'i.image_id = my_likes.image_id JOIN image_collection ic ON i.image_id = ic.image_id JOIN '+
+				'collections c ON ic.collection_id = c.collection_id GROUP BY i.image_id', [request_user_id])
+	     }
+    }
+  })
+	Promise.all([q2]).then(values => {
 		let new_data = {
 				pageNo: pageNo,
 				pageSize: pageSize,
-				totalPage: Math.ceil(values[0].results[0].totalPage / pageSize),
-				totalCount: values[0].results[0].totalPage,
-				lists: values[1].results
+				totalPage: Math.ceil(values[0].results.length / pageSize),
+				totalCount: values[0].results.length,
+				lists: values[0].results.slice(_left, _left+pageSize)
 			};
 			res.json(formater({code:'0', data:new_data}))
 	});
@@ -576,9 +614,10 @@ router.all('/getCollection/all', (req, res, next) => {
 	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
 	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
-	let q2 = query('SELECT ic.collection_id, c.collection_name, ic.image_id, i.image_md5 FROM '+
+	let q2 = query('SELECT u.user_id, u.user_name, u.image_md5 AS avatar, ic.collection_id, '+
+		'c.collection_name, ic.image_id, i.image_md5 FROM users u, '+
 		'image_collection ic, collections c, images i WHERE ic.collection_id = c.collection_id AND '+
-		'ic.image_id = i.image_id AND c.is_private = 1 ORDER BY ic.collection_id DESC', '');
+		'ic.image_id = i.image_id AND u.user_id = c.user_id AND c.is_private = 1 ORDER BY ic.collection_id DESC', '');
 	Promise.all([q2]).then(values => {
 		let collections = values[0].results
 		let newCollections = []
@@ -589,6 +628,9 @@ router.all('/getCollection/all', (req, res, next) => {
 	    	let newCollection = {}
 	    	newCollection.collection_id = c1.collection_id
 	    	newCollection.collection_name = c1.collection_name
+	    	newCollection.user_id = c1.user_id
+	    	newCollection.user_name = c1.user_name
+	    	newCollection.avatar = c1.avatar
 	    	newCollection.images_list = []
 	    	for (let c2 of collections) {
 	    		if (newCollection.collection_id === c2.collection_id) {
@@ -614,16 +656,36 @@ router.all('/getCollection/all', (req, res, next) => {
 		res.json(formater({code:'0', data:new_data}));
 	});
 });
-// 获取用户自己的图片集
-router.all('/getCollection/user', verify_token, (req, res, next) => {
+// 获取某个用户的图片集
+router.all('/getCollection/user', (req, res, next) => {
 	let _user = req.body;
-	let user_id = req.api_user.data.user_id;
+	let token = req.body.token || req.query.token || req.headers['x-access-token'] || '';
+	let request_user_id = _user.request_user_id || req.query.request_user_id;
 	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
 	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
-	let q2 = query('SELECT ic.collection_id, c.collection_name, ic.image_id, i.image_md5 FROM '+
+	let q2 = query('SELECT u.user_id, u.user_name, u.image_md5 AS avatar, ic.collection_id, '+
+		'c.collection_name, c.is_private, ic.image_id, i.image_md5 FROM users u, '+
 		'image_collection ic, collections c, images i WHERE ic.collection_id = c.collection_id AND '+
-		'ic.image_id = i.image_id AND i.user_id = ? ORDER BY ic.collection_id DESC', [user_id]);
+		'ic.image_id = i.image_id AND u.user_id = c.user_id AND i.user_id = ? AND c.is_private = 1 '+
+		'ORDER BY ic.collection_id DESC', [request_user_id]);
+	if (!request_user_id) {
+		return res.json(formater({code: '1', desc: 'id是必须的！'}))
+	}
+	jwt.verify(token, 'secret', function(err, decoded) {
+    if (!err) {
+      // 如果没问题就把解码后的信息保存到请求中，供后面的路由使用
+      req.api_user = decoded;
+      console.log('_user_id: ', req.api_user.data.user_id);
+      if (req.api_user.data.user_id == request_user_id) {
+      	q2 = query('SELECT u.user_id, u.user_name, u.image_md5 AS avatar, ic.collection_id, '+
+      		'c.collection_name, c.is_private, ic.image_id, i.image_md5 FROM users u, '+
+				'image_collection ic, collections c, images i WHERE ic.collection_id = c.collection_id AND '+
+				'ic.image_id = i.image_id AND u.user_id = c.user_id AND i.user_id = ? '+
+				'ORDER BY ic.collection_id DESC', [request_user_id]);
+	     }
+    }
+  })
 	Promise.all([q2]).then(values => {
 		let collections = values[0].results
 		let newCollections = []
@@ -634,6 +696,10 @@ router.all('/getCollection/user', verify_token, (req, res, next) => {
 	    	let newCollection = {}
 	    	newCollection.collection_id = c1.collection_id
 	    	newCollection.collection_name = c1.collection_name
+	    	newCollection.user_id = c1.user_id
+	    	newCollection.user_name = c1.user_name
+	    	newCollection.avatar = c1.avatar
+	    	newCollection.is_private = c1.is_private
 	    	newCollection.images_list = []
 	    	for (let c2 of collections) {
 	    		if (newCollection.collection_id === c2.collection_id) {
@@ -672,15 +738,20 @@ router.all('/getCollection/one', (req, res, next) => {
 		if (data.results[0].is_private == '0' && data.results[0].user_id != user_id) {
 			return res.json(formater({code: '1', desc: '该私密相册不属于该用户，不能被访问！'}))
 		}
-		let q1 = query('SELECT COUNT(*) AS totalPage FROM (SELECT i.* FROM images i, image_collection ic '+
-			'WHERE i.image_id = ic.image_id AND ic.collection_id = ?) a', [collection_id]);
-		let q2 = query('SELECT i.* FROM images i, image_collection ic WHERE i.image_id = ic.image_id AND '+
-			'ic.collection_id = ? LIMIT ?,?', [collection_id, _left, pageSize]);
+		let q1 = query('SELECT COUNT(*) AS totalPage FROM (SELECT i.*, u.user_id AS owner_id, u.user_name AS '+
+			'collection_owner, u.image_md5 AS owner_avatar, u.email AS owner_email, c.collection_name FROM '+
+			'images i, users u, image_collection ic, collections c WHERE c.user_id = u.user_id AND '+
+			'i.image_id = ic.image_id AND c.collection_id = ic.collection_id AND ic.collection_id = ?) a', [collection_id]);
+		let q2 = query('SELECT i.*, u.user_id AS owner_id, u.user_name AS '+
+			'collection_owner, u.image_md5 AS owner_avatar, u.email AS owner_email, c.collection_name FROM '+
+			'images i, users u, image_collection ic, collections c WHERE c.user_id = u.user_id AND '+
+			'i.image_id = ic.image_id AND c.collection_id = ic.collection_id AND ic.collection_id = ? LIMIT ?,?', [collection_id, _left, pageSize]);
 		Promise.all([q1, q2]).then(values => {
 			let new_data = {
 				pageNo: pageNo,
 				pageSize: pageSize,
 				totalPage: Math.ceil(values[0].results[0].totalPage / pageSize),
+				totalCount: values[0].results[0].totalPage,
 				lists: values[1].results
 			};
 			res.json(formater({code:'0', data:new_data}));
@@ -769,7 +840,7 @@ router.post('/uploadUserPhoto', verify_token, (req, res, next) => {
 	let user_id = req.api_user.data.user_id;
 	let collection_name = new Date().getFullYear() + '/' + new Date().getMonth() + '/' + 
 	new Date().getDate() + ' ' + new Date().getHours() + ':' + new Date().getMinutes() + 
-	':' + new Date().getSeconds() + ' 创建的新相册'
+	':' + new Date().getSeconds()
 	let post = {
 		user_id: user_id,
 		image_md5: _user.image_md5,

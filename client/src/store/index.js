@@ -57,9 +57,10 @@ const store = new Vuex.Store({
         commit('updateUserInfo', info)
       })
     },
-    getUserCollections ({commit}) {
+    getUserCollections ({commit, state}) {
       let data = {
-        token: localStorage.token,
+        user_id: state.userInfo.user_id,
+        request_user_id: state.userInfo.user_id,
         pageNo: 1,
         pageSize: 18000
       }

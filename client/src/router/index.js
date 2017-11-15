@@ -9,6 +9,7 @@ import UserCenter from '@/components/user/UserCenter'
 import UserProfile from '@/components/user/UserProfile'
 import Photo from '@/components/photos/Photo'
 import Collections from '@/components/CollectionHome'
+import Collection from '@/components/CollectionDetail'
 
 Vue.use(Router)
 
@@ -67,6 +68,11 @@ export default new Router({
       path: '/collections',
       name: 'collections',
       component: Collections
+    },
+    {
+      path: '/collection/*',
+      name: 'collection',
+      component: Collection
     }
   ]
 })

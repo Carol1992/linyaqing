@@ -286,7 +286,7 @@
           }
           this.noData = false
           for (let i = 0; i < lists.length; i++) {
-            lists[i].image_md5_new = lists[i].image_md5 + '?x-oss-process=image/auto-orient,1'
+            lists[i].image_md5_new = this.$store.state.urlBase + lists[i].image_md5 + this.$store.state.viewBase
             lists[i].isExif = true
             lists[i].isPic = false
             lists[i].isLoc = false
@@ -324,8 +324,12 @@
             return
           }
           if (xhr.status === 200) {
-            let imgUrl = host + '/' + startsWith + saveName
-            userOp.updateUserAccount.avatar(imgUrl, () => {
+            let data = {
+              saveName: saveName,
+              oldSaveName: this.info.saveName,
+              defaultImg: this.info.defaultImg
+            }
+            userOp.updateUserAccount.avatar(data, () => {
               self.$store.dispatch('getUserInfo')
             })
           }

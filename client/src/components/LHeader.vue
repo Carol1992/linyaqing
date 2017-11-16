@@ -149,9 +149,8 @@
                 return
               }
               if (xhr.status === 200) {
-                let imgUrl = host + '/' + startsWith + saveName
                 // 将图片设置为背景图片，组件上面有浮动层，用户可以填写照片的相关信息
-                self.$store.commit('getPhotoUrl', imgUrl)
+                self.$store.commit('getPhotoUrl', saveName)
                 self.$router.push('/addPhoto')
               }
             })

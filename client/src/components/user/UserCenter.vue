@@ -111,7 +111,7 @@
           }
           this.noData = false
           for (let i = 0; i < lists.length; i++) {
-            lists[i].image_md5 += '?x-oss-process=image/auto-orient,1'
+            lists[i].image_md5 = this.$store.state.urlBase + lists[i].image_md5 + this.$store.state.viewBase
             if (i % 3 === 0) {
               this.photos.group_a.push(lists[i])
             }
@@ -141,7 +141,7 @@
           }
           this.noData = false
           for (let i = 0; i < lists.length; i++) {
-            lists[i].image_md5 += '?x-oss-process=image/auto-orient,1'
+            lists[i].image_md5 = this.$store.state.urlBase + lists[i].image_md5 + this.$store.state.viewBase
             if (i % 3 === 0) {
               this.photos.group_a.push(lists[i])
             }
@@ -173,7 +173,7 @@
           for (let l of lists) {
             let newArr = []
             for (let image of l.images_list) {
-              image += '?x-oss-process=image/auto-orient,1'
+              image = this.$store.state.urlBase + image + this.$store.state.viewBase
               newArr.push(image)
             }
             l.images_list = newArr

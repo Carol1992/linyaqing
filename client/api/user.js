@@ -89,10 +89,12 @@ module.exports = {
 			  console.log(error)
 			});
 		},
-		avatar (avatar, callback) {
+		avatar (data, callback) {
 			axios.post('/api/updateUserAccount/avatar', {
 				token:localStorage.token,
-				image_md5:avatar
+				image_md5:data.saveName,
+				saveName: data.oldSaveName,
+				defaultImg: data.defaultImg
 			})
 			.then(function (response) {
 			  callback(response)

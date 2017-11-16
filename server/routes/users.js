@@ -159,11 +159,22 @@ router.post('/updateUserAccount/info', verify_token, (req, res, next) => {
 router.post('/updateUserAccount/avatar', verify_token, (req, res, next) => {
 	let user_id = req.api_user.data.user_id
 	let avatar = req.body.image_md5
+	let saveName = req.body.saveName
+	let defaultImg = req.body.defaultImg
 	if(!avatar) {
 		return res.json(formater({code:'1', desc:'图片不能为空！'}));
 	}
 	query('UPDATE users SET image_md5 = ? WHERE user_id = ?', [avatar, user_id])
 	.then((data) => {
+		if (!defaultImg) {
+			co(function* () {
+				client.useBucket('my-image-carol');
+			  var result = yield client.delete('users/' + saveName);
+			  console.log(result);
+			}).catch(function (err) {
+			  console.log(err);
+			});
+		}
 		res.json(formater({code:'0', desc:'用户头像修改成功！'}));
 	})
 })
@@ -196,15 +207,33 @@ router.all('/updateUserAccount/delete', verify_token, (req, res, next) => {
 	let post = {
 		user_id: req.api_user.data.user_id
 	};
-	query('DELETE FROM users WHERE user_id = ?', [post.user_id])
-	.then(function(data) {
-		if(data.results.affectedRows === 1) {
-  		res.json(formater({code:'0', desc:'账户删除成功！'}));
-  	} else {
-  		console.log('user not existed.');
-  		res.json(formater({code:'1', desc:'该用户不存在！'}));
-  	}
-	});
+	query('SELECT i.image_md5, u.image_md5 AS avatar FROM images i, users u WHERE '+
+		'i.user_id = u.user_id AND i.user_id = ?', [post.user_id])
+	.then(data => {
+		let results = data.results
+		let arr = []
+		if (results.length > 0) {
+			for (r of results) {
+				arr.push('users/' + r.image_md5)
+			}
+		}
+		arr.push('users/' + results[0].avatar)
+		co(function* () {
+			client.useBucket('my-image-carol');
+		  var result = yield client.deleteMulti(arr)
+		  console.log(result);
+		}).catch(function (err) {
+		  console.log(err);
+		});
+		query('DELETE FROM users WHERE user_id = ?', [post.user_id])
+		.then(function(data) {
+			if(data.results.affectedRows === 1) {
+	  		res.json(formater({code:'0', desc:'账户删除成功！'}));
+	  	} else {
+	  		res.json(formater({code:'1', desc:'该用户不存在！'}));
+	  	}
+		});
+	})
 });
 // 修改邮件设置
 router.post('/updateUserAccount/emailSettings', verify_token, (req, res, next) => {
@@ -285,21 +314,30 @@ router.all('/deleteUserPhoto', verify_token, (req, res, next) => {
 	if(!post.image_id) {
 		return res.json(formater({code:'1', desc:'请提供所要删除图片的id！'}));
 	}
-	query('SELECT image_id FROM images WHERE image_id = ? AND user_id = ?', [post.image_id, user_id])
+	query('SELECT image_id, image_md5 FROM images WHERE image_id = ? AND user_id = ?', [post.image_id, user_id])
 	.then(data => {
 		if(data.results.length === 0) {
 			return res.json(formater({code:'1', desc:'该图片不属于该用户！'}));
+		} else {
+			query('SELECT image_md5 FROM images WHERE image_id = ?', [post.image_id])
+			.then(data => {
+				co(function* () {
+					client.useBucket('my-image-carol');
+				  var result = yield client.delete('users/' + data.results[0].image_md5);
+				  console.log(result);
+				}).catch(function (err) {
+				  console.log(err);
+				});
+				query('DELETE FROM images WHERE image_id = ?', [post.image_id])
+				.then(function(data) {
+					if(data.results.affectedRows === 1) {
+						res.json(formater({code:'0', desc:'图片删除成功！'}));
+					} else {
+						res.json(formater({code:'1', desc:'图片不存在！'}));
+					}
+				});
+			})
 		}
-	})
-	.then(() => {
-		query('DELETE FROM images WHERE image_id = ?', [post.image_id])
-		.then(function(data) {
-			if(data.results.affectedRows === 1) {
-				res.json(formater({code:'0', desc:'图片删除成功！'}));
-			} else {
-				res.json(formater({code:'1', desc:'图片不存在！'}));
-			}
-		});
 	})
 });
 // 删除相册
@@ -313,17 +351,34 @@ router.all('/deleteCollection', verify_token, (req, res, next) => {
 	.then(data => {
 		if(data.results.length === 0) {
 			return res.json(formater({code:'1', desc:'该相册不属于该用户！'}));
+		} else {
+			query('SELECT ic.image_id, i.image_md5 FROM image_collection ic, images i WHERE '+
+				'ic.image_id = i.image_id AND ic.collection_id = ?', [collection_id])
+			.then(data => {
+				let results = data.results
+				let arr = []
+				if (results.length > 0) {
+					for (r of results) {
+						arr.push('users/' + r.image_md5)
+					}
+				}
+				co(function* () {
+					client.useBucket('my-image-carol');
+				  var result = yield client.deleteMulti(arr)
+				  console.log(result);
+				}).catch(function (err) {
+				  console.log(err);
+				});
+				query('DELETE FROM collections WHERE collection_id = ?', [collection_id])
+				.then(function(data) {
+					if(data.results.affectedRows === 1) {
+						res.json(formater({code:'0', desc:'相册删除成功！'}));
+					} else {
+						res.json(formater({code:'1', desc:'相册不存在！'}));
+					}
+				});
+			})
 		}
-	})
-	.then(() => {
-		query('DELETE FROM collections WHERE collection_id = ?', [collection_id])
-		.then(function(data) {
-			if(data.results.affectedRows === 1) {
-				res.json(formater({code:'0', desc:'相册删除成功！'}));
-			} else {
-				res.json(formater({code:'1', desc:'相册不存在！'}));
-			}
-		});
 	})
 })
 // 用户添加应用
@@ -847,7 +902,6 @@ router.all('/addToCollection', verify_token, (req, res, next) => {
 	}
 	query('SELECT collection_id FROM collections WHERE user_id = ? AND collection_id = ?', [user_id, post.collection_id])
 	.then(data => {
-		console.log(data)
 		if (data.results.length === 0) {
 			return res.json(formater({code: '1', desc: '该相册不属于该用户！'}))
 		}

@@ -7,6 +7,8 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
   state: {
+    urlBase: 'http://my-image-carol.oss-cn-beijing.aliyuncs.com/users/',
+    viewBase: '?x-oss-process=image/auto-orient,1',
     emailSettings: '',
     followers: [],
     followings: [],
@@ -63,12 +65,17 @@ const store = new Vuex.Store({
     }
   },
   actions: {
-    getUserInfo ({ commit }) {
+    getUserInfo ({ commit, state }) {
       return new Promise((resolve, reject) => {
         userOp.getUserInfo({}, (res) => {
           let info = res.data.data
+          info.saveName = info.image_md5
           if (info.image_md5 === 'null' || !info.image_md5) {
             info.image_md5 = require('@/assets/img/user_default.jpg')
+            info.defaultImg = true
+          } else {
+            info.image_md5 = state.urlBase + info.image_md5 + state.viewBase
+            info.defaultImg = false
           }
           commit('UpdateEmailSettings', info.email_settings)
           commit('updateFollowings', info.followings)
@@ -95,7 +102,13 @@ const store = new Vuex.Store({
         user_id: ownerId
       }
       userOp.getUserInfo(data, (res) => {
-        commit('updateOwnerInfo', res.data.data[0])
+        let info = res.data.data[0]
+        if (info.image_md5 === 'null' || !info.image_md5) {
+          info.image_md5 = require('@/assets/img/user_default.jpg')
+        } else {
+          info.image_md5 = state.urlBase + info.image_md5 + state.viewBase
+        }
+        commit('updateOwnerInfo', info)
       })
     }
   },

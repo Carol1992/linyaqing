@@ -8,7 +8,8 @@
       <div class="collection_owner">
         <img :src='collectionInfo.owner_avatar' alt="" @click='gotoUserCenter'>
         <span class="name" @click='gotoUserCenter'>{{collectionInfo.collection_owner}}</span>
-        <span class='follow' v-if='notMe' @click='followMe'><Icon type="person-add"></Icon>{{followMsg}}</span>
+        <span class='follow' v-if='notMe && !followed' @click='followMe'><Icon type="person-add"></Icon> 关注</span>
+        <span class='follow followed' v-if='notMe && followed' @click='notFollowMe'><Icon type="person"></Icon> 取消关注</span>
       </div>
     </div>
     <div class="photos">
@@ -16,7 +17,7 @@
       <Photos :photos="photos"></Photos>
     </div>
     <Edit v-if='showEdit' :collectionInfo='collectionInfo' @closeBox='closeBox' 
-    @successModify='successModify'></Edit>
+    @successModify='successModify' @successDelete='successDelete'></Edit>
   </div>
 </template>
 
@@ -81,10 +82,20 @@
         this.notifyMsg = '相册信息更新成功！'
         this.success(true)
       },
+      successDelete () {
+        this.notifyMsg = '成功删除相册！'
+        this.success(true)
+        this.$router.push({path: `/userCenter/${this.info.user_id}`})
+      },
       followMe () {
         photoOp.updatePhotographers({followings: this.collectionInfo.owner_id.toString()}, (res) => {
           this.followed = true
           this.followMsg = '已关注'
+        })
+      },
+      notFollowMe () {
+        photoOp.updatePhotographers_rm({following_id: this.collectionInfo.owner_id}, (res) => {
+          this.followed = false
         })
       },
       editCollection () {
@@ -111,7 +122,8 @@
           if (!lists[0].owner_avatar) {
             this.collectionInfo.owner_avatar = require('@/assets/img/user_default.jpg')
           } else {
-            this.collectionInfo.owner_avatar = lists[0].owner_avatar
+            this.collectionInfo.owner_avatar = this.$store.state.urlBase + lists[0].owner_avatar +
+            this.$store.state.viewBase
           }
           if (this.collectionInfo.owner_id === this.info.user_id) {
             this.notMe = false
@@ -125,7 +137,7 @@
             }
           }
           for (let i = 0; i < lists.length; i++) {
-            lists[i].image_md5 += '?x-oss-process=image/auto-orient,1'
+            lists[i].image_md5 = this.$store.state.urlBase + lists[i].image_md5 + this.$store.state.viewBase
             if (i % 3 === 0) {
               this.photos.group_a.push(lists[i])
             }
@@ -220,15 +232,20 @@
     cursor: pointer;
     color: #fff;
     display: inline-block;
-    /*border: 1px solid #999;*/
     border-radius: 5px;
     padding: 2px 8px;
-    background-color: #3CB46E
+    background-color: #3CB46E;
+    font-size: 16px;
   }
   .follow:hover {
-    /*border-color:#111;*/
-    /*color: #111;*/
     background-color: #44ce7d;
+  }
+  .followed {
+    background-color: grey;
+    color: #fff;
+  }
+  .followed:hover {
+    background-color: #979797;
   }
   .private-lock {
     font-size: 20px;

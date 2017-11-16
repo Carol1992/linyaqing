@@ -36,7 +36,7 @@
           for (let l of lists) {
             let newArr = []
             for (let image of l.images_list) {
-              image += '?x-oss-process=image/auto-orient,1'
+              image = this.$store.state.urlBase + image + this.$store.state.viewBase
               newArr.push(image)
             }
             l.images_list = newArr

@@ -106,7 +106,7 @@ export default {
         let lists = res.data.data.lists
         this.noFollowing = false
         for (let i = 0; i < lists.length; i++) {
-          lists[i].image_md5 += '?x-oss-process=image/auto-orient,1'
+          lists[i].image_md5 = this.$store.state.urlBase + lists[i].image_md5 + this.$store.state.viewBase
           if (i % 3 === 0) {
             this.photos.group_a.push(lists[i])
           }
@@ -128,7 +128,7 @@ export default {
         let lists = res.data.data.lists
         this.noFollowing = false
         for (let i = 0; i < lists.length; i++) {
-          lists[i].image_md5 += '?x-oss-process=image/auto-orient,1'
+          lists[i].image_md5 = this.$store.state.urlBase + lists[i].image_md5 + this.$store.state.viewBase
           if (i % 3 === 0) {
             this.photos.group_a.push(lists[i])
           }
@@ -155,7 +155,7 @@ export default {
         }
         this.noFollowing = false
         for (let i = 0; i < lists.length; i++) {
-          lists[i].image_md5 += '?x-oss-process=image/auto-orient,1'
+          lists[i].image_md5 = this.$store.state.urlBase + lists[i].image_md5 + this.$store.state.viewBase
           if (i % 3 === 0) {
             this.photos.group_a.push(lists[i])
           }

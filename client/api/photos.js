@@ -100,6 +100,18 @@ module.exports = {
 		  console.log(error)
 		});
 	},
+	deleteCollection (data, callback) {
+		axios.post('/api/deleteCollection', {
+			token:localStorage.token,
+			collection_id: data.collection_id
+		})
+		.then(function (response) {
+		  callback(response)
+		})
+		.catch(function (error) {
+		  console.log(error)
+		});
+	},
 	getCollection: {
 		all (data, callback) {
 			axios.post('/api/getCollection/all', data)

@@ -103,12 +103,24 @@ router.all('/getUserInfo', verify_token, (req, res, next) => {
 	} else {
 		let q1 = query('SELECT * FROM users WHERE user_id = ?', [user_id]);
 		let q2 = query('SELECT settings_id FROM user_email WHERE user_id = ?', [user_id]);
-		Promise.all([q1, q2]).then(values => {
+		let q3 = query('SELECT following_id FROM relationships WHERE user_id = ?', [user_id]);
+		let q4 = query('SELECT user_id AS follower_id FROM relationships WHERE following_id = ?', [user_id]);
+		Promise.all([q1, q2, q3, q4]).then(values => {
 			let settings = []
-			for(s of values[1].results) {
+			let followings = [] // 我的关注
+			let followers = [] // 我的粉丝
+			for(let s of values[1].results) {
 				settings.push(s.settings_id)
 			}
+			for(let f of values[2].results) {
+				followings.push(f.following_id)
+			}
+			for(let fr of values[3].results) {
+				followers.push(fr.follower_id)
+			}
 			values[0].results[0].email_settings = settings.toString()
+			values[0].results[0].followings = followings.toString()
+			values[0].results[0].followers = followers.toString()
 			res.json(formater({code:'0', data:values[0].results[0]}))
 		})
 	}
@@ -363,9 +375,9 @@ router.post('/updatePhotographers', verify_token, (req, res, next) => {
 		let s = [user_id, setting];
 		user_settings.push(s);
 	}
-	query('DELETE FROM relationships WHERE user_id = ?', [user_id])
+	query('DELETE FROM relationships WHERE user_id = ? AND following_id = ?', [user_id, user_settings[0][1]])
 	.then(function() {
-		query('INSERT IGNORE INTO relationships(user_id, follower_id) VALUES ?', [user_settings])
+		query('INSERT INTO relationships(user_id, following_id) VALUES ?', [user_settings])
 		.then(function(data) {
 			res.json(formater({code:'0', desc:'摄影师列表更新成功！'}));
 		})
@@ -378,7 +390,7 @@ router.all('/getPhotographers', (req, res, next) => {
 	let pageSize = +_user.pageSize || +req.query.pageSize || 25;
 	let _left = (pageNo - 1) * pageSize;
 	query('SELECT users.user_id, users.user_name, users.image_md5, users.wechat, a.follower_nums FROM '+
-		'users LEFT OUTER JOIN (SELECT user_id, COUNT(follower_id) AS follower_nums FROM relationships '+
+		'users LEFT OUTER JOIN (SELECT user_id, COUNT(following_id) AS follower_nums FROM relationships '+
 		'GROUP BY user_id) a ON a.user_id = users.user_id ORDER BY a.follower_nums DESC LIMIT ?,?', [_left, pageSize])
 	.then(function(data) {
 		res.json(formater({code:'0', data: data.results}));
@@ -496,16 +508,16 @@ router.all('/getList/following', verify_token, (req, res, next) => {
 	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
 	let q1 = query('SELECT COUNT(*) AS totalPage FROM (SELECT i.*, u.user_name, u.image_md5 AS avatar, '+
-		'u.email, c.is_private, likes.total_likes FROM images i JOIN (SELECT r.follower_id FROM relationships r '+
-		'WHERE r.user_id = ?) follow ON i.user_id = follow.follower_id JOIN users u ON i.user_id = u.user_id '+
-		'JOIN image_collection ic ON i.image_id = ic.collection_id JOIN collections c ON '+
+		'u.email, c.is_private, likes.total_likes FROM images i JOIN (SELECT r.following_id FROM relationships r '+
+		'WHERE r.user_id = ?) follow ON i.user_id = follow.following_id JOIN users u ON i.user_id = u.user_id '+
+		'JOIN image_collection ic ON i.image_id = ic.image_id JOIN collections c ON '+
 		'ic.collection_id = c.collection_id LEFT OUTER JOIN (SELECT l.image_id, COUNT(l.user_id) AS '+
 		'total_likes FROM image_likes l GROUP BY image_id) likes ON i.image_id = likes.image_id '+
 		'WHERE c.is_private = 1 GROUP BY ic.image_id ORDER BY likes.total_likes DESC) a', [user_id])
 	let q2 = query('SELECT i.*, u.user_name, u.image_md5 AS avatar, '+
-		'u.email, c.is_private, likes.total_likes FROM images i JOIN (SELECT r.follower_id FROM relationships r '+
-		'WHERE r.user_id = ?) follow ON i.user_id = follow.follower_id JOIN users u ON i.user_id = u.user_id '+
-		'JOIN image_collection ic ON i.image_id = ic.collection_id JOIN collections c ON '+
+		'u.email, c.is_private, likes.total_likes FROM images i JOIN (SELECT r.following_id FROM relationships r '+
+		'WHERE r.user_id = ?) follow ON i.user_id = follow.following_id JOIN users u ON i.user_id = u.user_id '+
+		'JOIN image_collection ic ON i.image_id = ic.image_id JOIN collections c ON '+
 		'ic.collection_id = c.collection_id LEFT OUTER JOIN (SELECT l.image_id, COUNT(l.user_id) AS '+
 		'total_likes FROM image_likes l GROUP BY image_id) likes ON i.image_id = likes.image_id '+
 		'WHERE c.is_private = 1 GROUP BY ic.image_id ORDER BY likes.total_likes DESC LIMIT ?,?', [user_id, _left, pageSize])
@@ -590,7 +602,7 @@ router.all('/getList/liked', (req, res, next) => {
 				'u.email, c.collection_id, c.collection_name, c.is_private, c.user_id AS collection_owner_id '+
 				'FROM images i JOIN users u ON i.user_id = u.user_id JOIN (SELECT l.image_id, likes.total_likes '+
 				'FROM image_likes l, (SELECT l.image_id, COUNT(l.user_id) AS total_likes FROM image_likes l '+
-				'GROUP BY l.image_id) likes WHERE l.user_id = ? AND l.imasge_id = likes.image_id) my_likes ON '+
+				'GROUP BY l.image_id) likes WHERE l.user_id = ? AND l.image_id = likes.image_id) my_likes ON '+
 				'i.image_id = my_likes.image_id JOIN image_collection ic ON i.image_id = ic.image_id JOIN '+
 				'collections c ON ic.collection_id = c.collection_id GROUP BY i.image_id', [request_user_id])
 	     }
@@ -665,7 +677,7 @@ router.all('/getCollection/user', (req, res, next) => {
 	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
 	let q2 = query('SELECT u.user_id, u.user_name, u.image_md5 AS avatar, ic.collection_id, '+
-		'c.collection_name, c.is_private, ic.image_id, i.image_md5 FROM users u, '+
+		'c.collection_name, c.collection_desc, c.is_private, ic.image_id, i.image_md5 FROM users u, '+
 		'image_collection ic, collections c, images i WHERE ic.collection_id = c.collection_id AND '+
 		'ic.image_id = i.image_id AND u.user_id = c.user_id AND i.user_id = ? AND c.is_private = 1 '+
 		'ORDER BY ic.collection_id DESC', [request_user_id]);
@@ -739,11 +751,12 @@ router.all('/getCollection/one', (req, res, next) => {
 			return res.json(formater({code: '1', desc: '该私密相册不属于该用户，不能被访问！'}))
 		}
 		let q1 = query('SELECT COUNT(*) AS totalPage FROM (SELECT i.*, u.user_id AS owner_id, u.user_name AS '+
-			'collection_owner, u.image_md5 AS owner_avatar, u.email AS owner_email, c.collection_name FROM '+
+			'collection_owner, u.image_md5 AS owner_avatar, u.email AS owner_email, c.collection_id AS collectionId, c.collection_name, c.is_private FROM '+
 			'images i, users u, image_collection ic, collections c WHERE c.user_id = u.user_id AND '+
 			'i.image_id = ic.image_id AND c.collection_id = ic.collection_id AND ic.collection_id = ?) a', [collection_id]);
 		let q2 = query('SELECT i.*, u.user_id AS owner_id, u.user_name AS '+
-			'collection_owner, u.image_md5 AS owner_avatar, u.email AS owner_email, c.collection_name FROM '+
+			'collection_owner, u.image_md5 AS owner_avatar, u.email AS owner_email, c.collection_id AS '+
+			'collectionId, c.collection_name, c.is_private, c.collection_name FROM '+
 			'images i, users u, image_collection ic, collections c WHERE c.user_id = u.user_id AND '+
 			'i.image_id = ic.image_id AND c.collection_id = ic.collection_id AND ic.collection_id = ? LIMIT ?,?', [collection_id, _left, pageSize]);
 		Promise.all([q1, q2]).then(values => {

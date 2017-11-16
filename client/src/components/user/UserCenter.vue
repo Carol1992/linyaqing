@@ -3,11 +3,11 @@
     <div class="top">
       <div class="user">
         <div class="avatar">
-          <img :src='info.image_md5' alt="">
+          <img :src='ownerInfo.image_md5' alt="">
         </div>
         <div class="name">
-          <span>{{info.user_name}}</span>
-          <span class="more" @click='gotoProfile'><span>账户设置</span></span>
+          <span>{{ownerInfo.user_name}}</span>
+          <span class="more" @click='gotoProfile' v-if='isMe'><span>账户设置</span></span>
         </div>
       </div>
     </div>
@@ -30,6 +30,7 @@
 </template>
 
 <script>
+  import userOp from '../../../api/user'
   import photoOp from '../../../api/photos'
   import Photos from '../photos/Photos'
   import Collections from '../photos/Collections'
@@ -56,7 +57,12 @@
         pageSize: 18000,
         collections: [],
         noData: false,
-        noDataMsg: '您还没有上传过照片:)'
+        noDataMsg: '您还没有上传过照片:)',
+        isMe: false,
+        ownerInfo: {
+          user_name: '',
+          image_md5: ''
+        }
       }
     },
     components: {
@@ -95,8 +101,8 @@
       },
       getList_user () {
         let data = {
-          user_id: this.info.user_id,
-          request_user_id: this.info.user_id,
+          token: localStorage.token,
+          request_user_id: this.$route.params[0],
           pageNo: this.currentPage1,
           pageSize: this.pageSize
         }
@@ -125,8 +131,8 @@
       },
       getList_liked () {
         let data = {
-          user_id: this.info.user_id,
-          request_user_id: this.info.user_id,
+          token: localStorage.token,
+          request_user_id: this.$route.params[0],
           pageNo: this.currentPage2,
           pageSize: this.pageSize
         }
@@ -155,8 +161,8 @@
       },
       getCollection_user () {
         let data = {
-          user_id: this.info.user_id,
-          request_user_id: this.info.user_id,
+          token: localStorage.token,
+          request_user_id: this.$route.params[0],
           pageNo: this.currentPage3,
           pageSize: this.pageSize
         }
@@ -179,6 +185,15 @@
             this.collections.push(l)
           }
         })
+      },
+      getOwnerInfo () {
+        let data = {
+          user_id: this.$route.params[0]
+        }
+        userOp.getUserInfo(data, (res) => {
+          this.ownerInfo.user_name = res.data.data[0].user_name
+          this.ownerInfo.image_md5 = res.data.data[0].image_md5
+        })
       }
     },
     computed: {
@@ -196,11 +211,18 @@
         this.$store.commit('isLogin', false)
       }
       if (this.login) {
-        this.$store.dispatch('getUserInfo')
+        this.$store.dispatch('getUserInfo').then(() => {
+          if (this.info.user_id === this.$route.params[0]) {
+            this.isMe = true
+          } else {
+            this.isMe = false
+          }
+        })
       }
       this.getList_user()
       this.getList_liked()
       this.getCollection_user()
+      this.getOwnerInfo()
     }
   }
 </script>

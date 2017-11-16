@@ -33,10 +33,9 @@ module.exports = {
 		  console.log(error)
 		});
 	},
-	getUserInfo (callback) {
-		axios.post('/api/getUserInfo', {
-			token:localStorage.token,
-		})
+	getUserInfo (data, callback) {
+		data.token = localStorage.token
+		axios.post('/api/getUserInfo', data)
 		.then(function (response) {
 		  callback(response)
 		})

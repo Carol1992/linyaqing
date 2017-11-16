@@ -68,8 +68,8 @@
           password: this.password
         }
         userOp.login(data, (res) => {
-          if (JSON.stringify(res.data.data) === '{}') {
-            this.notifyMsg = '邮箱或密码错误！'
+          if (res.data.code === '1') {
+            this.notifyMsg = res.data.desc
             this.error(true)
             return
           }

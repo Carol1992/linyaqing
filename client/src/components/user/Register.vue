@@ -84,6 +84,11 @@
           password: this.password
         }
         userOp.register(data, (res) => {
+          if (res.data.code === '1') {
+            this.notifyMsg = res.data.desc
+            this.error(true)
+            return
+          }
           userOp.login(data, (res) => {
             this.$router.push('/')
           })

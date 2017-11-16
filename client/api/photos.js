@@ -29,13 +29,13 @@ module.exports = {
 		  console.log(error)
 		});	
 	},
-	updatePhotographers () {
+	updatePhotographers (data, callback) {
 		axios.post('/api/updatePhotographers', {
 			token:localStorage.token,
-			followings:'1,2,3,4'
+			followings:data.followings
 		})
 		.then(function (response) {
-		  console.log(response)
+		  callback(response)
 		})
 		.catch(function (error) {
 		  console.log(error)
@@ -116,6 +116,16 @@ module.exports = {
 			  console.log(error)
 			});	
 		}
+	},
+	updateCollection (data, callback) {
+		data.token = localStorage.token
+		axios.post('/api/updateCollection', data)
+		.then(function (response) {
+		  callback(response)
+		})
+		.catch(function (error) {
+		  console.log(error)
+		});	
 	},
 	getList: {
 		new (data, callback) {

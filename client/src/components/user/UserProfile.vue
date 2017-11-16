@@ -274,7 +274,8 @@
         let data = {
           token: localStorage.token,
           pageNo: this.currentPage1,
-          pageSize: this.pageSize
+          pageSize: this.pageSize,
+          request_user_id: this.info.user_id
         }
         photoOp.getList.user(data, (res) => {
           let lists = res.data.data.lists

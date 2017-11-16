@@ -78,7 +78,7 @@
       },
       gotoUserCenter () {
         this.$store.commit('getHeaderInfo', {isStore: false, isCollections: false})
-        this.$router.push({path: `/userCenter/${this.info.user_name}`})
+        this.$router.push({path: `/userCenter/${this.info.user_id}`})
       },
       gotoCollections () {
         this.$store.commit('getHeaderInfo', {isStore: false, isCollections: true})
@@ -90,6 +90,10 @@
         this.success(true)
       },
       uploadPhoto () {
+        if (!this.login) {
+          this.$router.push('/login')
+          return
+        }
         this.$store.commit('getHeaderInfo', {isStore: false, isCollections: false})
         document.getElementById('uploadPhoto').click()
       },

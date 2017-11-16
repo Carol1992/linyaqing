@@ -57,8 +57,9 @@
         c.showCover = false
       },
       getPhotos (c) {
-        const collectionId = c.collection_id
-        this.$router.push({path: `/collection/${collectionId}`})
+        let collectionId = c.collection_id
+        let userId = c.user_id
+        this.$router.push({path: `/collection/${userId}/${collectionId}`})
       }
     }
   }

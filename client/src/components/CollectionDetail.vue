@@ -2,24 +2,28 @@
   <div class="container">
     <div class="intro">
       <div class="collection_name">
-        {{collection_name}}
+        {{collectionInfo.collection_name}} <Icon type="locked" v-if='collectionInfo.is_private' class='private-lock'></Icon>
+        <span class="edit" v-if='!notMe' @click='editCollection'><Icon type="edit"></Icon> 编辑</span>
       </div>
       <div class="collection_owner">
-        <img :src='owner_avatar' alt="">
-        <span>{{collection_owner}}</span>
-        <Icon type="person-add" class='follow'></Icon>
+        <img :src='collectionInfo.owner_avatar' alt="" @click='gotoUserCenter'>
+        <span class="name" @click='gotoUserCenter'>{{collectionInfo.collection_owner}}</span>
+        <span class='follow' v-if='notMe' @click='followMe'><Icon type="person-add"></Icon>{{followMsg}}</span>
       </div>
     </div>
     <div class="photos">
       <div class="counts">{{totalCount}} 张照片</div>
       <Photos :photos="photos"></Photos>
     </div>
+    <Edit v-if='showEdit' :collectionInfo='collectionInfo' @closeBox='closeBox' 
+    @successModify='successModify'></Edit>
   </div>
 </template>
 
 <script>
   import photoOp from '../../api/photos'
-  import Photos from './photos/Photos.vue'
+  import Photos from './photos/Photos'
+  import Edit from './photos/editCollection'
   export default {
     name: 'CollectionDetail',
     data () {
@@ -32,35 +36,93 @@
         totalCount: '',
         currentPageNo: 1,
         currentPageSize: 18000,
-        collection_owner: '',
-        owner_id: '',
-        owner_avatar: '',
-        owner_email: '',
-        collection_name: ''
+        notMe: false,
+        followMsg: ' 关注',
+        followed: false,
+        showEdit: false,
+        collectionInfo: {
+          collection_id: '',
+          collection_owner: '',
+          owner_id: '',
+          owner_avatar: '',
+          owner_email: '',
+          collection_name: '',
+          is_private: false,
+          collection_desc: ''
+        },
+        notifyMsg: ''
       }
     },
     components: {
-      Photos
+      Photos,
+      Edit
     },
     methods: {
+      success (nodesc) {
+        this.$Notice.success({
+          title: this.notifyMsg,
+          desc: nodesc ? '' : ''
+        })
+      },
+      error (nodesc) {
+        this.$Notice.error({
+          title: this.notifyMsg,
+          desc: nodesc ? '' : ''
+        })
+      },
+      gotoUserCenter () {
+        this.$router.push({path: `/userCenter/${this.collectionInfo.owner_id}`})
+      },
+      closeBox () {
+        this.showEdit = false
+      },
+      successModify () {
+        this.showEdit = false
+        this.notifyMsg = '相册信息更新成功！'
+        this.success(true)
+      },
+      followMe () {
+        photoOp.updatePhotographers({followings: this.collectionInfo.owner_id.toString()}, (res) => {
+          this.followed = true
+          this.followMsg = '已关注'
+        })
+      },
+      editCollection () {
+        this.showEdit = true
+      },
       getPhotos () {
+        let params = this.$route.params[0]
+        this.collectionInfo.collection_id = params.split('/')[1]
         let data = {
-          user_id: this.info.user_id,
-          collection_id: this.$route.params[0],
+          user_id: params.split('/')[0],
+          collection_id: params.split('/')[1],
           pageNo: this.currentPageNo,
           pageSize: this.currentPageSize
         }
         photoOp.getCollection.one(data, (res) => {
           this.totalCount = res.data.data.totalCount
           let lists = res.data.data.lists
-          this.collection_owner = lists[0].collection_owner
-          this.collection_name = lists[0].collection_name
-          this.owner_email = lists[0].owner_email
-          this.owner_id = lists[0].owner_id
+          this.collectionInfo.collection_owner = lists[0].collection_owner
+          this.collectionInfo.collection_name = lists[0].collection_name
+          this.collectionInfo.owner_email = lists[0].owner_email
+          this.collectionInfo.owner_id = lists[0].owner_id
+          this.collectionInfo.is_private = lists[0].is_private === '0'
+          this.collectionInfo.collection_desc = lists[0].collection_desc
           if (!lists[0].owner_avatar) {
-            this.owner_avatar = require('@/assets/img/user_default.jpg')
+            this.collectionInfo.owner_avatar = require('@/assets/img/user_default.jpg')
           } else {
-            this.owner_avatar = lists[0].owner_avatar
+            this.collectionInfo.owner_avatar = lists[0].owner_avatar
+          }
+          if (this.collectionInfo.owner_id === this.info.user_id) {
+            this.notMe = false
+          } else {
+            this.notMe = true
+          }
+          for (let f of this.followings) {
+            if (f === this.collectionInfo.owner_id.toString()) {
+              this.followed = true
+              this.followMsg = '已关注'
+            }
           }
           for (let i = 0; i < lists.length; i++) {
             lists[i].image_md5 += '?x-oss-process=image/auto-orient,1'
@@ -84,9 +146,10 @@
         this.$store.commit('isLogin', false)
       }
       if (this.login) {
-        this.$store.dispatch('getUserInfo')
+        this.$store.dispatch('getUserInfo').then(() => {
+          this.getPhotos()
+        })
       }
-      this.getPhotos()
     },
     computed: {
       info () {
@@ -94,6 +157,9 @@
       },
       login () {
         return this.$store.state.alreadyLogin
+      },
+      followings () {
+        return this.$store.state.followings.split(',')
       }
     }
   }
@@ -134,7 +200,7 @@
     overflow: hidden;
     vertical-align: middle;
   }
-  .collection_owner span {
+  .name {
     vertical-align: middle;
     line-height: 40px;
     overflow: hidden;
@@ -146,15 +212,49 @@
     margin-left: 10px;
     margin-right: 10px;
   }
-  .collection_owner span:hover {
+  .name:hover {
     color:#111;
   }
   .follow {
     vertical-align: middle;
     cursor: pointer;
-    color: #999;
+    color: #fff;
+    display: inline-block;
+    /*border: 1px solid #999;*/
+    border-radius: 5px;
+    padding: 2px 8px;
+    background-color: #3CB46E
   }
   .follow:hover {
-    color:#111;
+    /*border-color:#111;*/
+    /*color: #111;*/
+    background-color: #44ce7d;
+  }
+  .private-lock {
+    font-size: 20px;
+  }
+  .edit {
+    font-size: 18px;
+    display: inline-block;
+    border-radius: 5px;
+    border: 1px solid #999;
+    vertical-align: middle;
+    padding: 2px 5px;
+    cursor: pointer;
+    color: #999;
+  }
+  .edit:hover {
+    border-color: #111;
+    color: #111;
+  }
+  @media screen and (max-width: 809px) {
+    .collection_name {
+      font-size: 28px;
+    }
+    .edit {
+      margin-left: 0;
+      display: block;
+      margin-top: 10px;
+    }
   }
 </style>

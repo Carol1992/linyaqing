@@ -8,6 +8,8 @@ Vue.use(Vuex)
 const store = new Vuex.Store({
   state: {
     emailSettings: '',
+    followers: [],
+    followings: [],
     userInfo: {},
     alreadyLogin: false,
     photoInfo: {},
@@ -44,22 +46,33 @@ const store = new Vuex.Store({
     },
     updateUserCollections (state, collections) {
       state.userCollections = collections
+    },
+    updateFollowings (state, info) {
+      state.followings = info
+    },
+    updateFollowers (state, info) {
+      state.followers = info
     }
   },
   actions: {
     getUserInfo ({ commit }) {
-      userOp.getUserInfo((res) => {
-        let info = res.data.data
-        if (info.image_md5 === 'null' || !info.image_md5) {
-          info.image_md5 = require('@/assets/img/user_default.jpg')
-        }
-        commit('UpdateEmailSettings', info.email_settings)
-        commit('updateUserInfo', info)
+      return new Promise((resolve, reject) => {
+        userOp.getUserInfo({}, (res) => {
+          let info = res.data.data
+          if (info.image_md5 === 'null' || !info.image_md5) {
+            info.image_md5 = require('@/assets/img/user_default.jpg')
+          }
+          commit('UpdateEmailSettings', info.email_settings)
+          commit('updateFollowings', info.followings)
+          commit('updateFollowers', info.followers)
+          commit('updateUserInfo', info)
+          resolve()
+        })
       })
     },
     getUserCollections ({commit, state}) {
       let data = {
-        user_id: state.userInfo.user_id,
+        token: localStorage.token,
         request_user_id: state.userInfo.user_id,
         pageNo: 1,
         pageSize: 18000

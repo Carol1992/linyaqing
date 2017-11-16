@@ -3,7 +3,7 @@
     <div class="myheader">
       <LHeader></LHeader>
     </div>
-    <router-view/>
+    <router-view :key="key"/>
   </div>
 </template>
 
@@ -16,6 +16,11 @@ export default {
   },
   data () {
     return {}
+  },
+  computed: {
+    key () {
+      return this.$route.name !== undefined ? this.$route.name + +new Date() : this.$route + +new Date()
+    }
   }
 }
 </script>

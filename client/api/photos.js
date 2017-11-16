@@ -30,9 +30,21 @@ module.exports = {
 		});	
 	},
 	updatePhotographers (data, callback) {
-		axios.post('/api/updatePhotographers', {
+		axios.post('/api/updatePhotographers/add', {
 			token:localStorage.token,
 			followings:data.followings
+		})
+		.then(function (response) {
+		  callback(response)
+		})
+		.catch(function (error) {
+		  console.log(error)
+		});	
+	},
+	updatePhotographers_rm (data, callback) {
+		axios.post('/api/updatePhotographers/rm', {
+			token:localStorage.token,
+			following_id:data.following_id
 		})
 		.then(function (response) {
 		  callback(response)

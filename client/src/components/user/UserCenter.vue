@@ -30,7 +30,6 @@
 </template>
 
 <script>
-  import userOp from '../../../api/user'
   import photoOp from '../../../api/photos'
   import Photos from '../photos/Photos'
   import Collections from '../photos/Collections'
@@ -58,11 +57,7 @@
         collections: [],
         noData: false,
         noDataMsg: '您还没有上传过照片:)',
-        isMe: false,
-        ownerInfo: {
-          user_name: '',
-          image_md5: ''
-        }
+        isMe: false
       }
     },
     components: {
@@ -185,15 +180,6 @@
             this.collections.push(l)
           }
         })
-      },
-      getOwnerInfo () {
-        let data = {
-          user_id: this.$route.params[0]
-        }
-        userOp.getUserInfo(data, (res) => {
-          this.ownerInfo.user_name = res.data.data[0].user_name
-          this.ownerInfo.image_md5 = res.data.data[0].image_md5
-        })
       }
     },
     computed: {
@@ -202,6 +188,9 @@
       },
       login () {
         return this.$store.state.alreadyLogin
+      },
+      ownerInfo () {
+        return this.$store.state.ownerInfo
       }
     },
     mounted () {
@@ -212,7 +201,7 @@
       }
       if (this.login) {
         this.$store.dispatch('getUserInfo').then(() => {
-          if (this.info.user_id === this.$route.params[0]) {
+          if (this.info.user_id === +this.$route.params[0]) {
             this.isMe = true
           } else {
             this.isMe = false
@@ -222,7 +211,7 @@
       this.getList_user()
       this.getList_liked()
       this.getCollection_user()
-      this.getOwnerInfo()
+      this.$store.dispatch('getOwnerInfo', this.$route.params[0])
     }
   }
 </script>

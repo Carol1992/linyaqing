@@ -181,7 +181,7 @@
           this.$store.dispatch('getUserCollections')
           this.$store.commit('updateShowAddToCollection', true)
           photoOp.uploadUserPhoto(this.photoInfo, (res) => {
-            this.$router.push({path: `/userCenter/${this.info.user_name}`})
+            this.$router.push({path: `/userCenter/${this.info.user_id}`})
           })
         }
       },

@@ -831,3 +831,31 @@ data: post: {
 }
 
 53. 点赞、评论图片，将图片加入收藏，用websocket通知图片的所有者
+
+54. 取消关注某人
+url:'/updatePhotographers/remove'
+data: post: {
+	token: '',
+	following_id: ''
+}
+
+55. 用户删除图片、相册、账户时，阿里云上相关联的图片也要删除
+co(function* () {
+  var result = yield client.deleteMulti(['obj-1', 'obj-2', 'obj-3']);
+  console.log(result);
+  var result = yield client.deleteMulti(['obj-1', 'obj-2', 'obj-3'], {
+    quiet: true
+  });
+  console.log(result);
+}).catch(function (err) {
+  console.log(err);
+});
+
+56. 删除相册
+url: '/deleteCollection'
+data: post: {
+	token: '',
+	collection_id:''
+}
+
+57. 用户把相册里的图片都删除后，相册是不存在的

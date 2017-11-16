@@ -12,6 +12,7 @@ let verify_token= require('./verify_token');
 var my_secret = require('./secret');
 var co = require('co');
 var OSS = require('ali-oss');
+var fs = require('fs');
 var client = new OSS({
   region: my_secret.region,
   accessKeyId: my_secret.accessKeyId,
@@ -301,6 +302,30 @@ router.all('/deleteUserPhoto', verify_token, (req, res, next) => {
 		});
 	})
 });
+// 删除相册
+router.all('/deleteCollection', verify_token, (req, res, next) => {
+	let user_id = req.api_user.data.user_id;
+	let collection_id = req.body.collection_id || req.query.collection_id;
+	if(!collection_id) {
+		return res.json(formater({code:'1', desc:'请提供所要删除相册的id！'}));
+	}
+	query('SELECT collection_id FROM collections WHERE collection_id = ? AND user_id = ?', [collection_id, user_id])
+	.then(data => {
+		if(data.results.length === 0) {
+			return res.json(formater({code:'1', desc:'该相册不属于该用户！'}));
+		}
+	})
+	.then(() => {
+		query('DELETE FROM collections WHERE collection_id = ?', [collection_id])
+		.then(function(data) {
+			if(data.results.affectedRows === 1) {
+				res.json(formater({code:'0', desc:'相册删除成功！'}));
+			} else {
+				res.json(formater({code:'1', desc:'相册不存在！'}));
+			}
+		});
+	})
+})
 // 用户添加应用
 router.post('/addNewApp', verify_token, (req, res, next) => {
 	let _user = req.body;
@@ -365,22 +390,61 @@ router.post('/updatePhotoTag', (req, res, next) => {
 	});
 });
 // 更新用户关注的摄影师
-router.post('/updatePhotographers', verify_token, (req, res, next) => {
+router.post('/updatePhotographers/add', verify_token, (req, res, next) => {
 	let _user = req.body;
 	let user_id = req.api_user.data.user_id;
 	let settings = req.body.followings.split(',');
 	let user_settings = [];
+	if (settings.length === 0) {
+		return res.json(formater({code: '1', desc: '没有提供关注者的id'}))
+	}
 	for(let setting of settings) {
 		if (user_id === setting) continue;
 		let s = [user_id, setting];
 		user_settings.push(s);
 	}
-	query('DELETE FROM relationships WHERE user_id = ? AND following_id = ?', [user_id, user_settings[0][1]])
+	if (user_settings.length === 1) {
+		query('DELETE FROM relationships WHERE user_id = ? AND following_id = ?', [user_id, user_settings[0][1]])
+		.then(function() {
+			query('INSERT INTO relationships(user_id, following_id) VALUES ?', [user_settings])
+			.then(function(data) {
+				res.json(formater({code:'0', desc:'摄影师列表更新成功！'}));
+			})
+		});
+	} else {
+		query('DELETE FROM relationships WHERE user_id = ?', [user_id])
+		.then(function() {
+			query('INSERT IGNORE INTO relationships(user_id, following_id) VALUES ?', [user_settings])
+			.then(function(data) {
+				res.json(formater({code:'0', desc:'摄影师列表更新成功！'}));
+			})
+		});
+	}
+});
+// 获取推荐的摄影师
+router.all('/getPhotographers', (req, res, next) => {
+	let _user = req.body;
+	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
+	let pageSize = +_user.pageSize || +req.query.pageSize || 25;
+	let _left = (pageNo - 1) * pageSize;
+	query('SELECT users.user_id, users.user_name, users.image_md5, users.wechat, a.follower_nums FROM '+
+		'users LEFT OUTER JOIN (SELECT user_id, COUNT(following_id) AS follower_nums FROM relationships '+
+		'GROUP BY user_id) a ON a.user_id = users.user_id ORDER BY a.follower_nums DESC LIMIT ?,?', [_left, pageSize])
+	.then(function(data) {
+		res.json(formater({code:'0', data: data.results}));
+	});
+});
+// 取消关注
+router.all('/updatePhotographers/rm', verify_token, (req, res, next) => {
+	let _user = req.body;
+	let user_id = req.api_user.data.user_id;
+	let following_id = req.body.following_id || req.query.following_id;
+	if (!following_id) {
+		return res.json(formater({code: '1', desc: '没有提供关注者的id'}))
+	}
+	query('DELETE FROM relationships WHERE user_id = ? AND following_id = ?', [user_id, following_id])
 	.then(function() {
-		query('INSERT INTO relationships(user_id, following_id) VALUES ?', [user_settings])
-		.then(function(data) {
-			res.json(formater({code:'0', desc:'摄影师列表更新成功！'}));
-		})
+		res.json(formater({code:'0', desc:'摄影师列表更新成功！'}));
 	});
 });
 // 获取推荐的摄影师
@@ -954,30 +1018,30 @@ router.post('/uploadPhotoToAliyun', (req, res, next) => {
 	    size += chunk.length;
 	});
 	req.on("end",function(){
-	    var buffer = Buffer.concat(chunks, size);
-	    co(function* () {
-				// 获取bucket列表
-			  // var result = yield client.listBuckets();
-			  // var buckets = result.buckets;
-			  client.useBucket('my-image-carol');
-			  // var result2 = yield client.list({
-			  //   'max-keys': 5
-			  // });
-		  	// var lists = result2.objects;
-		  	// 上传图片
-		  	var result3 = yield client.put(new Date().getTime() + '.' + ext, buffer);
-		  	var url = result3.url;
-		  	// 下载文件
-		  	//var result4 = yield client.get('1509406172995.jpeg', '');
-		  	//var url2 = client.signatureUrl('1509406172995.jpeg');
-		  	//console.log(result4);
-		  	// 删除文件
-		  	// var result4 = yield client.delete('object-key');
-		  	// console.log(result4);
-			  res.json(formater({code:'0', data:{url:url}}));
-			}).catch(function (err) {
-			  console.log(err);
-			});
+    var buffer = Buffer.concat(chunks, size);
+    co(function* () {
+			// 获取bucket列表
+		  // var result = yield client.listBuckets();
+		  // var buckets = result.buckets;
+		  client.useBucket('my-image-carol');
+		  // var result2 = yield client.list({
+		  //   'max-keys': 5
+		  // });
+	  	// var lists = result2.objects;
+	  	// 上传图片
+	  	var result3 = yield client.put(new Date().getTime() + '.' + ext, buffer);
+	  	var url = result3.url;
+	  	// 下载文件
+	  	//var result4 = yield client.get('1509406172995.jpeg', '');
+	  	//var url2 = client.signatureUrl('1509406172995.jpeg');
+	  	//console.log(result4);
+	  	// 删除文件
+	  	// var result4 = yield client.delete('object-key');
+	  	// console.log(result4);
+		  res.json(formater({code:'0', data:{url:url}}));
+		}).catch(function (err) {
+		  console.log(err);
+		});
 	});
 });
 router.post('/uploadPhotoToAliyun/bak', verify_token, (req, res, next) => {
@@ -999,6 +1063,29 @@ router.post('/uploadPhotoToAliyun/bak', verify_token, (req, res, next) => {
 		  console.log(err);
 		});
 });
+// 用户下载图片
+router.all('/download/photo', (req, res, next) => {
+	let filename = req.body.filename || req.query.filename
+	if (!filename) {
+		return res.json(formater({code:'1',desc:'请提供要下载的文件名称！'}))
+	}
+	res.set({
+		// 'Content-Type': 'application/force-download',
+   'Content-Type': 'application/octet-stream',
+   'Content-Disposition': 'attachment; filename='+filename
+  });
+	co(function* () {
+	  client.useBucket('my-image-carol');
+  	// var result4 = yield client.get('1509406044609.gif', 'a.gif');
+  	// var url2 = client.signatureUrl('1509406044609.gif');
+  	var result = yield client.getStream('users/'+filename);
+	  // var writeStream = fs.createWriteStream('b.gif');
+	  // result.stream.pipe(writeStream);
+	  result.stream.pipe(res)
+	}).catch(function (err) {
+	  console.log(err);
+	});
+})
 // 上传商品图片到服务器
 router.post('/uploadProductImageToAliyun', verify_token, (req, res, next) => {
 	if(req.headers['content-length'] === '0') {

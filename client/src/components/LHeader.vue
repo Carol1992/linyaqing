@@ -111,7 +111,11 @@
           return
         }
         aliyunOp.getAliyunKey((res) => {
-          const {accessKeyId, host_user, policy, signature, saveName, startsWith} = res.data.data
+          let {accessKeyId, host_user, policy, signature, saveName, startsWith} = res.data.data
+          let pos = file.name.lastIndexOf('.')
+          if (pos !== -1) {
+            saveName = saveName + file.name.substring(pos)
+          }
           fd.append('OSSAccessKeyId', accessKeyId)
           fd.append('policy', policy)
           fd.append('signature', signature)

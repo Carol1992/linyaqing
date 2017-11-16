@@ -19,7 +19,11 @@ const store = new Vuex.Store({
       isCollections: false
     },
     showAddToCollection: false,
-    userCollections: []
+    userCollections: [],
+    ownerInfo: {
+      user_name: '',
+      image_md5: ''
+    }
   },
   mutations: {
     UpdateEmailSettings (state, settings) {
@@ -52,6 +56,10 @@ const store = new Vuex.Store({
     },
     updateFollowers (state, info) {
       state.followers = info
+    },
+    updateOwnerInfo (state, info) {
+      state.ownerInfo.user_name = info.user_name
+      state.ownerInfo.image_md5 = info.image_md5
     }
   },
   actions: {
@@ -80,6 +88,14 @@ const store = new Vuex.Store({
       photoOp.getCollection.user(data, (res) => {
         let collections = res.data.data.lists
         commit('updateUserCollections', collections)
+      })
+    },
+    getOwnerInfo ({commit, state}, ownerId) {
+      let data = {
+        user_id: ownerId
+      }
+      userOp.getUserInfo(data, (res) => {
+        commit('updateOwnerInfo', res.data.data[0])
       })
     }
   },

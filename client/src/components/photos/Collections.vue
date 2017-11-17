@@ -1,9 +1,9 @@
 <template>
   <div class="container">
     <div class="images">
-      <div class="image" v-for='collection in new_collections' 
+      <div class="image" v-for='collection in collections' 
       @mouseenter='showCovers(collection)'
-      @mouseleave='hideCovers(collection)'
+      @mouseleave='showCovers(collection)'
       @click='getPhotos(collection)'>
         <div class="cover" v-if='collection.showCover'></div>
         <div class="left">
@@ -39,22 +39,9 @@
       return {}
     },
     props: ['collections'],
-    computed: {
-      new_collections () {
-        let nc = []
-        for (let c of this.collections) {
-          c.showCover = false
-          nc.push(c)
-        }
-        return nc
-      }
-    },
     methods: {
       showCovers (c) {
-        c.showCover = true
-      },
-      hideCovers (c) {
-        c.showCover = false
+        this.$emit('showCovers', c)
       },
       getPhotos (c) {
         let collectionId = c.collection_id
@@ -80,10 +67,11 @@
     width: calc(100% / 3 - 20px);
     margin-bottom: 30px;
     background-color: #fff;
-    min-height: 300px;
+    height: 380px;
     border-radius: 8px;
     overflow: hidden;
     position: relative;
+    cursor: pointer;
   }
   .left {
     width: 70%;
@@ -131,8 +119,8 @@
     position: absolute;
     margin-top: 0;
     margin-left: 0;
-    z-index: 2;
-    background-color: rgba(255,255,255,0.1);
+    /*background-color: rgba(255,255,255,0.3);*/
+    background-color: rgba(0,0,0,0.1);
   }
   @media screen and (max-width: 809px) {
     .image {

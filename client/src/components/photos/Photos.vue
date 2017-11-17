@@ -1,20 +1,26 @@
 <template>
   <div class="container">
     <div class="images left">
-      <div class="image" v-for='photo in photos.group_a'>
-        <!-- <div class="imageCover"></div> -->
+      <div class="image" v-for='photo in photos.group_a' 
+      @mouseenter='showCovers(photo)'
+      @mouseleave='showCovers(photo)'>
+        <Cover :photoInfo='photo' v-if='photo.showCover'></Cover>
         <img :src='photo.image_md5' alt="">
       </div>
     </div>
     <div class="images middle">
-      <div class="image" v-for='photo in photos.group_b'>
-        <!-- <div class="imageCover"></div> -->
+      <div class="image" v-for='photo in photos.group_b' 
+      @mouseenter='showCovers(photo)'
+      @mouseleave='showCovers(photo)'>
+        <Cover :photoInfo='photo' v-if='photo.showCover'></Cover>
         <img :src='photo.image_md5' alt="">
       </div>
     </div>
     <div class="images right">
-      <div class="image" v-for='photo in photos.group_c'>
-        <!-- <div class="imageCover"></div> -->
+      <div class="image" v-for='photo in photos.group_c' 
+      @mouseenter='showCovers(photo)'
+      @mouseleave='showCovers(photo)'>
+        <Cover :photoInfo='photo' v-if='photo.showCover'></Cover>
         <img :src='photo.image_md5' alt="">
       </div>
     </div>
@@ -22,6 +28,7 @@
 </template>
 
 <script>
+  import Cover from './imgCover'
   export default {
     name: 'Photos',
     data () {
@@ -30,8 +37,13 @@
       }
     },
     props: ['photos'],
+    components: {
+      Cover
+    },
     methods: {
-
+      showCovers (c) {
+        this.$emit('showCovers', c)
+      }
     }
   }
 </script>
@@ -57,6 +69,7 @@
     margin-bottom: 4.5%;
     width: 100%;
     background-color: #f5f5f5;
+    position: relative;
   }
   .imageCover {
     background-color: rgba(0,0,0,0.1);

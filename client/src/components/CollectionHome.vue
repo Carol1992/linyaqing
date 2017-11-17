@@ -4,7 +4,7 @@
       <h1>Sharing Life</h1>
       <h3>相册分享，免费下载，好友互赞，记录生活点点滴滴。</h3>
     </div>
-    <Collections :collections='collections'></Collections>
+    <Collections :collections='collections' @showCovers='showCovers'></Collections>
     <BackTop></BackTop>
   </div>
 </template>
@@ -25,6 +25,9 @@
       }
     },
     methods: {
+      showCovers (c) {
+        c.showCover = !c.showCover
+      },
       getCollection_all () {
         let data = {
           pageNo: this.currentPageNo,
@@ -40,6 +43,7 @@
               newArr.push(image)
             }
             l.images_list = newArr
+            l.showCover = false
             this.collections.push(l)
           }
         })

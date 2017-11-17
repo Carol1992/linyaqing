@@ -19,7 +19,7 @@
       </div>
       <div class="photos">
         <Photos :photos="photos" v-if='!isActivated3'></Photos>
-        <Collections :collections='collections' v-if='isActivated3'></Collections>
+        <Collections :collections='collections' v-if='isActivated3' @showCovers='showCovers'></Collections>
       </div>
       <div class="noData" v-if='noData'>
         <span>{{noDataMsg}}</span>
@@ -176,10 +176,14 @@
               image = this.$store.state.urlBase + image + this.$store.state.viewBase
               newArr.push(image)
             }
+            l.showCover = false
             l.images_list = newArr
             this.collections.push(l)
           }
         })
+      },
+      showCovers (c) {
+        c.showCover = !c.showCover
       }
     },
     computed: {

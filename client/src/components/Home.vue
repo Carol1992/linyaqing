@@ -9,7 +9,7 @@
       <span class="nav" :class="{activated: isActivated2}" @click='getNew'>最新</span>
       <span class="nav" v-if='login' :class="{activated: isActivated3}" @click='getFollowing'>关注</span>
     </div>
-    <Photos :photos="photos"></Photos>
+    <Photos :photos="photos" @showCovers='showCovers'></Photos>
     <div class="noFollowing" v-if='noFollowing'>
       <span>目前没有关注任何人哦:）</span>
     </div>
@@ -68,6 +68,9 @@ export default {
         }
       }
     },
+    showCovers (c) {
+      c.showCover = !c.showCover
+    },
     getHot () {
       this.isActivated = true
       this.isActivated2 = false
@@ -106,6 +109,12 @@ export default {
         let lists = res.data.data.lists
         this.noFollowing = false
         for (let i = 0; i < lists.length; i++) {
+          lists[i].showCover = false
+          if (lists[i].avatar === 'null' || !lists[i].avatar) {
+            lists[i].avatar = require('@/assets/img/user_default.jpg')
+          } else {
+            lists[i].avatar = this.$store.state.urlBase + lists[i].avatar + this.$store.state.viewBase
+          }
           lists[i].image_md5 = this.$store.state.urlBase + lists[i].image_md5 + this.$store.state.viewBase
           if (i % 3 === 0) {
             this.photos.group_a.push(lists[i])
@@ -128,6 +137,12 @@ export default {
         let lists = res.data.data.lists
         this.noFollowing = false
         for (let i = 0; i < lists.length; i++) {
+          lists[i].showCover = false
+          if (lists[i].avatar === 'null' || !lists[i].avatar) {
+            lists[i].avatar = require('@/assets/img/user_default.jpg')
+          } else {
+            lists[i].avatar = this.$store.state.urlBase + lists[i].avatar + this.$store.state.viewBase
+          }
           lists[i].image_md5 = this.$store.state.urlBase + lists[i].image_md5 + this.$store.state.viewBase
           if (i % 3 === 0) {
             this.photos.group_a.push(lists[i])
@@ -155,6 +170,12 @@ export default {
         }
         this.noFollowing = false
         for (let i = 0; i < lists.length; i++) {
+          lists[i].showCover = false
+          if (lists[i].avatar === 'null' || !lists[i].avatar) {
+            lists[i].avatar = require('@/assets/img/user_default.jpg')
+          } else {
+            lists[i].avatar = this.$store.state.urlBase + lists[i].avatar + this.$store.state.viewBase
+          }
           lists[i].image_md5 = this.$store.state.urlBase + lists[i].image_md5 + this.$store.state.viewBase
           if (i % 3 === 0) {
             this.photos.group_a.push(lists[i])

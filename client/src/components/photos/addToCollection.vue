@@ -1,9 +1,6 @@
 <template>
   <div class="container">
     <div class="addTo">
-     <!--  <div class="bigImg">
-        <img :src='imgInfo.photoUrl' alt="">
-      </div> -->
       <div class="collections">
         <p>请选择存放该图片的相册</p>
         <RadioGroup v-model="selected" vertical>

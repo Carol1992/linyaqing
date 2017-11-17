@@ -25,7 +25,8 @@ const store = new Vuex.Store({
     ownerInfo: {
       user_name: '',
       image_md5: ''
-    }
+    },
+    likeThePhoto: false
   },
   mutations: {
     UpdateEmailSettings (state, settings) {
@@ -62,6 +63,9 @@ const store = new Vuex.Store({
     updateOwnerInfo (state, info) {
       state.ownerInfo.user_name = info.user_name
       state.ownerInfo.image_md5 = info.image_md5
+    },
+    updatePhotoLike (state) {
+      state.likeThePhoto = !state.likeThePhoto
     }
   },
   actions: {
@@ -111,6 +115,15 @@ const store = new Vuex.Store({
         commit('updateOwnerInfo', info)
       })
     }
+    // photoLike ({commit, state}, data) {
+    //   let data = {
+    //     image_id: data.image_id,
+    //     like: this.like ? '1' : '0'
+    //   }
+    //   photoOp.photoLike(data, (res) => {
+    //     console.log(res)
+    //   })
+    // }
   },
   getters: {}
 })

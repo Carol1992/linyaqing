@@ -866,3 +866,10 @@ data: post: {
 }
 
 57. 用户把相册里的图片都删除后，相册是不存在的
+
+58. 用户是否喜欢过该图片
+url:'/alreadyLike'
+data: {
+	token: '',
+	image_id: ''
+}

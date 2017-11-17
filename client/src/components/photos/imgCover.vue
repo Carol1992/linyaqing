@@ -1,15 +1,15 @@
 <template>
   <div class="container">
     <div class="top">
-      <span class="likes"><Icon type="android-favorite"></Icon><span class="likes-nums">{{photoInfo.total_likes}}</span></span>
-      <span class="add"><Icon type="plus-round"></Icon>添加到相册</span>
+      <span class="likes" @click='photoLike'><Icon type="android-favorite"></Icon><span class="likes-nums">{{photoInfo.total_likes}}</span></span>
+      <span class="add" @click='addToCollection'><Icon type="plus-round"></Icon>添加到相册</span>
     </div>
     <div class="bottom">
       <div class="users">
-        <img :src='photoInfo.avatar' alt="">
-        <span>{{photoInfo.user_name}}</span>
+        <img :src='photoInfo.avatar' alt="" @click='gotoUserCenter'>
+        <span @click='gotoUserCenter'>{{photoInfo.user_name}}</span>
       </div>
-      <div class="download">
+      <div class="download" @click='downloadPic'>
         <Icon type="ios-download-outline"></Icon>
       </div>
     </div>
@@ -17,9 +17,38 @@
 </template>
 
 <script>
+  import photoOp from '../../../api/photos'
   export default {
     name: 'imgCover',
-    props: ['photoInfo']
+    props: ['photoInfo'],
+    methods: {
+      photoLike () {
+        // this.like = !this.like
+        // let data = {
+        //   image_id: this.photoInfo.image_id,
+        //   like: this.like ? '1' : '0'
+        // }
+        // photoOp.photoLike(data, (res) => {
+        //   console.log(res)
+        // })
+      },
+      addToCollection () {
+        let data = {
+          image_id: this.photoInfo.image_id,
+          collection_id: 83
+        }
+        photoOp.addToCollection(data, (res) => {
+          console.log(res)
+        })
+      },
+      gotoUserCenter () {
+        this.$router.push({path: `/userCenter/${this.photoInfo.user_id}`})
+      },
+      downloadPic () {
+        photoOp.downloadPhoto({filename: this.photoInfo.aliyun_name})
+        // window.location.href = '/api/download/photo?filename=' + this.photoInfo.aliyun_name
+      }
+    }
   }
 </script>
 

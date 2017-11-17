@@ -112,6 +112,19 @@ module.exports = {
 		  console.log(error)
 		});
 	},
+	downloadPhoto (data) {
+		axios.get('/api/download/photo', {
+			params: {
+				filename: data.filename
+			}
+		})
+		.then(function (response) {
+		  window.location.href = '/api/download/photo?filename=' + data.filename
+		})
+		.catch(function (error) {
+		  console.log(error)
+		});
+	},
 	getCollection: {
 		all (data, callback) {
 			axios.post('/api/getCollection/all', data)
@@ -144,6 +157,16 @@ module.exports = {
 	updateCollection (data, callback) {
 		data.token = localStorage.token
 		axios.post('/api/updateCollection', data)
+		.then(function (response) {
+		  callback(response)
+		})
+		.catch(function (error) {
+		  console.log(error)
+		});	
+	},
+	addToCollection (data, callback) {
+		data.token = localStorage.token
+		axios.post('/api/addToCollection', data)
 		.then(function (response) {
 		  callback(response)
 		})
@@ -209,13 +232,14 @@ module.exports = {
 		  console.log(error)
 		});	
 	},
-	photoLike () {
+	photoLike (data, callback) {
 		axios.post('/api/photoLike', {
-			image_id:'8',
-			like:'1' // 1代表喜欢该图片，0取消该喜欢
+			token: localStorage.token,
+			image_id: data.image_id,
+			like: data.like // 1代表喜欢该图片，0取消该喜欢
 		})
 		.then(function (response) {
-		  console.log(response)
+		  callback(response)
 		})
 		.catch(function (error) {
 		  console.log(error)

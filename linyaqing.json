@@ -6,7 +6,7 @@
       "type": "Project",
       "description": "",
       "id": "0b866162-ffa3-4622-b17c-0ff5588de6b7",
-      "lastModified": "2017-11-14T16:13:15.596+08:00",
+      "lastModified": "2017-11-17T15:17:54.697+08:00",
       "name": "linyaqing"
     },
     {
@@ -553,6 +553,55 @@
         },
         "bodyType": "Text",
         "autoSetLength": true,
+        "textBody": "{\"collection_id\":19}"
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/deleteCollection"
+      },
+      "id": "d072a447-90d2-4047-8814-d88a9b32df09",
+      "lastModified": "2017-11-16T15:45:40.254+08:00",
+      "name": "删除相册",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "enabled": true,
+          "name": "x-access-token",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjMsImlzX2RldmVsb3BlciI6IjAiLCJpc19hZG1pbiI6IjEiLCJ1c2VyX25hbWUiOiLlpKfoi4_miZMiLCJwaG9uZSI6bnVsbCwiZW1haWwiOiJtZWxpQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiaGgiLCJwcm92aW5jZSI6IuW5v-S4nCIsImNpdHkiOiLmt7HlnLMiLCJ0b3duIjoi56aP55SwIiwiaW1hZ2VfbWQ1IjoiaHR0cDovL215LWltYWdlLWNhcm9sLm9zcy1jbi1iZWlqaW5nLmFsaXl1bmNzLmNvbS91c2Vycy8xNTEwNDc3OTA2MTUzIiwicGVyc29uYWxfc2l0ZSI6bnVsbCwid2VjaGF0IjpudWxsLCJhZGRyZXNzIjpudWxsLCJiaW8iOm51bGwsImNyZWF0ZWRfdGltZSI6IjIwMTctMTEtMTRUMDU6NDM6MzIuMDAwWiIsImRldl91cmwiOiJodHRwczovL2JhaWR1LmNvbSIsImRldl9kZXNjIjoiSSBBTSBBTiBFWENFTExFTlQgREVWRUxPUEVSIiwiZGVsaXZlcnlfYWRkcmVzcyI6bnVsbCwiZGVsaXZlcnlfY2l0eSI6bnVsbCwiZGVsaXZlcnlfcHJvdmluY2UiOm51bGwsImRlbGl2ZXJ5X3Rvd24iOm51bGwsImNvbnNpZ25lZSI6bnVsbCwiY29uc2lnbmVlX3Bob25lIjpudWxsfSwiaWF0IjoxNTEwNjU0MDQ0LCJleHAiOjE1MTMyNDYwNDR9.m8y2q-sol_OFj7FkiYS047wy3uIeNQbXiIwpK_DXe9g"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true,
         "textBody": ""
       },
       "headersType": "Form",
@@ -583,6 +632,54 @@
           "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjUsImlzX2RldmVsb3BlciI6IjEiLCJpc19hZG1pbiI6IjEiLCJ1c2VyX25hbWUiOiLlpKfoi4_miZMiLCJmaXJzdF9uYW1lIjoiIiwibGFzdF9uYW1lIjoiIiwicGhvbmUiOm51bGwsImVtYWlsIjoibXNzQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiaGgiLCJwcm92aW5jZSI6bnVsbCwiY2l0eSI6bnVsbCwidG93biI6bnVsbCwiaW1hZ2VfbWQ1IjpudWxsLCJwZXJzb25hbF9zaXRlIjpudWxsLCJpbnN0YWdyYW0iOm51bGwsInR3aXR0ZXIiOm51bGwsImxvY2F0aW9uIjpudWxsLCJiaW8iOm51bGwsImNyZWF0ZWRfdGltZSI6bnVsbCwiZGV2X3VybCI6bnVsbCwiZGV2X2Rlc2MiOm51bGx9LCJpYXQiOjE1MDkyNzMxNTIsImV4cCI6MTUwOTM1OTU1Mn0.M81HTWIPbux64phVwl-d8aeQ6SGOQ4-thEh-DV_amVc"
         }
       ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "uriEditor": true,
+      "type": "Request",
+      "method": {
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
+        "name": "GET"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": [
+            {
+              "enabled": true,
+              "name": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjMsImlzX2RldmVsb3BlciI6IjAiLCJpc19hZG1pbiI6IjEiLCJ1c2VyX25hbWUiOiLlpKfoi4_miZMiLCJwaG9uZSI6bnVsbCwiZW1haWwiOiJtZWxpQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiaGgiLCJwcm92aW5jZSI6IuW5v-S4nCIsImNpdHkiOiLmt7HlnLMiLCJ0b3duIjoi56aP55SwIiwiaW1hZ2VfbWQ1IjoiaHR0cDovL215LWltYWdlLWNhcm9sLm9zcy1jbi1iZWlqaW5nLmFsaXl1bmNzLmNvbS91c2Vycy8xNTEwNDc3OTA2MTUzIiwicGVyc29uYWxfc2l0ZSI6bnVsbCwid2VjaGF0IjpudWxsLCJhZGRyZXNzIjpudWxsLCJiaW8iOm51bGwsImNyZWF0ZWRfdGltZSI6IjIwMTctMTEtMTRUMDU6NDM6MzIuMDAwWiIsImRldl91cmwiOiJodHRwczovL2JhaWR1LmNvbSIsImRldl9kZXNjIjoiSSBBTSBBTiBFWENFTExFTlQgREVWRUxPUEVSIiwiZGVsaXZlcnlfYWRkcmVzcyI6bnVsbCwiZGVsaXZlcnlfY2l0eSI6bnVsbCwiZGVsaXZlcnlfcHJvdmluY2UiOm51bGwsImRlbGl2ZXJ5X3Rvd24iOm51bGwsImNvbnNpZ25lZSI6bnVsbCwiY29uc2lnbmVlX3Bob25lIjpudWxsfSwiaWF0IjoxNTEwNjU0MDQ0LCJleHAiOjE1MTMyNDYwNDR9.m8y2q-sol_OFj7FkiYS047wy3uIeNQbXiIwpK_DXe9g"
+            },
+            {
+              "enabled": true,
+              "name": "following_id",
+              "value": "2"
+            }
+          ]
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/updatePhotographers/rm"
+      },
+      "id": "2f0ba24e-405f-4804-9e34-26e168018bbb",
+      "lastModified": "2017-11-16T15:43:56.353+08:00",
+      "name": "取消关注某人",
+      "headers": [],
       "metaInfo": {
         "ownerId": "google-oauth2|109130615408366779233"
       },
@@ -936,6 +1033,42 @@
     {
       "type": "Request",
       "method": {
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
+        "name": "GET"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/download/photo"
+      },
+      "id": "d706b3ec-0488-4769-bb8d-64b65af2abe1",
+      "lastModified": "2017-11-16T09:47:17.274+08:00",
+      "name": "用户下载图片",
+      "headers": [],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
         "requestBody": true,
         "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
         "name": "POST"
@@ -1024,6 +1157,54 @@
           "enabled": true,
           "name": "x-access-token",
           "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjMsImlzX2RldmVsb3BlciI6IjAiLCJpc19hZG1pbiI6IjEiLCJ1c2VyX25hbWUiOiLlpKfoi4_miZMiLCJwaG9uZSI6bnVsbCwiZW1haWwiOiJtZWxpQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiaGgiLCJwcm92aW5jZSI6bnVsbCwiY2l0eSI6Iua3seWcsyIsInRvd24iOiLnpo_nlLAiLCJpbWFnZV9tZDUiOm51bGwsInBlcnNvbmFsX3NpdGUiOm51bGwsIndlY2hhdCI6bnVsbCwiYWRkcmVzcyI6bnVsbCwiYmlvIjpudWxsLCJjcmVhdGVkX3RpbWUiOiIyMDE3LTEwLTMxVDIzOjE0OjMyLjAwMFoiLCJkZXZfdXJsIjoiaHR0cHM6Ly9iYWlkdS5jb20iLCJkZXZfZGVzYyI6IkkgQU0gQU4gRVhDRUxMRU5UIERFVkVMT1BFUiIsImRlbGl2ZXJ5X2FkZHJlc3MiOm51bGwsImRlbGl2ZXJ5X2NpdHkiOm51bGwsImRlbGl2ZXJ5X3Byb3ZpbmNlIjpudWxsLCJkZWxpdmVyeV90b3duIjpudWxsLCJjb25zaWduZWUiOm51bGwsImNvbnNpZ25lZV9waG9uZSI6bnVsbH0sImlhdCI6MTUwOTU5OTYyMiwiZXhwIjoxNTA5Njg2MDIyfQ.bC_Y7jQu_gtFmMOmsrWdnU6zlvL5wPjBXH30C46ksZU"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|109130615408366779233"
+      },
+      "parentId": "0b866162-ffa3-4622-b17c-0ff5588de6b7"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded"
+        },
+        "bodyType": "Text",
+        "autoSetLength": true
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "localhost:3000",
+        "path": "/alreadyLike"
+      },
+      "id": "c236c1e8-2781-4a29-9fbc-77efd5cf87a1",
+      "lastModified": "2017-11-17T15:17:54.698+08:00",
+      "name": "用户是否给该图片点过赞",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "enabled": true,
+          "name": "x-access-token",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjM5LCJpc19kZXZlbG9wZXIiOiIxIiwiaXNfYWRtaW4iOiIxIiwidXNlcl9uYW1lIjoidGVzdGVyMiIsInBob25lIjoiIiwiZW1haWwiOiJ0ZXN0ZXIyQHFxLmNvbSIsInBhc3N3b3JkIjoiNDZmOTRjOGRlMTRmYjM2NjgwODUwNzY4ZmYxYjdmMmEiLCJwcm92aW5jZSI6IiIsImNpdHkiOiIiLCJ0b3duIjoiIiwiaW1hZ2VfbWQ1IjoiMTUxMDg4MDI2NDcwOSIsInBlcnNvbmFsX3NpdGUiOiIiLCJ3ZWNoYXQiOiIiLCJhZGRyZXNzIjoiIiwiYmlvIjoiIiwiY3JlYXRlZF90aW1lIjoiMjAxNy0xMS0xN1QwMDo1MzowNS4wMDBaIiwiZGV2X3VybCI6IiIsImRldl9kZXNjIjoiIiwiZGVsaXZlcnlfYWRkcmVzcyI6IiIsImRlbGl2ZXJ5X2NpdHkiOiIiLCJkZWxpdmVyeV9wcm92aW5jZSI6IiIsImRlbGl2ZXJ5X3Rvd24iOiIiLCJjb25zaWduZWUiOiIiLCJjb25zaWduZWVfcGhvbmUiOiIifSwiaWF0IjoxNTEwOTAwMjM2LCJleHAiOjE1MTM0OTIyMzZ9.O2mrwFqXrB__aibqOHWBXytf5lMdIYBuNjpSy2F72Y4"
         }
       ],
       "metaInfo": {
@@ -1922,7 +2103,8 @@
           "encoding": "application/x-www-form-urlencoded"
         },
         "bodyType": "Text",
-        "autoSetLength": true
+        "autoSetLength": true,
+        "textBody": "{\"request_user_id\":3}"
       },
       "headersType": "Form",
       "uri": {
@@ -1938,7 +2120,7 @@
         "path": "/getList/liked"
       },
       "id": "83ccb607-b1e3-4d04-8a4f-30f63c982ad7",
-      "lastModified": "2017-11-11T08:55:03.469+08:00",
+      "lastModified": "2017-11-15T15:29:44.469+08:00",
       "name": "获取用户喜欢过的所有图片列表",
       "headers": [
         {
@@ -2076,7 +2258,8 @@
           "encoding": "application/x-www-form-urlencoded"
         },
         "bodyType": "Text",
-        "autoSetLength": true
+        "autoSetLength": true,
+        "textBody": "{\"request_user_id\":3}"
       },
       "headersType": "Form",
       "uri": {
@@ -2092,7 +2275,7 @@
         "path": "/getList/user"
       },
       "id": "f215c106-2251-4c70-a739-3defcc8bea0b",
-      "lastModified": "2017-11-11T08:40:11.214+08:00",
+      "lastModified": "2017-11-15T14:55:33.849+08:00",
       "name": "获取用户的所有图片列表",
       "headers": [
         {
@@ -2124,7 +2307,8 @@
           "encoding": "application/x-www-form-urlencoded"
         },
         "bodyType": "Text",
-        "autoSetLength": true
+        "autoSetLength": true,
+        "textBody": "{\"request_user_id\":3}"
       },
       "headersType": "Form",
       "uri": {
@@ -2140,7 +2324,7 @@
         "path": "/getCollection/user"
       },
       "id": "64d7d761-7050-4ccd-a0c2-aa30179f4943",
-      "lastModified": "2017-11-14T13:04:29.755+08:00",
+      "lastModified": "2017-11-15T15:03:46.892+08:00",
       "name": "获取用户自建的图片集",
       "headers": [
         {
@@ -2149,7 +2333,6 @@
           "value": "application/json"
         },
         {
-          "enabled": true,
           "name": "x-access-token",
           "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjMsImlzX2RldmVsb3BlciI6IjAiLCJpc19hZG1pbiI6IjEiLCJ1c2VyX25hbWUiOiLlpKfoi4_miZMiLCJwaG9uZSI6bnVsbCwiZW1haWwiOiJtZWxpQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiaGgiLCJwcm92aW5jZSI6IuW5v-S4nCIsImNpdHkiOiLmt7HlnLMiLCJ0b3duIjoi56aP55SwIiwiaW1hZ2VfbWQ1IjpudWxsLCJwZXJzb25hbF9zaXRlIjpudWxsLCJ3ZWNoYXQiOm51bGwsImFkZHJlc3MiOm51bGwsImJpbyI6bnVsbCwiY3JlYXRlZF90aW1lIjoiMjAxNy0xMS0wOVQwMToxODoxMi4wMDBaIiwiZGV2X3VybCI6Imh0dHBzOi8vYmFpZHUuY29tIiwiZGV2X2Rlc2MiOiJJIEFNIEFOIEVYQ0VMTEVOVCBERVZFTE9QRVIiLCJkZWxpdmVyeV9hZGRyZXNzIjpudWxsLCJkZWxpdmVyeV9jaXR5IjpudWxsLCJkZWxpdmVyeV9wcm92aW5jZSI6bnVsbCwiZGVsaXZlcnlfdG93biI6bnVsbCwiY29uc2lnbmVlIjpudWxsLCJjb25zaWduZWVfcGhvbmUiOm51bGx9LCJpYXQiOjE1MTAyOTQ2OTYsImV4cCI6MTUxMjg4NjY5Nn0.otFs_4hWS_C9-Wpo6I0vb0hhcVvQUN5zDeG8pjT7FXM"
         }

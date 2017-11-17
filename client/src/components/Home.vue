@@ -115,6 +115,7 @@ export default {
           } else {
             lists[i].avatar = this.$store.state.urlBase + lists[i].avatar + this.$store.state.viewBase
           }
+          lists[i].aliyun_name = lists[i].image_md5
           lists[i].image_md5 = this.$store.state.urlBase + lists[i].image_md5 + this.$store.state.viewBase
           if (i % 3 === 0) {
             this.photos.group_a.push(lists[i])
@@ -143,6 +144,7 @@ export default {
           } else {
             lists[i].avatar = this.$store.state.urlBase + lists[i].avatar + this.$store.state.viewBase
           }
+          lists[i].aliyun_name = lists[i].image_md5
           lists[i].image_md5 = this.$store.state.urlBase + lists[i].image_md5 + this.$store.state.viewBase
           if (i % 3 === 0) {
             this.photos.group_a.push(lists[i])
@@ -176,6 +178,7 @@ export default {
           } else {
             lists[i].avatar = this.$store.state.urlBase + lists[i].avatar + this.$store.state.viewBase
           }
+          lists[i].aliyun_name = lists[i].image_md5
           lists[i].image_md5 = this.$store.state.urlBase + lists[i].image_md5 + this.$store.state.viewBase
           if (i % 3 === 0) {
             this.photos.group_a.push(lists[i])

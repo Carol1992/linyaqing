@@ -352,8 +352,8 @@ router.all('/deleteCollection', verify_token, (req, res, next) => {
 		if(data.results.length === 0) {
 			return res.json(formater({code:'1', desc:'该相册不属于该用户！'}));
 		} else {
-			query('SELECT ic.image_id, i.image_md5 FROM image_collection ic, images i WHERE '+
-				'ic.image_id = i.image_id AND ic.collection_id = ?', [collection_id])
+			query('SELECT ic.image_id, i.image_md5 FROM image_collection ic, images i, collections c WHERE '+
+				'ic.image_id = i.image_id AND ic.collection_id = ? AND i.user_id = c.user_id', [collection_id])
 			.then(data => {
 				let results = data.results
 				let arr = []
@@ -1553,7 +1553,23 @@ router.post('/placeOrder', verify_token, (req, res, next) => {
 		})
 	})
 });
-
+// 用户是否给该图片点过赞
+router.all('/alreadyLike', verify_token, (req, res, next) => {
+	let user_id = req.api_user.data.user_id;
+	let image_id = req.body.image_id;
+	if (!image_id) {
+		return res.json(formater({code: '1', desc: '请提供图片id'}))
+	}
+	query('SELECT image_id FROM image_likes WHERE image_id = ? AND user_id = ?', 
+		[image_id, user_id])
+	.then(data => {
+		let alreadyLike = false
+		if(data.results.length !== 0) {
+			alreadyLike = true
+		}
+		res.json(formater({code: '0', data:{alreadyLike: alreadyLike}}))
+	})
+})
 // 用户给图片点赞
 router.post('/photoLike', verify_token, (req, res, next) => {
 	let user_id = req.api_user.data.user_id;

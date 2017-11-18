@@ -181,6 +181,10 @@
           this.$store.dispatch('getUserCollections')
           this.$store.commit('updateShowAddToCollection', true)
           photoOp.uploadUserPhoto(this.photoInfo, (res) => {
+            if (res.data.code === '1') {
+              this.notifyMsg = '噢噢，出错了，请重新上传！'
+              this.error(true)
+            }
             this.$router.push({path: `/userCenter/${this.info.user_id}`})
           })
         }

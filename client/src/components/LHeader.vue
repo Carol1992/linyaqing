@@ -26,6 +26,9 @@
         <img :src='info.image_md5' height="49" width="49" alt="">
       </div>
     </div>
+    <div class="loadingCover" v-if="showLoading">
+      <Spin size="large" fix class='loadIcon'></Spin>
+    </div>
   </div>
 </template>
 
@@ -37,7 +40,8 @@
     name: 'Lheader',
     data () {
       return {
-        showMore: true
+        showMore: true,
+        showLoading: false
       }
     },
     methods: {
@@ -110,7 +114,14 @@
           this.error(true)
           return
         }
+        this.showLoading = true
         aliyunOp.getAliyunKey((res) => {
+          if (res.data.code === '1') {
+            this.showLoading = false
+            this.notifyMsg = '图片上传失败！'
+            this.error(true)
+            return
+          }
           let {accessKeyId, host_user, policy, signature, saveName, startsWith} = res.data.data
           let pos = file.name.lastIndexOf('.')
           if (pos !== -1) {
@@ -153,6 +164,7 @@
                 self.$store.commit('getPhotoUrl', saveName)
                 self.$router.push('/addPhoto')
               }
+              self.showLoading = false
             })
             .catch((err) => {
               console.log(err)
@@ -183,6 +195,17 @@
 </script>
 
 <style scoped>
+  .loadingCover {
+    position: fixed;
+    width: 100%;
+    height: 100vh;
+    top:0;
+    left: 0;
+    font-size: 50px;
+  }
+  .loadIcon {
+    color: #fff;
+  }
   .container {
     width: 96%;
     margin: auto;

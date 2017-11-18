@@ -19,7 +19,7 @@
         <input type="checkbox" :checked='collectionInfo.isPrivate' 
         @change='changePrivate(collectionInfo)'>
         <span>设置为私密相册</span>
-        <span class="deleteCollection" @click='deleteCollection'>删除相册</span>
+        <span class="deleteCollection" @click='deleteCollection(collectionInfo)'>删除相册</span>
       </div>
       <div class="submit" @click='submit(collectionInfo)'>
         <input type="button" value="提交">
@@ -29,7 +29,6 @@
 </template>
 
 <script>
-  import photoOp from '../../../api/photos'
   export default {
     name: 'editCollection',
     data () {
@@ -48,16 +47,8 @@
       submit (collectionInfo) {
         this.$emit('updateCollectionInfo', collectionInfo)
       },
-      deleteCollection (e) {
-        let data = {
-          collection_id: this.collectionInfo.collection_id
-        }
-        photoOp.deleteCollection(data, (res) => {
-          if (res.data.code === '1') {
-            return
-          }
-          this.$emit('successDelete', e)
-        })
+      deleteCollection (collectionInfo) {
+        this.$emit('deleteCollection', collectionInfo)
       }
     }
   }
@@ -68,7 +59,7 @@
     width: 100%;
     height: 100vh;
     background-color: rgba(0,0,0,0.4);
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     z-index: 10;

@@ -26,6 +26,7 @@
       <div class="noData" v-if='noData'>
         <span>{{noDataMsg}}</span>
       </div>
+      <add-to-collection v-if='showDialog' @addTo='addTo' @closeCollection='closeCollection'></add-to-collection>
     </div>
     <BackTop></BackTop>
   </div>
@@ -36,6 +37,7 @@
   import Photos from '../photos/Photos'
   import Collections from '../photos/Collections'
   import addToCollection from '../photos/addToCollection'
+  import $ from 'jquery'
   export default {
     name: 'userCenter',
     data () {
@@ -56,7 +58,7 @@
         currentPage1: 1,
         currentPage2: 1,
         currentPage3: 1,
-        pageSize: 18000,
+        pageSize: 3,
         collections: [],
         noData: false,
         noDataMsg: '您还没有上传过照片:)',
@@ -71,6 +73,18 @@
       addToCollection
     },
     methods: {
+      success (nodesc) {
+        this.$Notice.success({
+          title: this.notifyMsg,
+          desc: nodesc ? '' : ''
+        })
+      },
+      error (nodesc) {
+        this.$Notice.error({
+          title: this.notifyMsg,
+          desc: nodesc ? '' : ''
+        })
+      },
       clearData () {
         this.photos.group_a = []
         this.photos.group_b = []
@@ -107,34 +121,42 @@
           pageNo: this.currentPage1,
           pageSize: this.pageSize
         }
-        photoOp.getList.user(data, (res) => {
-          this.summary.photos = res.data.data.totalCount
-          let lists = res.data.data.lists
-          if (lists.length === 0) {
-            this.noData = true
-            this.noDataMsg = '您还没有上传过照片哦:)'
-            return
-          }
-          this.noData = false
-          for (let i = 0; i < lists.length; i++) {
-            lists[i].showCover = false
-            lists[i].aliyun_name = lists[i].image_md5
-            lists[i].image_md5 = this.$store.state.urlBase + lists[i].image_md5 + this.$store.state.viewBase
-            if (lists[i].avatar === 'null' || !lists[i].avatar) {
-              lists[i].avatar = require('@/assets/img/user_default.jpg')
-            } else {
-              lists[i].avatar = this.$store.state.urlBase + lists[i].avatar + this.$store.state.viewBase
+        return new Promise((resolve, reject) => {
+          photoOp.getList.user(data, (res) => {
+            if (res.data.code === '1') {
+              this.notifyMsg = '获取最新图片列表失败！'
+              this.error(true)
+              return
             }
-            if (i % 3 === 0) {
-              this.photos.group_a.push(lists[i])
+            this.summary.photos = res.data.data.totalCounts
+            let lists = res.data.data.lists
+            for (let i = 0; i < lists.length; i++) {
+              lists[i].showCover = false
+              lists[i].aliyun_name = lists[i].image_md5
+              lists[i].image_md5 = this.$store.state.urlBase + lists[i].image_md5 + this.$store.state.viewBase
+              if (lists[i].avatar === 'null' || !lists[i].avatar) {
+                lists[i].avatar = require('@/assets/img/user_default.jpg')
+              } else {
+                lists[i].avatar = this.$store.state.urlBase + lists[i].avatar + this.$store.state.viewBase
+              }
+              if (i % 3 === 0) {
+                this.photos.group_a.push(lists[i])
+              }
+              if ((i - 1) % 3 === 0) {
+                this.photos.group_b.push(lists[i])
+              }
+              if ((i - 2) % 3 === 0) {
+                this.photos.group_c.push(lists[i])
+              }
             }
-            if ((i - 1) % 3 === 0) {
-              this.photos.group_b.push(lists[i])
+            if (this.photos.group_a.length === 0 && this.photos.group_b.length === 0 && this.photos.group_c.length === 0) {
+              this.noData = true
+              this.noDataMsg = '您还没有上传过照片哦:)'
+              return
             }
-            if ((i - 2) % 3 === 0) {
-              this.photos.group_c.push(lists[i])
-            }
-          }
+            this.noData = false
+            resolve()
+          })
         })
       },
       getList_liked () {
@@ -144,34 +166,42 @@
           pageNo: this.currentPage2,
           pageSize: this.pageSize
         }
-        photoOp.getList.liked(data, (res) => {
-          this.summary.liked = res.data.data.totalCount
-          let lists = res.data.data.lists
-          if (lists.length === 0) {
-            this.noData = true
-            this.noDataMsg = '您还没有赞过任何一张照片:)'
-            return
-          }
-          this.noData = false
-          for (let i = 0; i < lists.length; i++) {
-            lists[i].showCover = false
-            lists[i].aliyun_name = lists[i].image_md5
-            lists[i].image_md5 = this.$store.state.urlBase + lists[i].image_md5 + this.$store.state.viewBase
-            if (lists[i].avatar === 'null' || !lists[i].avatar) {
-              lists[i].avatar = require('@/assets/img/user_default.jpg')
-            } else {
-              lists[i].avatar = this.$store.state.urlBase + lists[i].avatar + this.$store.state.viewBase
+        return new Promise((resolve, reject) => {
+          photoOp.getList.liked(data, (res) => {
+            if (res.data.code === '1') {
+              this.notifyMsg = '获取最新图片列表失败！'
+              this.error(true)
+              return
             }
-            if (i % 3 === 0) {
-              this.photos.group_a.push(lists[i])
+            this.summary.liked = res.data.data.totalCounts
+            let lists = res.data.data.lists
+            for (let i = 0; i < lists.length; i++) {
+              lists[i].showCover = false
+              lists[i].aliyun_name = lists[i].image_md5
+              lists[i].image_md5 = this.$store.state.urlBase + lists[i].image_md5 + this.$store.state.viewBase
+              if (lists[i].avatar === 'null' || !lists[i].avatar) {
+                lists[i].avatar = require('@/assets/img/user_default.jpg')
+              } else {
+                lists[i].avatar = this.$store.state.urlBase + lists[i].avatar + this.$store.state.viewBase
+              }
+              if (i % 3 === 0) {
+                this.photos.group_a.push(lists[i])
+              }
+              if ((i - 1) % 3 === 0) {
+                this.photos.group_b.push(lists[i])
+              }
+              if ((i - 2) % 3 === 0) {
+                this.photos.group_c.push(lists[i])
+              }
             }
-            if ((i - 1) % 3 === 0) {
-              this.photos.group_b.push(lists[i])
+            if (this.photos.group_a.length === 0 && this.photos.group_b.length === 0 && this.photos.group_c.length === 0) {
+              this.noData = true
+              this.noDataMsg = '您还没有赞过任何一张照片:)'
+              return
             }
-            if ((i - 2) % 3 === 0) {
-              this.photos.group_c.push(lists[i])
-            }
-          }
+            this.noData = false
+            resolve()
+          })
         })
       },
       getCollection_user () {
@@ -181,25 +211,33 @@
           pageNo: this.currentPage3,
           pageSize: this.pageSize
         }
-        photoOp.getCollection.user(data, (res) => {
-          this.summary.collections = res.data.data.totalCount
-          let lists = res.data.data.lists
-          if (lists.length === 0) {
-            this.noData = true
-            this.noDataMsg = '您还没有新建过相册:)'
-            return
-          }
-          this.noData = false
-          for (let l of lists) {
-            let newArr = []
-            for (let image of l.images_list) {
-              image = this.$store.state.urlBase + image + this.$store.state.viewBase
-              newArr.push(image)
+        return new Promise((resolve, reject) => {
+          photoOp.getCollection.user(data, (res) => {
+            if (res.data.code === '1') {
+              this.notifyMsg = '获取最新图片列表失败！'
+              this.error(true)
+              return
             }
-            l.showCover = false
-            l.images_list = newArr
-            this.collections.push(l)
-          }
+            this.summary.collections = res.data.data.totalCounts
+            let lists = res.data.data.lists
+            for (let l of lists) {
+              let newArr = []
+              for (let image of l.images_list) {
+                image = this.$store.state.urlBase + image + this.$store.state.viewBase
+                newArr.push(image)
+              }
+              l.showCover = false
+              l.images_list = newArr
+              this.collections.push(l)
+            }
+            if (this.collections.length === 0) {
+              this.noData = true
+              this.noDataMsg = '您还没有新建过相册:)'
+              return
+            }
+            this.noData = false
+            resolve()
+          })
         })
       },
       showCovers (c) {
@@ -256,11 +294,36 @@
           pageSize: this.pageSize
         }
         photoOp.getList.liked(data, (res) => {
-          this.summary.liked = res.data.data.totalCount
+          if (res.data.code === '1') return
+          this.summary.liked = res.data.data.totalCounts
         })
         photoOp.getCollection.user(data, (res) => {
-          this.summary.collections = res.data.data.totalCount
+          if (res.data.code === '1') return
+          this.summary.collections = res.data.data.totalCounts
         })
+      },
+      onScroll () {
+        if ($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
+          $(window).unbind('scroll')
+          if (this.isActivated1) {
+            this.currentPage1 ++
+            this.getList_user().then(() => {
+              $(window).bind('scroll', this.onScroll)
+            })
+          }
+          if (this.isActivated2) {
+            this.currentPage2 ++
+            this.getList_liked().then(() => {
+              $(window).bind('scroll', this.onScroll)
+            })
+          }
+          if (this.isActivated3) {
+            this.currentPage3 ++
+            this.getCollection_user().then(() => {
+              $(window).bind('scroll', this.onScroll)
+            })
+          }
+        }
       }
     },
     computed: {
@@ -295,6 +358,10 @@
       this.getList_user()
       this.getBasicData()
       this.$store.dispatch('getOwnerInfo', this.$route.params[0])
+      this.$nextTick(function () {
+      // window.addEventListener('scroll', this.onScroll)
+        $(window).scroll(this.onScroll)
+      })
     }
   }
 </script>

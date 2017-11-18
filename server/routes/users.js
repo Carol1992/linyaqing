@@ -9,6 +9,7 @@ let crypto = require('crypto');
 let jwt = require('jsonwebtoken');
 let verify_token= require('./verify_token');
 // 阿里云OSS
+var aliyun_folder = 'users/'
 var my_secret = require('./secret');
 var co = require('co');
 var OSS = require('ali-oss');
@@ -16,7 +17,8 @@ var fs = require('fs');
 var client = new OSS({
   region: my_secret.region,
   accessKeyId: my_secret.accessKeyId,
-  accessKeySecret: my_secret.accessKeySecret
+  accessKeySecret: my_secret.accessKeySecret,
+  bucket: my_secret.bucket
 });
 // 处理表单上传
 var formidable = require('formidable');
@@ -30,21 +32,12 @@ router.post('/register', function(req, res, next) {
 		email : _user.email,
 		password : _user.password
 	};
-	if(!post.user_name) {
-		return res.json(formater({code:'1', desc:'用户名不能为空哦！'}));
-	}
-	if(!post.email) {
-		return res.json(formater({code:'1', desc:'邮件不能为空！'}));
-	}
-	if(!post.password) {
-		return res.json(formater({code:'1', desc:'密码不能为空'}));
-	} else {
-		//post.password = md5.update(post.password).digest("hex")
+	if(!post.user_name || !post.email || !post.password) {
+		return res.json(formater({code:'1', desc:'参数错误(缺失用户名或密码或邮箱)！'}));
 	}
 	query('SELECT * FROM users WHERE email = ?', [post.email])
 	.then(function(data) {
 		if(data.results.length > 0) {
-			console.log('user existed, insert failed.')
 			return res.json(formater({code:'1', desc:'使用该邮件注册的用户已经存在'}));
 		} else {
 			query('INSERT INTO users SET ?', [post])
@@ -62,16 +55,12 @@ router.post('/login', function(req, res, next) {
 		email : _user.email,
 		password : _user.password
 	}
-	if(!post.email) {
-		return res.json(formater({code:'1', desc:'邮件不能为空！'}));
-	}
-	if(!post.password) {
-		return res.json(formater({code:'1', desc:'密码不能为空'}));
+	if(!post.email || !post.password) {
+		return res.json(formater({code:'1', desc:'参数错误(缺失密码或邮箱)！'}));
 	}
 	query('SELECT * FROM users WHERE email = ?', [post.email])
 	.then(function(data) {
 		if(data.results.length === 0) {
-			console.log('user not existed.')
 			return res.json(formater({code:'1', desc:'该邮箱尚未注册，请先注册！'}));
 		}
 		if(post.password === data.results[0].password) {
@@ -97,7 +86,7 @@ router.all('/getUserInfo', verify_token, (req, res, next) => {
 	let search_user_id = req.body.user_id || req.query.user_id
 	if (search_user_id) {
 		user_id = search_user_id
-		query('SELECT user_name, email, image_md5, personal_site FROM users WHERE user_id = ?', [user_id])
+		query('SELECT user_name, email, image_md5, wechat, personal_site FROM users WHERE user_id = ?', [user_id])
 		.then(data => {
 			return res.json(formater({code:'0', data:data.results}))
 		})
@@ -133,24 +122,19 @@ router.post('/updateUserAccount/info', verify_token, (req, res, next) => {
 		user_id: req.api_user.data.user_id,
 		email: _user.email,
 		user_name: _user.user_name,
-		personal_site: _user.personal_site,
+		// personal_site: _user.personal_site,
 		wechat: _user.wechat,
 		address: _user.address,
-		bio: _user.bio,
-		province: _user.province,
-		city: _user.city,
-		town: _user.town
+		bio: _user.bio
+		// province: _user.province,
+		// city: _user.city,
+		// town: _user.town
 	};
-	if(!post.user_name) {
-		return res.json(formater({code:'1', desc:'用户名不能为空！'}));
+	if(!post.user_name || !post.email) {
+		return res.json(formater({code:'1', desc:'参数错误(确实用户名或邮箱)！'}));
 	}
-	if(!post.email) {
-		return res.json(formater({code:'1', desc:'邮件不能为空！'}));
-	}
-	query('UPDATE users SET email=?, user_name=?,' +
-		 'personal_site=?, wechat=?, address=?, bio=?, province=?, city=?, town=? WHERE user_id=?', 
-		 [post.email, post.user_name, post.personal_site,
-				post.wechat, post.address, post.bio, post.province, post.city, post.town, post.user_id])
+	query('UPDATE users SET email = ?, user_name = ?, wechat = ?, address = ?, bio = ? WHERE user_id = ?', 
+		 [post.email, post.user_name, post.wechat, post.address, post.bio, post.user_id])
 	.then(function(data) {
 		res.json(formater({code:'0', desc:'用户信息修改成功！'}))
 	});
@@ -168,9 +152,7 @@ router.post('/updateUserAccount/avatar', verify_token, (req, res, next) => {
 	.then((data) => {
 		if (!defaultImg) {
 			co(function* () {
-				client.useBucket('my-image-carol');
-			  var result = yield client.delete('users/' + saveName);
-			  console.log(result);
+			  var result = yield client.delete(aliyun_folder + saveName);
 			}).catch(function (err) {
 			  console.log(err);
 			});
@@ -185,24 +167,14 @@ router.post('/updateUserAccount/password', verify_token, (req, res, next) => {
 		user_id: req.api_user.data.user_id,
 		password: _user.password
 	};
-	if(!post.password) return res.json(formater({code:'1', desc:'密码不能为空！'}));
-	query('SELECT * FROM users WHERE user_id = ?', [post.user_id])
+	if(!post.password) return res.json(formater({code:'1', desc:'参数错误(密码缺失)！'}));
+	query('UPDATE users SET password = ? WHERE user_id = ?', [post.password, post.user_id])
 	.then(function(data) {
-		if(data.results.length === 0) {
-			console.log('user not existed.');
-			return res.json(formater({code:'1', desc:'该用户不存在！'}));
-			next();
-		}
+		res.json(formater({code:'0', desc:'用户密码修改成功！'}));
 	})
-	.then(function() {
-		query('UPDATE users SET password = ? WHERE user_id = ?', [post.password, post.user_id])
-		.then(function(data) {
-			res.json(formater({code:'0', desc:'用户密码修改成功！'}));
-		})
-	});
 });
-// 删除账户, 用户存储在其他表格的信息，如添加的应用、邮件设置、关注的category和摄像师等资料，也需要删除。外键的删除规则
-// 设置为层叠(cascade)
+// 删除账户, 用户存储在其他表格的信息，如添加的应用、邮件设置、关注的category和摄像师等资料，也需要删除。
+// 外键的删除规则设置为层叠(cascade)
 router.all('/updateUserAccount/delete', verify_token, (req, res, next) => {
 	let post = {
 		user_id: req.api_user.data.user_id
@@ -214,14 +186,12 @@ router.all('/updateUserAccount/delete', verify_token, (req, res, next) => {
 		let arr = []
 		if (results.length > 0) {
 			for (r of results) {
-				arr.push('users/' + r.image_md5)
+				arr.push(aliyun_folder + r.image_md5)
 			}
 		}
-		arr.push('users/' + results[0].avatar)
+		arr.push(aliyun_folder + results[0].avatar)
 		co(function* () {
-			client.useBucket('my-image-carol');
 		  var result = yield client.deleteMulti(arr)
-		  console.log(result);
 		}).catch(function (err) {
 		  console.log(err);
 		});
@@ -229,8 +199,6 @@ router.all('/updateUserAccount/delete', verify_token, (req, res, next) => {
 		.then(function(data) {
 			if(data.results.affectedRows === 1) {
 	  		res.json(formater({code:'0', desc:'账户删除成功！'}));
-	  	} else {
-	  		res.json(formater({code:'1', desc:'该用户不存在！'}));
 	  	}
 		});
 	})
@@ -239,28 +207,21 @@ router.all('/updateUserAccount/delete', verify_token, (req, res, next) => {
 router.post('/updateUserAccount/emailSettings', verify_token, (req, res, next) => {
 	let _user = req.body;
 	let user_id = req.api_user.data.user_id;
-	let settings = _user.email_settings.split(',');
+	let settings = _user.email_settings.toString();
+	if (!settings) return res.json(formater({code:'1', desc:'参数错误(设置缺失)！'}));
+	settings = settings.split(',');
 	let user_settings = [];
 	for(let setting of settings) {
 		let s = [user_id, setting];
 		user_settings.push(s);
 	}
-	query('SELECT user_id FROM users WHERE user_id = ?', [user_id])
-	.then(data => {
-		if(data.results.length === 0) {
-			return res.json(formater({code:'1', desc:'该用户不存在！'}));
-			next();
-		}
-	})
-	.then(() => {
-		query('DELETE FROM user_email WHERE user_id = ?', [user_id])
+	query('DELETE FROM user_email WHERE user_id = ?', [user_id])
+	.then(function() {
+		query('INSERT INTO user_email(user_id, settings_id) VALUES ?', [user_settings])
 		.then(function() {
-			query('INSERT INTO user_email(user_id, settings_id) VALUES ?', [user_settings])
-				.then(function(data) {
-					res.json(formater({code:'0', desc:'邮件设置成功！'}));
-				})
-		});
-	})
+			res.json(formater({code:'0', desc:'邮件设置成功！'}));
+		})
+	});
 });
 // 用户注册成为developer
 router.post('/updateUserAccount/developer', verify_token, (req, res, next) => {
@@ -273,7 +234,6 @@ router.post('/updateUserAccount/developer', verify_token, (req, res, next) => {
 	query('SELECT is_developer FROM users WHERE user_id = ?', [user_id])
 	.then(function(data) {
 		if(data.results[0].is_developer === '0') {
-			console.log('already register as a developer.');
 			return res.json(formater({code:'1', desc:'该用户已经注册为开发者！'}));
 		} else {
 			query('UPDATE users SET is_developer = ?, dev_url = ?, dev_desc = ? WHERE user_id = ?', ['0', post.url, post.description, user_id])
@@ -290,19 +250,17 @@ router.all('/getUserApplication', verify_token, (req, res, next) => {
 	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
 	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
-	let q1 = query('SELECT COUNT(*) AS totalPage FROM applications WHERE user_id = ?', [user_id]);
-	Promise.all([q1]).then(values => {
-		query('SELECT * FROM (SELECT * FROM applications WHERE user_id = ?) a LIMIT ?,?', [user_id, _left, pageSize])
-		.then(data => {
-			let new_data = {
-				pageNo: pageNo,
-				pageSize: pageSize,
-				totalPage: Math.ceil(values[0].results[0].totalPage / pageSize),
-				lists: data.results
-			};
-			res.json(formater({code:'0', data:new_data}));
-		})
-	});
+	query('SELECT * FROM applications WHERE user_id = ?', [user_id])
+	.then(data => {
+		let new_data = {
+			pageNo: pageNo,
+			pageSize: pageSize,
+			totalPage: Math.ceil(data.results.length / pageSize),
+			totalCounts: data.results.length,
+			lists: data.results.slice(_left, _left+pageSize)
+		};
+		res.json(formater({code:'0', data:new_data}));
+	})
 });
 // 删除用户图片
 router.all('/deleteUserPhoto', verify_token, (req, res, next) => {
@@ -312,7 +270,7 @@ router.all('/deleteUserPhoto', verify_token, (req, res, next) => {
 		image_id: _user.image_id || req.query.image_id
 	};
 	if(!post.image_id) {
-		return res.json(formater({code:'1', desc:'请提供所要删除图片的id！'}));
+		return res.json(formater({code:'1', desc:'参数错误(缺失图片的id)！'}));
 	}
 	query('SELECT image_id, image_md5 FROM images WHERE image_id = ? AND user_id = ?', [post.image_id, user_id])
 	.then(data => {
@@ -321,10 +279,9 @@ router.all('/deleteUserPhoto', verify_token, (req, res, next) => {
 		} else {
 			query('SELECT image_md5 FROM images WHERE image_id = ?', [post.image_id])
 			.then(data => {
+				if (data.results.length === 0) return res.json(formater({code:'1', desc:'图片不存在！'}));
 				co(function* () {
-					client.useBucket('my-image-carol');
-				  var result = yield client.delete('users/' + data.results[0].image_md5);
-				  console.log(result);
+				  var result = yield client.delete(aliyun_folder + data.results[0].image_md5);
 				}).catch(function (err) {
 				  console.log(err);
 				});
@@ -332,8 +289,6 @@ router.all('/deleteUserPhoto', verify_token, (req, res, next) => {
 				.then(function(data) {
 					if(data.results.affectedRows === 1) {
 						res.json(formater({code:'0', desc:'图片删除成功！'}));
-					} else {
-						res.json(formater({code:'1', desc:'图片不存在！'}));
 					}
 				});
 			})
@@ -345,40 +300,34 @@ router.all('/deleteCollection', verify_token, (req, res, next) => {
 	let user_id = req.api_user.data.user_id;
 	let collection_id = req.body.collection_id || req.query.collection_id;
 	if(!collection_id) {
-		return res.json(formater({code:'1', desc:'请提供所要删除相册的id！'}));
+		return res.json(formater({code:'1', desc:'参数错误(缺失相册的id)！'}));
 	}
 	query('SELECT collection_id FROM collections WHERE collection_id = ? AND user_id = ?', [collection_id, user_id])
 	.then(data => {
 		if(data.results.length === 0) {
 			return res.json(formater({code:'1', desc:'该相册不属于该用户！'}));
-		} else {
-			query('SELECT ic.image_id, i.image_md5 FROM image_collection ic, images i WHERE '+
-				'ic.image_id = i.image_id AND ic.collection_id = ? AND i.user_id = ?', [collection_id, user_id])
-			.then(data => {
-				let results = data.results
-				let arr = []
-				if (results.length > 0) {
-					for (r of results) {
-						arr.push('users/' + r.image_md5)
-					}
-				}
-				co(function* () {
-					client.useBucket('my-image-carol');
-				  var result = yield client.deleteMulti(arr)
-				  console.log(result);
-				}).catch(function (err) {
-				  console.log(err);
-				});
-				query('DELETE FROM collections WHERE collection_id = ?', [collection_id])
-				.then(function(data) {
-					if(data.results.affectedRows === 1) {
-						res.json(formater({code:'0', desc:'相册删除成功！'}));
-					} else {
-						res.json(formater({code:'1', desc:'相册不存在！'}));
-					}
-				});
-			})
 		}
+		query('SELECT ic.image_id, i.image_md5 FROM image_collection ic, images i WHERE '+
+			'ic.image_id = i.image_id AND ic.collection_id = ? AND i.user_id = ?', [collection_id, user_id])
+		.then(data => {
+			let results = data.results
+			if (results.length === 0) return res.json(formater({code:'1', desc:'相册不存在！'}));
+			let arr = []
+			for (let r of results) {
+				arr.push(aliyun_folder + r.image_md5)
+			}
+			co(function* () {
+			  var result = yield client.deleteMulti(arr)
+			}).catch(function (err) {
+			  console.log(err);
+			});
+			query('DELETE FROM collections WHERE collection_id = ?', [collection_id])
+			.then(function(data) {
+				if(data.results.affectedRows === 1) {
+					res.json(formater({code:'0', desc:'相册删除成功！'}));
+				}
+			});
+		})
 	})
 })
 // 用户添加应用
@@ -390,7 +339,9 @@ router.post('/addNewApp', verify_token, (req, res, next) => {
 		app_desc: _user.app_desc,
 		callback_url: _user.callback_url
 	};
-	let permissions = _user.permissions.split(',');
+	let permissions = _user.permissions;
+	if (!post.app_name || !permissions) return res.json(formater({code:'1', desc:'参数错误(缺失应用名称或权限)！'}));
+	permissions = permissions.split(',');
 	query('SELECT is_developer FROM users WHERE user_id = ?', [post.user_id])
 	.then(function(data) {
 		if(data.results[0].is_developer === '1') {
@@ -429,6 +380,9 @@ router.post('/updatePhotoTag', (req, res, next) => {
 		image_id: _user.image_id,
 		tag: _user.tag // 以逗号分隔
 	};
+	if (!post.image_id || !post.tags) {
+		return res.json(formater({code:'1', desc:'参数错误(缺失图像id或标签)！'}));
+	}
 	query('SELECT image_tags FROM images WHERE image_id = ?', [post.image_id])
 	.then(function(data) {
 		let old_tags = data.results[0].image_tags;
@@ -448,7 +402,7 @@ router.post('/updatePhotoTag', (req, res, next) => {
 router.post('/updatePhotographers/add', verify_token, (req, res, next) => {
 	let _user = req.body;
 	let user_id = req.api_user.data.user_id;
-	let settings = req.body.followings.split(',');
+	let settings = req.body.followings.toString().split(',');
 	let user_settings = [];
 	if (settings.length === 0) {
 		return res.json(formater({code: '1', desc: '没有提供关注者的id'}))
@@ -515,7 +469,7 @@ router.all('/getPhotographers', (req, res, next) => {
 		res.json(formater({code:'0', data: data.results}));
 	});
 });
-// 关键字搜索
+// TODO:关键字搜索
 router.all('/search', (req, res, next) => {
 	let _user = req.body;
 	let keyword = _user.keyword || req.query.keyword;
@@ -549,7 +503,9 @@ router.all('/getCategories', (req, res, next) => {
 router.post('/updateUserCategories', verify_token, (req, res, next) => {
 	let _user = req.body;
 	let user_id = req.api_user.data.user_id;
-	let settings = _user.categories.split(',');
+	let settings = _user.categories;
+	if (!settings) return res.json(formater({code:'1', desc:'参数错误(缺失设置)！'}));
+	settings = settings.toString().split(',');
 	let user_settings = [];
 	for(let setting of settings) {
 		let s = [user_id, setting];
@@ -569,27 +525,22 @@ router.all('/getList/new', (req, res, next) => {
 	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
 	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
-	let q1 = query('SELECT COUNT(*) AS totalPage FROM (SELECT i.*, u.user_name, u.image_md5 AS avatar, '+
+	query('SELECT i.*, u.user_name, u.image_md5 AS avatar, '+
 		'u.email, c.is_private, likes.total_likes FROM image_collection ic JOIN collections c ON '+
 		'ic.collection_id = c.collection_id JOIN images i ON ic.image_id = i.image_id JOIN users u ON '+
 		'i.user_id = u.user_id LEFT OUTER JOIN (SELECT l.image_id, COUNT(l.user_id) AS total_likes FROM '+
 		'image_likes l GROUP BY image_id) likes ON i.image_id = likes.image_id WHERE c.is_private = 1 '+
-		'GROUP BY ic.image_id ORDER BY i.created_time DESC) a', '');
-	let q2 = query('SELECT i.*, u.user_name, u.image_md5 AS avatar, '+
-		'u.email, c.is_private, likes.total_likes FROM image_collection ic JOIN collections c ON '+
-		'ic.collection_id = c.collection_id JOIN images i ON ic.image_id = i.image_id JOIN users u ON '+
-		'i.user_id = u.user_id LEFT OUTER JOIN (SELECT l.image_id, COUNT(l.user_id) AS total_likes FROM '+
-		'image_likes l GROUP BY image_id) likes ON i.image_id = likes.image_id WHERE c.is_private = 1 '+
-		'GROUP BY ic.image_id ORDER BY i.created_time DESC LIMIT ?,?', [_left, pageSize]);
-	Promise.all([q1, q2]).then(values => {
+		'GROUP BY ic.image_id ORDER BY i.created_time DESC', '')
+	.then(data => {
 		let new_data = {
-				pageNo: pageNo,
-				pageSize: pageSize,
-				totalPage: Math.ceil(values[0].results[0].totalPage / pageSize),
-				lists: values[1].results
-			};
-			res.json(formater({code:'0', data:new_data}))
-	});
+			pageNo: pageNo,
+			pageSize: pageSize,
+			totalPage: Math.ceil(data.results.length / pageSize),
+			totalCounts: data.results.length,
+			lists: data.results.slice(_left, _left+pageSize)
+		};
+		res.json(formater({code:'0', data:new_data}))
+	})
 });
 // 获取最热图片列表
 router.all('/getList/hot', (req, res, next) => {
@@ -597,27 +548,22 @@ router.all('/getList/hot', (req, res, next) => {
 	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
 	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
-	let q1 = query('SELECT COUNT(*) AS totalPage FROM (SELECT i.*, u.user_name, u.image_md5 AS avatar, '+
+	query('SELECT i.*, u.user_name, u.image_md5 AS avatar, '+
 		'u.email, c.is_private, likes.total_likes FROM image_collection ic JOIN collections c ON '+
 		'ic.collection_id = c.collection_id JOIN images i ON ic.image_id = i.image_id JOIN users u ON '+
 		'i.user_id = u.user_id LEFT OUTER JOIN (SELECT l.image_id, COUNT(l.user_id) AS total_likes FROM '+
 		'image_likes l GROUP BY image_id) likes ON i.image_id = likes.image_id WHERE c.is_private = 1 '+
-		'GROUP BY ic.image_id) a', '');
-	let q2 = query('SELECT i.*, u.user_name, u.image_md5 AS avatar, '+
-		'u.email, c.is_private, likes.total_likes FROM image_collection ic JOIN collections c ON '+
-		'ic.collection_id = c.collection_id JOIN images i ON ic.image_id = i.image_id JOIN users u ON '+
-		'i.user_id = u.user_id LEFT OUTER JOIN (SELECT l.image_id, COUNT(l.user_id) AS total_likes FROM '+
-		'image_likes l GROUP BY image_id) likes ON i.image_id = likes.image_id WHERE c.is_private = 1 '+
-		'GROUP BY ic.image_id ORDER BY likes.total_likes DESC LIMIT ?,?', [_left, pageSize]);
-	Promise.all([q1, q2]).then(values => {
+		'GROUP BY ic.image_id ORDER BY likes.total_likes DESC', '')
+	.then(data => {
 		let new_data = {
-				pageNo: pageNo,
-				pageSize: pageSize,
-				totalPage: Math.ceil(values[0].results[0].totalPage / pageSize),
-				lists: values[1].results
-			};
-			res.json(formater({code:'0', data:new_data}))
-	});
+			pageNo: pageNo,
+			pageSize: pageSize,
+			totalPage: Math.ceil(data.results.length / pageSize),
+			totalCounts: data.results.length,
+			lists: data.results.slice(_left, _left+pageSize)
+		};
+		res.json(formater({code:'0', data:new_data}))
+	})
 });
 // 已登录用户，获取其所关注的作者的图片列表
 router.all('/getList/following', verify_token, (req, res, next) => {
@@ -626,29 +572,23 @@ router.all('/getList/following', verify_token, (req, res, next) => {
 	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
 	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
-	let q1 = query('SELECT COUNT(*) AS totalPage FROM (SELECT i.*, u.user_name, u.image_md5 AS avatar, '+
+	query('SELECT i.*, u.user_name, u.image_md5 AS avatar, '+
 		'u.email, c.is_private, likes.total_likes FROM images i JOIN (SELECT r.following_id FROM relationships r '+
 		'WHERE r.user_id = ?) follow ON i.user_id = follow.following_id JOIN users u ON i.user_id = u.user_id '+
 		'JOIN image_collection ic ON i.image_id = ic.image_id JOIN collections c ON '+
 		'ic.collection_id = c.collection_id LEFT OUTER JOIN (SELECT l.image_id, COUNT(l.user_id) AS '+
 		'total_likes FROM image_likes l GROUP BY image_id) likes ON i.image_id = likes.image_id '+
-		'WHERE c.is_private = 1 GROUP BY ic.image_id ORDER BY likes.total_likes DESC) a', [user_id])
-	let q2 = query('SELECT i.*, u.user_name, u.image_md5 AS avatar, '+
-		'u.email, c.is_private, likes.total_likes FROM images i JOIN (SELECT r.following_id FROM relationships r '+
-		'WHERE r.user_id = ?) follow ON i.user_id = follow.following_id JOIN users u ON i.user_id = u.user_id '+
-		'JOIN image_collection ic ON i.image_id = ic.image_id JOIN collections c ON '+
-		'ic.collection_id = c.collection_id LEFT OUTER JOIN (SELECT l.image_id, COUNT(l.user_id) AS '+
-		'total_likes FROM image_likes l GROUP BY image_id) likes ON i.image_id = likes.image_id '+
-		'WHERE c.is_private = 1 GROUP BY ic.image_id ORDER BY likes.total_likes DESC LIMIT ?,?', [user_id, _left, pageSize])
-	Promise.all([q1, q2]).then(values => {
+		'WHERE c.is_private = 1 GROUP BY ic.image_id ORDER BY likes.total_likes DESC', [user_id])
+	.then(data => {
 		let new_data = {
-				pageNo: pageNo,
-				pageSize: pageSize,
-				totalPage: Math.ceil(values[0].results[0].totalPage / pageSize),
-				lists: values[1].results
-			};
-			res.json(formater({code:'0', data:new_data}));
-	});
+			pageNo: pageNo,
+			pageSize: pageSize,
+			totalPage: Math.ceil(data.results.length / pageSize),
+			totalCounts: data.results.length,
+			lists: data.results.slice(_left, _left+pageSize)
+		};
+		res.json(formater({code:'0', data:new_data}))
+	})
 });
 // 获取某个用户的所有图片列表
 router.all('/getList/user', (req, res, next) => {
@@ -671,7 +611,6 @@ router.all('/getList/user', (req, res, next) => {
     if (!err) {
       // 如果没问题就把解码后的信息保存到请求中，供后面的路由使用
       req.api_user = decoded;
-      console.log('_user_id: ', req.api_user.data.user_id);
       if (req.api_user.data.user_id == request_user_id) {
       	q2 = query('SELECT i.*, u.user_name, u.image_md5 AS user_avatar, c.is_private, likes.total_likes '+
 				'FROM image_collection ic JOIN collections c ON ic.collection_id = c.collection_id '+
@@ -687,8 +626,8 @@ router.all('/getList/user', (req, res, next) => {
 			pageNo: pageNo,
 			pageSize: pageSize,
 			totalPage: Math.ceil(values[0].results.length / pageSize),
-			totalCount: values[0].results.length,
-			lists: values[0].results
+			totalCounts: values[0].results.length,
+			lists: values[0].results.slice(_left, _left+pageSize)
 		};
 		res.json(formater({code:'0', data:new_data}))
 	});
@@ -734,7 +673,7 @@ router.all('/getList/liked', (req, res, next) => {
 				pageNo: pageNo,
 				pageSize: pageSize,
 				totalPage: Math.ceil(values[0].results.length / pageSize),
-				totalCount: values[0].results.length,
+				totalCounts: values[0].results.length,
 				lists: values[0].results.slice(_left, _left+pageSize)
 			};
 			res.json(formater({code:'0', data:new_data}))
@@ -783,7 +722,7 @@ router.all('/getCollection/all', (req, res, next) => {
 			pageNo: pageNo,
 			pageSize: pageSize,
 			totalPage: Math.ceil(newArr.length / pageSize),
-			totalCount: newArr.length,
+			totalCounts: newArr.length,
 			lists: newArr.slice(_left, _left+pageSize)
 		};
 		res.json(formater({code:'0', data:new_data}));
@@ -809,7 +748,6 @@ router.all('/getCollection/user', (req, res, next) => {
     if (!err) {
       // 如果没问题就把解码后的信息保存到请求中，供后面的路由使用
       req.api_user = decoded;
-      console.log('_user_id: ', req.api_user.data.user_id);
       if (req.api_user.data.user_id == request_user_id) {
       	q2 = query('SELECT u.user_id, u.user_name, u.image_md5 AS avatar, ic.collection_id, '+
       		'c.collection_name, c.is_private, ic.image_id, i.image_md5 FROM users u, '+
@@ -852,7 +790,7 @@ router.all('/getCollection/user', (req, res, next) => {
 			pageNo: pageNo,
 			pageSize: pageSize,
 			totalPage: Math.ceil(newArr.length / pageSize),
-			totalCount: newArr.length,
+			totalCounts: newArr.length,
 			lists: newArr.slice(_left, _left+pageSize)
 		};
 		res.json(formater({code:'0', data:new_data}));
@@ -1104,48 +1042,13 @@ router.post('/uploadPhotoToAliyun', (req, res, next) => {
 	req.on("end",function(){
     var buffer = Buffer.concat(chunks, size);
     co(function* () {
-			// 获取bucket列表
-		  // var result = yield client.listBuckets();
-		  // var buckets = result.buckets;
-		  client.useBucket('my-image-carol');
-		  // var result2 = yield client.list({
-		  //   'max-keys': 5
-		  // });
-	  	// var lists = result2.objects;
-	  	// 上传图片
 	  	var result3 = yield client.put(new Date().getTime() + '.' + ext, buffer);
 	  	var url = result3.url;
-	  	// 下载文件
-	  	//var result4 = yield client.get('1509406172995.jpeg', '');
-	  	//var url2 = client.signatureUrl('1509406172995.jpeg');
-	  	//console.log(result4);
-	  	// 删除文件
-	  	// var result4 = yield client.delete('object-key');
-	  	// console.log(result4);
 		  res.json(formater({code:'0', data:{url:url}}));
 		}).catch(function (err) {
 		  console.log(err);
 		});
 	});
-});
-router.post('/uploadPhotoToAliyun/bak', verify_token, (req, res, next) => {
-	co(function* () {
-		client.useBucket('my-image-carol');
-	  	// 上传图片
-	  	// use 'chunked encoding'
-	  var stream = fs.createReadStream('local-file');
-	  var result = yield client.putStream('object-key', stream);
-	  console.log(result);
-	  // don't use 'chunked encoding'
-	  var stream = fs.createReadStream('local-file');
-	  var size = fs.statSync('local-file').size;
-	  var result = yield client.putStream(
-	    'object-key', stream, {contentLength: size});
-	  console.log(result);
-		  res.json(formater({code:'0', data:{url:url}}));
-		}).catch(function (err) {
-		  console.log(err);
-		});
 });
 // 用户下载图片
 router.all('/download/photo', (req, res, next) => {
@@ -1159,17 +1062,74 @@ router.all('/download/photo', (req, res, next) => {
    'Content-Disposition': 'attachment; filename='+filename
   });
 	co(function* () {
-	  client.useBucket('my-image-carol');
-  	// var result4 = yield client.get('1509406044609.gif', 'a.gif');
-  	// var url2 = client.signatureUrl('1509406044609.gif');
-  	var result = yield client.getStream('users/'+filename);
-	  // var writeStream = fs.createWriteStream('b.gif');
-	  // result.stream.pipe(writeStream);
+  	var result = yield client.getStream(aliyun_folder+filename);
 	  result.stream.pipe(res)
 	}).catch(function (err) {
 	  console.log(err);
 	});
 })
+// 用户是否给该图片点过赞
+router.all('/alreadyLike', verify_token, (req, res, next) => {
+	let user_id = req.api_user.data.user_id;
+	let image_id = req.body.image_id;
+	if (!image_id) {
+		return res.json(formater({code: '1', desc: '请提供图片id'}))
+	}
+	query('SELECT image_id FROM image_likes WHERE image_id = ? AND user_id = ?', 
+		[image_id, user_id])
+	.then(data => {
+		let alreadyLike = false
+		if(data.results.length !== 0) {
+			alreadyLike = true
+		}
+		query('SELECT COUNT(*) AS total_likes FROM image_likes WHERE image_id = ?', [image_id])
+		.then(data => {
+			res.json(formater({code: '0', data:{alreadyLike: alreadyLike, total_likes: data.results[0].total_likes}}))
+		})
+	})
+})
+// 用户给图片点赞
+router.post('/photoLike', verify_token, (req, res, next) => {
+	let user_id = req.api_user.data.user_id;
+	let image_id = req.body.image_id;
+	let like = req.body.like;
+	if(like !== '0' && like !== '1') {
+		return res.json(formater({code:'1', desc:'参数错误！'}));
+	}
+	query('SELECT image_id, liked FROM images WHERE image_id = ?', [image_id])
+	.then(data => {
+		if(data.results.length === 0) {
+			return res.json(formater({code:'1', desc:'图片不存在！'}));
+		}
+		query('SELECT image_id FROM image_likes WHERE image_id = ? AND user_id = ?', [image_id, user_id])
+		.then(data => {
+			let hasRecords = data.results.length === 0 ? false : true;
+			if(like === '0') {
+				// 用户取消点赞，判断image_likes是否已经有点赞记录，有的话才可以取消
+				if (hasRecords) {
+					query('DELETE FROM image_likes WHERE image_id = ? AND user_id = ?', [image_id, user_id])
+					.then(data => {
+						res.json(formater({code:'0', desc:'点赞取消成功！'}));
+					})
+				} else {
+					res.json(formater({code:'1', desc:'用户未给该照片点过赞，无法取消赞！'}));
+				}
+			} else {
+				// 用户给图片点赞，判断image_likes是否不存在该照片的点赞记录，不存在才可以点赞
+				if (hasRecords) {
+					res.json(formater({code:'1', desc:'用户已经给该照片点过赞，无法再次点赞！'}));
+				} else {
+					query('INSERT INTO image_likes SET ?', [{image_id: image_id, user_id: user_id}])
+					.then(data => {
+						res.json(formater({code:'0', desc:'点赞成功！'}));
+					})
+				}
+			}
+		})
+	})
+});
+
+/********* 下一期开发(start) **********/
 // 上传商品图片到服务器
 router.post('/uploadProductImageToAliyun', verify_token, (req, res, next) => {
 	if(req.headers['content-length'] === '0') {
@@ -1198,7 +1158,6 @@ router.post('/uploadProductImageToAliyun', verify_token, (req, res, next) => {
 			});
 	});
 });
-
 // 修改产品库存
 router.post('/changeStocks', verify_token, (req, res, next) => {
 	let _user = req.body;
@@ -1558,7 +1517,6 @@ router.all('/getDeliveryAddress', verify_token, (req, res, next) => {
 		res.json(formater({code:'0', data:new_data}));
 	})
 });
-
 // 用户提交订单
 router.post('/placeOrder', verify_token, (req, res, next) => {
 	let _user = req.body;
@@ -1583,66 +1541,7 @@ router.post('/placeOrder', verify_token, (req, res, next) => {
 		})
 	})
 });
-// 用户是否给该图片点过赞
-router.all('/alreadyLike', verify_token, (req, res, next) => {
-	let user_id = req.api_user.data.user_id;
-	let image_id = req.body.image_id;
-	if (!image_id) {
-		return res.json(formater({code: '1', desc: '请提供图片id'}))
-	}
-	query('SELECT image_id FROM image_likes WHERE image_id = ? AND user_id = ?', 
-		[image_id, user_id])
-	.then(data => {
-		let alreadyLike = false
-		if(data.results.length !== 0) {
-			alreadyLike = true
-		}
-		query('SELECT COUNT(*) AS total_likes FROM image_likes WHERE image_id = ?', [image_id])
-		.then(data => {
-			res.json(formater({code: '0', data:{alreadyLike: alreadyLike, total_likes: data.results[0].total_likes}}))
-		})
-	})
-})
-// 用户给图片点赞
-router.post('/photoLike', verify_token, (req, res, next) => {
-	let user_id = req.api_user.data.user_id;
-	let image_id = req.body.image_id;
-	let like = req.body.like;
-	if(like !== '0' && like !== '1') {
-		return res.json(formater({code:'1', desc:'参数错误！'}));
-	}
-	query('SELECT image_id, liked FROM images WHERE image_id = ?', [image_id])
-	.then(data => {
-		if(data.results.length === 0) {
-			return res.json(formater({code:'1', desc:'图片不存在！'}));
-		}
-		query('SELECT image_id FROM image_likes WHERE image_id = ? AND user_id = ?', [image_id, user_id])
-		.then(data => {
-			let hasRecords = data.results.length === 0 ? false : true;
-			if(like === '0') {
-				// 用户取消点赞，判断image_likes是否已经有点赞记录，有的话才可以取消
-				if (hasRecords) {
-					query('DELETE FROM image_likes WHERE image_id = ? AND user_id = ?', [image_id, user_id])
-					.then(data => {
-						res.json(formater({code:'0', desc:'点赞取消成功！'}));
-					})
-				} else {
-					res.json(formater({code:'1', desc:'用户未给该照片点过赞，无法取消赞！'}));
-				}
-			} else {
-				// 用户给图片点赞，判断image_likes是否不存在该照片的点赞记录，不存在才可以点赞
-				if (hasRecords) {
-					res.json(formater({code:'1', desc:'用户已经给该照片点过赞，无法再次点赞！'}));
-				} else {
-					query('INSERT INTO image_likes SET ?', [{image_id: image_id, user_id: user_id}])
-					.then(data => {
-						res.json(formater({code:'0', desc:'点赞成功！'}));
-					})
-				}
-			}
-		})
-	})
-});
+/********* 下一期开发(end) **********/
 
 module.exports = router;
 

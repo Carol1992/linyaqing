@@ -2,7 +2,7 @@
   <div class="container">
     <div class="details">
       <p><Icon type="ios-albums"></Icon> 请选择存放该图片的相册</p>
-      <Icon type="android-cancel" id='cancel' @click='closeCollection'></Icon>
+      <span @click='closeCollection'><Icon type="android-cancel" id='cancel'></Icon></span>
       <div class="select-collection">
         <div class="collection" v-for='collection in userCollections' 
         @click='selectCollection($event, collection)'>
@@ -42,6 +42,7 @@
         this.$emit('addTo', this.collectionId)
       },
       closeCollection (e) {
+        console.log('hi')
         this.$emit('closeCollection', e)
       },
       selectCollection (e, collection) {

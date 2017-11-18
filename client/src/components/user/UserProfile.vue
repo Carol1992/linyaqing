@@ -11,7 +11,7 @@
         <div class="password" @click='isProfile = false; isPhoto = false; isEmail = false; isPwd = true; isApp = false; isDelete = false; nowEdit = "更改密码"'>
           <span :class='{activated: isPwd}'>更改密码</span>
         </div>
-        <div class="photos" @click='getList_user'>
+        <div class="photos" @click='getList'>
           <span :class='{activated: isPhoto}'>照片管理</span>
         </div>
         <div class="email" @click='isProfile = false; isPhoto = false; isEmail = true; isPwd = false; isApp = false; isDelete = false; nowEdit = "邮件设置"'>
@@ -32,6 +32,7 @@
           <div class="user_avatar">
             <div class="myavatar">
               <img :src='info.image_md5' alt="">
+              <Icon type="load-c" class="demo-spin-icon-load" v-if='loading'></Icon>
             </div>
             <span id="changeIco" @click='changeAvatar1'>更换头像</span>
             <input type="file" class="hidden-file-upload" id="uploadImg" @change='changeAvatar2'>
@@ -47,7 +48,7 @@
             </div>
             <div class="website">
               <span><Icon type="link"></Icon> 微 信</span>
-              <input type="text" maxlength="100" v-model='info.personal_site'>
+              <input type="text" maxlength="100" v-model='info.wechat'>
             </div>
           </div>
         </div>
@@ -67,7 +68,7 @@
       </div>
       <div class="isDelete" v-if='isDelete'>
         <div class="warm">
-          <p>确定要删除账户吗？删除账户后与账户关联的所有信息都将被清除！</p>
+          <p>确定要删除账户吗？删除账户后与账户关联的所有信息和照片都将被清除！</p>
           <p>如果只是要删除部分信息，请导航到具体模块进行删除。</p>
         </div>
         <div class="confirmed" @click='deleteAccount'>
@@ -100,6 +101,7 @@
         <div class="image-edit" v-for='photo in photos'>
           <div class="left-image">
             <img :src='photo.image_md5_new' alt="">
+            <Icon type="load-c" class="demo-spin-icon-load" v-if='loading2'></Icon>
           </div>
           <div class="image-detail">
             <div class="image-choices">
@@ -111,31 +113,31 @@
             </div>
             <div class="image-exif" v-if='photo.isExif'>
               <div class="image-make">
-                <span>Make</span>
+                <span>相机</span>
                 <input type="text" maxlength="50" v-model='photo.make'>
               </div>
               <div class="image-model">
-                <span>Model</span>
+                <span>型号</span>
                 <input type="text" maxlength="50" v-model='photo.model'>
               </div>
               <div class="image-focal">
-                <span>Focal length (mm)</span>
+                <span>镜头焦距 (mm)</span>
                 <input type="text" maxlength="50" v-model='photo.focalLength'>
               </div>
               <div class="image-aper">
-                <span>Aperture (ƒ)</span>
+                <span>镜头光圈 (ƒ)</span>
                 <input type="text" maxlength="50" v-model='photo.aperture'>
               </div>
               <div class="image-iso">
-                <span>ISO</span>
+                <span>感光度</span>
                 <input type="text" maxlength="50" v-model='photo.iso'>
               </div>
               <div class="image-shutter">
-                <span>Shutter speed (s)</span>
+                <span>快门速度 (s)</span>
                 <input type="text" maxlength="50" v-model='photo.shutterSpeed'>
               </div>
               <div class="created">
-                <span>DateTimeOriginal</span>
+                <span>拍摄日期</span>
                 <input type="text" maxlength="50" v-model='photo.dateTimeOriginal'>
               </div>
             </div>
@@ -178,6 +180,7 @@
   import userOp from '../../../api/user'
   import aliyunOp from '../../../api/aliyun'
   import photoOp from '../../../api/photos'
+  import $ from 'jquery'
   export default {
     name: 'userProfile',
     data () {
@@ -194,9 +197,11 @@
         password_confirmed: '',
         imgUrl: '',
         currentPage1: 1,
-        pageSize: 18000,
+        pageSize: 20,
         photos: [],
-        noData: false
+        noData: false,
+        loading: false,
+        loading2: true
       }
     },
     components: {
@@ -252,6 +257,11 @@
       },
       deletePic (photo) {
         photoOp.deleteUserPhoto({image_id: photo.image_id}, (res) => {
+          if (res.data.code === '1') {
+            this.notifyMsg = '图片删除失败！'
+            this.error(true)
+            return
+          }
           this.getList_user()
           this.notifyMsg = '图片删除成功！'
           this.success(true)
@@ -259,9 +269,18 @@
       },
       updatePhoto (photo) {
         photoOp.updatePhoto(photo, (res) => {
+          if (res.data.code === '1') {
+            this.notifyMsg = '图片信息更新失败！'
+            this.error(true)
+            return
+          }
           this.notifyMsg = '图片信息更新成功！'
           this.success(true)
         })
+      },
+      getList () {
+        this.photos = []
+        this.getList_user()
       },
       getList_user () {
         this.isProfile = false
@@ -277,23 +296,31 @@
           pageSize: this.pageSize,
           request_user_id: this.info.user_id
         }
-        photoOp.getList.user(data, (res) => {
-          let lists = res.data.data.lists
-          this.photos = []
-          if (lists.length === 0) {
-            this.noData = true
-            return
-          }
-          this.noData = false
-          for (let i = 0; i < lists.length; i++) {
-            lists[i].image_md5_new = this.$store.state.urlBase + lists[i].image_md5 + this.$store.state.viewBase
-            lists[i].isExif = true
-            lists[i].isPic = false
-            lists[i].isLoc = false
-            lists[i].isTag = false
-            lists[i].isSet = false
-            this.photos.push(lists[i])
-          }
+        return new Promise((resolve, reject) => {
+          photoOp.getList.user(data, (res) => {
+            this.loading2 = false
+            if (res.data.code === '1') {
+              this.notifyMsg = '图片获取失败！'
+              this.error(true)
+              return
+            }
+            let lists = res.data.data.lists
+            for (let i = 0; i < lists.length; i++) {
+              lists[i].image_md5_new = this.$store.state.urlBase + lists[i].image_md5 + this.$store.state.viewBase
+              lists[i].isExif = true
+              lists[i].isPic = false
+              lists[i].isLoc = false
+              lists[i].isTag = false
+              lists[i].isSet = false
+              this.photos.push(lists[i])
+            }
+            if (this.photos.length === 0) {
+              this.noData = true
+              return
+            }
+            this.noData = false
+            resolve()
+          })
         })
       },
       changeInfo () {
@@ -323,16 +350,20 @@
             this.error(true)
             return
           }
-          if (xhr.status === 200) {
-            let data = {
-              saveName: saveName,
-              oldSaveName: this.info.saveName,
-              defaultImg: this.info.defaultImg
-            }
-            userOp.updateUserAccount.avatar(data, () => {
-              self.$store.dispatch('getUserInfo')
-            })
+          let data = {
+            saveName: saveName,
+            oldSaveName: this.info.saveName,
+            defaultImg: this.info.defaultImg
           }
+          userOp.updateUserAccount.avatar(data, (res) => {
+            if (res.data.code === '1') {
+              this.notifyMsg = '操作失败！'
+              this.error(true)
+              return
+            }
+            self.$store.dispatch('getUserInfo')
+          })
+          self.loading = false
         })
         .catch((err) => {
           console.log(err)
@@ -401,7 +432,14 @@
           this.error(true)
           return
         }
+        this.loading = true
         aliyunOp.getAliyunKey((res) => {
+          if (res.data.code === '1') {
+            this.loading = false
+            this.notifyMsg = '头像更新失败！'
+            this.error(true)
+            return
+          }
           const {accessKeyId, host_user, policy, signature, saveName, startsWith} = res.data.data
           fd.append('OSSAccessKeyId', accessKeyId)
           fd.append('policy', policy)
@@ -411,6 +449,15 @@
           fd.append('file', file, saveName)
           this.saveImgToAliyun(fd, file, host_user, startsWith, saveName)
         })
+      },
+      onScroll () {
+        if ($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
+          $(window).unbind('scroll')
+          this.currentPage1 ++
+          this.getList_user().then(() => {
+            $(window).bind('scroll', this.onScroll)
+          })
+        }
       }
     },
     computed: {
@@ -430,11 +477,31 @@
       if (this.login) {
         this.$store.dispatch('getUserInfo')
       }
+      this.$nextTick(function () {
+      // window.addEventListener('scroll', this.onScroll)
+        $(window).scroll(this.onScroll)
+      })
     }
   }
 </script>
 
 <style scoped>
+  .demo-spin-icon-load{
+    animation: ani-demo-spin 1s linear infinite;
+    font-size: 40px;
+    position: absolute;
+    color: #5EA7F4;
+    font-weight: bolder;
+    width: 40px;
+    height: 40px;
+    top: calc(50% - 20px);
+    left: calc(50% - 20px);
+  }
+  @keyframes ani-demo-spin {
+    from { transform: rotate(0deg);}
+    50%  { transform: rotate(180deg);}
+    to   { transform: rotate(360deg);}
+  }
   .container {
     width: 78%;
     margin: auto;
@@ -535,6 +602,7 @@
     border-radius: 50%;
     overflow: hidden;
     margin: auto;
+    position: relative;
   }
   .myavatar > img {
     width: 150px;
@@ -595,6 +663,7 @@
     display: inline-block;
     float: left;
     margin-right: 5%;
+    position: relative;
   }
   .image-detail {
     width: 60%;

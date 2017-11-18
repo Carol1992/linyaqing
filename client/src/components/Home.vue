@@ -1,5 +1,5 @@
 <template>
-  <div id="home">
+   <div id="home">
     <div class="introduction">
       <h1>Sharing Life</h1>
       <h3>图片分享，免费下载，好友互赞，记录生活点点滴滴。</h3>
@@ -23,6 +23,7 @@
 import photosOp from '../../api/photos'
 import Photos from './photos/Photos'
 import addToCollection from './photos/addToCollection'
+import $ from 'jquery'
 export default {
   name: 'home',
   components: {
@@ -37,7 +38,7 @@ export default {
       currentPage1: 1,
       currentPage2: 1,
       currentPage3: 1,
-      pageSize: 18000,
+      pageSize: 20,
       photos: {
         group_a: [],
         group_b: [],
@@ -50,29 +51,59 @@ export default {
   },
   methods: {
     onScroll () {
-      let documentHeight = document.body.clientHeight
-      let pos = 0
-      if (document.body.clientWidth < 809) {
-        pos = documentHeight * 0.5
-      } else {
-        pos = documentHeight * 0.7
-      }
-      if (window.scrollY > pos) {
+      // let documentHeight = document.body.clientHeight
+      // let pos = 0
+      // if (document.body.clientWidth < 809) {
+      //   pos = documentHeight * 0.5
+      // } else {
+      //   pos = documentHeight * 0.7
+      // }
+      if ($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
+        $(window).unbind('scroll')
         if (this.isActivated) {
           this.currentPage1 ++
-          this.getList_hot()
-          return
+          this.getList_hot().then(() => {
+            $(window).bind('scroll', this.onScroll)
+            // setTimeout(() => {
+            //   $(window).bind('scroll', this.onScroll)
+            // }, 2000)
+          })
         }
         if (this.isActivated2) {
           this.currentPage2 ++
-          this.getList_new()
-          return
+          this.getList_new().then(() => {
+            $(window).bind('scroll', this.onScroll)
+            // setTimeout(() => {
+            //   $(window).bind('scroll', this.onScroll)
+            // }, 2000)
+          })
         }
         if (this.isActivated3) {
           this.currentPage3 ++
-          this.getList_following()
+          this.getList_following().then(() => {
+            $(window).bind('scroll', this.onScroll)
+            // setTimeout(() => {
+            //   $(window).bind('scroll', this.onScroll)
+            // }, 2000)
+          })
         }
       }
+      // if (window.scrollY > pos) {
+      //   if (this.isActivated) {
+      //     this.currentPage1 ++
+      //     this.getList_hot()
+      //     return
+      //   }
+      //   if (this.isActivated2) {
+      //     this.currentPage2 ++
+      //     this.getList_new()
+      //     return
+      //   }
+      //   if (this.isActivated3) {
+      //     this.currentPage3 ++
+      //     this.getList_following()
+      //   }
+      // }
     },
     showCovers (c) {
       if (!c.showCover) {
@@ -89,6 +120,7 @@ export default {
         like: this.alreadyLiked ? '0' : '1'
       }
       photosOp.photoLike(data, (res) => {
+        if (res.data.code === '1') return
         this.$store.dispatch('likedPhoto', {image_id: data.image_id}).then((res) => {
           photo.total_likes = res.data.data.total_likes
         })
@@ -163,28 +195,36 @@ export default {
         pageNo: this.currentPage1,
         pageSize: this.pageSize
       }
-      photosOp.getList.hot(data, (res) => {
-        let lists = res.data.data.lists
-        this.noFollowing = false
-        for (let i = 0; i < lists.length; i++) {
-          lists[i].showCover = false
-          if (lists[i].avatar === 'null' || !lists[i].avatar) {
-            lists[i].avatar = require('@/assets/img/user_default.jpg')
-          } else {
-            lists[i].avatar = this.$store.state.urlBase + lists[i].avatar + this.$store.state.viewBase
+      return new Promise((resolve, reject) => {
+        photosOp.getList.hot(data, (res) => {
+          if (res.data.code === '1') {
+            this.notifyMsg = '获取最热图片列表失败！'
+            this.error(true)
+            return
           }
-          lists[i].aliyun_name = lists[i].image_md5
-          lists[i].image_md5 = this.$store.state.urlBase + lists[i].image_md5 + this.$store.state.viewBase
-          if (i % 3 === 0) {
-            this.photos.group_a.push(lists[i])
+          let lists = res.data.data.lists
+          this.noFollowing = false
+          for (let i = 0; i < lists.length; i++) {
+            lists[i].showCover = false
+            if (lists[i].avatar === 'null' || !lists[i].avatar) {
+              lists[i].avatar = require('@/assets/img/user_default.jpg')
+            } else {
+              lists[i].avatar = this.$store.state.urlBase + lists[i].avatar + this.$store.state.viewBase
+            }
+            lists[i].aliyun_name = lists[i].image_md5
+            lists[i].image_md5 = this.$store.state.urlBase + lists[i].image_md5 + this.$store.state.viewBase
+            if (i % 3 === 0) {
+              this.photos.group_a.push(lists[i])
+            }
+            if ((i - 1) % 3 === 0) {
+              this.photos.group_b.push(lists[i])
+            }
+            if ((i - 2) % 3 === 0) {
+              this.photos.group_c.push(lists[i])
+            }
           }
-          if ((i - 1) % 3 === 0) {
-            this.photos.group_b.push(lists[i])
-          }
-          if ((i - 2) % 3 === 0) {
-            this.photos.group_c.push(lists[i])
-          }
-        }
+          resolve()
+        })
       })
     },
     getList_new () {
@@ -192,28 +232,36 @@ export default {
         pageNo: this.currentPage2,
         pageSize: this.pageSize
       }
-      photosOp.getList.new(data, (res) => {
-        let lists = res.data.data.lists
-        this.noFollowing = false
-        for (let i = 0; i < lists.length; i++) {
-          lists[i].showCover = false
-          if (lists[i].avatar === 'null' || !lists[i].avatar) {
-            lists[i].avatar = require('@/assets/img/user_default.jpg')
-          } else {
-            lists[i].avatar = this.$store.state.urlBase + lists[i].avatar + this.$store.state.viewBase
+      return new Promise((resolve, reject) => {
+        photosOp.getList.new(data, (res) => {
+          if (res.data.code === '1') {
+            this.notifyMsg = '获取最新图片列表失败！'
+            this.error(true)
+            return
           }
-          lists[i].aliyun_name = lists[i].image_md5
-          lists[i].image_md5 = this.$store.state.urlBase + lists[i].image_md5 + this.$store.state.viewBase
-          if (i % 3 === 0) {
-            this.photos.group_a.push(lists[i])
+          let lists = res.data.data.lists
+          this.noFollowing = false
+          for (let i = 0; i < lists.length; i++) {
+            lists[i].showCover = false
+            if (lists[i].avatar === 'null' || !lists[i].avatar) {
+              lists[i].avatar = require('@/assets/img/user_default.jpg')
+            } else {
+              lists[i].avatar = this.$store.state.urlBase + lists[i].avatar + this.$store.state.viewBase
+            }
+            lists[i].aliyun_name = lists[i].image_md5
+            lists[i].image_md5 = this.$store.state.urlBase + lists[i].image_md5 + this.$store.state.viewBase
+            if (i % 3 === 0) {
+              this.photos.group_a.push(lists[i])
+            }
+            if ((i - 1) % 3 === 0) {
+              this.photos.group_b.push(lists[i])
+            }
+            if ((i - 2) % 3 === 0) {
+              this.photos.group_c.push(lists[i])
+            }
           }
-          if ((i - 1) % 3 === 0) {
-            this.photos.group_b.push(lists[i])
-          }
-          if ((i - 2) % 3 === 0) {
-            this.photos.group_c.push(lists[i])
-          }
-        }
+          resolve()
+        })
       })
     },
     getList_following () {
@@ -222,32 +270,40 @@ export default {
         pageNo: this.currentPage3,
         pageSize: this.pageSize
       }
-      photosOp.getList.following(data, (res) => {
-        let lists = res.data.data.lists
-        if (lists.length === 0) {
-          this.noFollowing = true
-          return
-        }
-        this.noFollowing = false
-        for (let i = 0; i < lists.length; i++) {
-          lists[i].showCover = false
-          if (lists[i].avatar === 'null' || !lists[i].avatar) {
-            lists[i].avatar = require('@/assets/img/user_default.jpg')
-          } else {
-            lists[i].avatar = this.$store.state.urlBase + lists[i].avatar + this.$store.state.viewBase
+      return new Promise((resolve, reject) => {
+        photosOp.getList.following(data, (res) => {
+          if (res.data.code === '1') {
+            this.notifyMsg = '获取关注图片列表失败！'
+            this.error(true)
+            return
           }
-          lists[i].aliyun_name = lists[i].image_md5
-          lists[i].image_md5 = this.$store.state.urlBase + lists[i].image_md5 + this.$store.state.viewBase
-          if (i % 3 === 0) {
-            this.photos.group_a.push(lists[i])
+          let lists = res.data.data.lists
+          for (let i = 0; i < lists.length; i++) {
+            lists[i].showCover = false
+            if (lists[i].avatar === 'null' || !lists[i].avatar) {
+              lists[i].avatar = require('@/assets/img/user_default.jpg')
+            } else {
+              lists[i].avatar = this.$store.state.urlBase + lists[i].avatar + this.$store.state.viewBase
+            }
+            lists[i].aliyun_name = lists[i].image_md5
+            lists[i].image_md5 = this.$store.state.urlBase + lists[i].image_md5 + this.$store.state.viewBase
+            if (i % 3 === 0) {
+              this.photos.group_a.push(lists[i])
+            }
+            if ((i - 1) % 3 === 0) {
+              this.photos.group_b.push(lists[i])
+            }
+            if ((i - 2) % 3 === 0) {
+              this.photos.group_c.push(lists[i])
+            }
           }
-          if ((i - 1) % 3 === 0) {
-            this.photos.group_b.push(lists[i])
+          if (this.photos.group_a.length === 0 && this.photos.group_b.length === 0 && this.photos.group_c.length === 0) {
+            this.noFollowing = true
+            return
           }
-          if ((i - 2) % 3 === 0) {
-            this.photos.group_c.push(lists[i])
-          }
-        }
+          this.noFollowing = false
+          resolve()
+        })
       })
     }
   },
@@ -269,9 +325,10 @@ export default {
       this.$store.dispatch('getUserInfo')
     }
     this.getHot()
-    // this.$nextTick(function () {
-    //   window.addEventListener('scroll', this.onScroll)
-    // })
+    this.$nextTick(function () {
+      // window.addEventListener('scroll', this.onScroll)
+      $(window).scroll(this.onScroll)
+    })
   }
 }
 </script>

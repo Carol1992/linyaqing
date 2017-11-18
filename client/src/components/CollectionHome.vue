@@ -12,6 +12,7 @@
 <script>
   import photoOp from '../../api/photos'
   import Collections from './photos/Collections'
+  import $ from 'jquery'
   export default {
     name: 'collection_home',
     components: {
@@ -21,10 +22,19 @@
       return {
         collections: [],
         currentPageNo: 1,
-        pageSize: 18000
+        pageSize: 20
       }
     },
     methods: {
+      onScroll () {
+        if ($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
+          $(window).unbind('scroll')
+          this.currentPageNo ++
+          this.getCollection_all().then(() => {
+            $(window).bind('scroll', this.onScroll)
+          })
+        }
+      },
       showCovers (c) {
         c.showCover = !c.showCover
       },
@@ -33,19 +43,20 @@
           pageNo: this.currentPageNo,
           pageSize: this.pageSize
         }
-        photoOp.getCollection.all(data, (res) => {
-          let lists = res.data.data.lists
-          this.collections = []
-          for (let l of lists) {
-            let newArr = []
-            for (let image of l.images_list) {
-              image = this.$store.state.urlBase + image + this.$store.state.viewBase
-              newArr.push(image)
+        return new Promise((resolve, reject) => {
+          photoOp.getCollection.all(data, (res) => {
+            let lists = res.data.data.lists
+            for (let l of lists) {
+              let newArr = []
+              for (let image of l.images_list) {
+                image = this.$store.state.urlBase + image + this.$store.state.viewBase
+                newArr.push(image)
+              }
+              l.images_list = newArr
+              l.showCover = false
+              this.collections.push(l)
             }
-            l.images_list = newArr
-            l.showCover = false
-            this.collections.push(l)
-          }
+          })
         })
       }
     },
@@ -66,7 +77,12 @@
       if (this.login) {
         this.$store.dispatch('getUserInfo')
       }
+      this.collections = []
       this.getCollection_all()
+      this.$nextTick(function () {
+      // window.addEventListener('scroll', this.onScroll)
+        $(window).scroll(this.onScroll)
+      })
     }
   }
 </script>

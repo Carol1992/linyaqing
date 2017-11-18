@@ -18,7 +18,7 @@
     @addToCollection='addToCollection'></Photos>
     </div>
     <Edit v-if='showEdit' :collectionInfo='collectionInfo' @closeBox='closeBox' 
-    @updateCollectionInfo='successModify' @successDelete='successDelete' @changePrivate='changePrivate'></Edit>
+    @updateCollectionInfo='successModify' @deleteCollection='successDelete' @changePrivate='changePrivate'></Edit>
     <add-to-collection v-if='showDialog' @addTo='addTo' @closeCollection='closeCollection'></add-to-collection>
   </div>
 </template>
@@ -28,6 +28,7 @@
   import Photos from './photos/Photos'
   import Edit from './photos/editCollection'
   import addToCollection from './photos/addToCollection'
+  import $ from 'jquery'
   export default {
     name: 'CollectionDetail',
     data () {
@@ -39,7 +40,7 @@
         },
         totalCount: '',
         currentPageNo: 1,
-        currentPageSize: 18000,
+        currentPageSize: 20,
         notMe: false,
         followMsg: ' 关注',
         followed: false,
@@ -66,10 +67,6 @@
     },
     methods: {
       success (nodesc) {
-        this.$Notice.config({
-          top: 100,
-          duration: 2
-        })
         this.$Notice.success({
           title: this.notifyMsg,
           desc: nodesc ? '' : ''
@@ -140,22 +137,45 @@
             this.showEdit = false
             this.notifyMsg = '相册信息更新成功！'
             this.success(true)
+          } else {
+            this.notifyMsg = '相册信息更新失败！'
+            this.error(true)
           }
         })
       },
-      successDelete () {
-        this.notifyMsg = '成功删除相册！'
-        this.success(true)
-        this.$router.push({path: `/userCenter/${this.info.user_id}`})
+      successDelete (collectionInfo) {
+        let data = {
+          collection_id: collectionInfo.collection_id
+        }
+        photoOp.deleteCollection(data, (res) => {
+          if (res.data.code === '1') {
+            this.notifyMsg = '相册删除失败！'
+            this.error(true)
+            return
+          }
+          this.notifyMsg = '成功删除相册！'
+          this.success(true)
+          this.$router.push({path: `/userCenter/${this.info.user_id}`})
+        })
       },
       followMe () {
         photoOp.updatePhotographers({followings: this.collectionInfo.owner_id.toString()}, (res) => {
+          if (res.data.code === '1') {
+            this.notifyMsg = '关注失败！'
+            this.error(true)
+            return
+          }
           this.followed = true
           this.followMsg = '已关注'
         })
       },
       notFollowMe () {
         photoOp.updatePhotographers_rm({following_id: this.collectionInfo.owner_id}, (res) => {
+          if (res.data.code === '1') {
+            this.notifyMsg = '取消关注失败！'
+            this.error(true)
+            return
+          }
           this.followed = false
         })
       },
@@ -200,32 +220,41 @@
           pageNo: this.currentPageNo,
           pageSize: this.currentPageSize
         }
-        photoOp.getCollection.one(data, (res) => {
-          this.photos.group_a = []
-          this.photos.group_b = []
-          this.photos.group_c = []
-          this.totalCount = res.data.data.totalCount
-          let lists = res.data.data.lists
-          for (let i = 0; i < lists.length; i++) {
-            lists[i].showCover = false
-            lists[i].aliyun_name = lists[i].image_md5
-            lists[i].image_md5 = this.$store.state.urlBase + lists[i].image_md5 + this.$store.state.viewBase
-            if (lists[i].avatar === 'null' || !lists[i].avatar) {
-              lists[i].avatar = require('@/assets/img/user_default.jpg')
-            } else {
-              lists[i].avatar = this.$store.state.urlBase + lists[i].avatar + this.$store.state.viewBase
+        return new Promise((resolve, reject) => {
+          photoOp.getCollection.one(data, (res) => {
+            this.totalCount = res.data.data.totalCount
+            let lists = res.data.data.lists
+            for (let i = 0; i < lists.length; i++) {
+              lists[i].showCover = false
+              lists[i].aliyun_name = lists[i].image_md5
+              lists[i].image_md5 = this.$store.state.urlBase + lists[i].image_md5 + this.$store.state.viewBase
+              if (lists[i].avatar === 'null' || !lists[i].avatar) {
+                lists[i].avatar = require('@/assets/img/user_default.jpg')
+              } else {
+                lists[i].avatar = this.$store.state.urlBase + lists[i].avatar + this.$store.state.viewBase
+              }
+              if (i % 3 === 0) {
+                this.photos.group_a.push(lists[i])
+              }
+              if ((i - 1) % 3 === 0) {
+                this.photos.group_b.push(lists[i])
+              }
+              if ((i - 2) % 3 === 0) {
+                this.photos.group_c.push(lists[i])
+              }
             }
-            if (i % 3 === 0) {
-              this.photos.group_a.push(lists[i])
-            }
-            if ((i - 1) % 3 === 0) {
-              this.photos.group_b.push(lists[i])
-            }
-            if ((i - 2) % 3 === 0) {
-              this.photos.group_c.push(lists[i])
-            }
-          }
+            resolve()
+          })
         })
+      },
+      onScroll () {
+        if ($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
+          $(window).unbind('scroll')
+          this.currentPageNo ++
+          this.getPhotos().then(() => {
+            $(window).bind('scroll', this.onScroll)
+          })
+        }
       }
     },
     mounted () {
@@ -236,10 +265,17 @@
       }
       if (this.login) {
         this.$store.dispatch('getUserInfo').then(() => {
+          this.photos.group_a = []
+          this.photos.group_b = []
+          this.photos.group_c = []
           this.getCollectionInfo()
           this.getPhotos()
         })
       }
+      this.$nextTick(function () {
+      // window.addEventListener('scroll', this.onScroll)
+        $(window).scroll(this.onScroll)
+      })
     },
     computed: {
       info () {

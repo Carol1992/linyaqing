@@ -145,6 +145,7 @@ module.exports = {
 			});	
 		},
 		one (data, callback) {
+			data.token = localStorage.token
 			axios.post('/api/getCollection/one', data)
 			.then(function (response) {
 			  callback(response)
@@ -167,6 +168,15 @@ module.exports = {
 	addToCollection (data, callback) {
 		data.token = localStorage.token
 		axios.post('/api/addToCollection', data)
+		.then(function (response) {
+		  callback(response)
+		})
+		.catch(function (error) {
+		  console.log(error)
+		});	
+	},
+	getCollectionInfo (data, callback) {
+		axios.post('/api/getCollectionInfo', data)
 		.then(function (response) {
 		  callback(response)
 		})
@@ -237,6 +247,18 @@ module.exports = {
 			token: localStorage.token,
 			image_id: data.image_id,
 			like: data.like // 1代表喜欢该图片，0取消该喜欢
+		})
+		.then(function (response) {
+		  callback(response)
+		})
+		.catch(function (error) {
+		  console.log(error)
+		});	
+	},
+	alreadyLike (data, callback) {
+		axios.post('/api/alreadyLike', {
+			token: localStorage.token,
+			image_id: data.image_id
 		})
 		.then(function (response) {
 		  callback(response)

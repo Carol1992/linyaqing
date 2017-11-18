@@ -2,7 +2,7 @@
   <div class="container">
     <div class="intro">
       <div class="collection_name">
-        {{collectionInfo.collection_name}} <Icon type="locked" v-if='collectionInfo.is_private' class='private-lock'></Icon>
+        {{collectionInfo.collection_name}} <Icon type="locked" v-if='collectionInfo.isPrivate' class='private-lock'></Icon>
         <span class="edit" v-if='!notMe' @click='editCollection'><Icon type="edit"></Icon> 编辑</span>
       </div>
       <div class="collection_owner">
@@ -14,10 +14,12 @@
     </div>
     <div class="photos">
       <div class="counts">{{totalCount}} 张照片</div>
-      <Photos :photos="photos"></Photos>
+      <Photos :photos="photos" @showCovers='showCovers' @photoLike='photoLike' 
+    @addToCollection='addToCollection'></Photos>
     </div>
     <Edit v-if='showEdit' :collectionInfo='collectionInfo' @closeBox='closeBox' 
-    @successModify='successModify' @successDelete='successDelete'></Edit>
+    @updateCollectionInfo='successModify' @successDelete='successDelete' @changePrivate='changePrivate'></Edit>
+    <add-to-collection v-if='showDialog' @addTo='addTo' @closeCollection='closeCollection'></add-to-collection>
   </div>
 </template>
 
@@ -25,6 +27,7 @@
   import photoOp from '../../api/photos'
   import Photos from './photos/Photos'
   import Edit from './photos/editCollection'
+  import addToCollection from './photos/addToCollection'
   export default {
     name: 'CollectionDetail',
     data () {
@@ -48,18 +51,25 @@
           owner_avatar: '',
           owner_email: '',
           collection_name: '',
-          is_private: false,
+          isPrivate: false,
           collection_desc: ''
         },
-        notifyMsg: ''
+        notifyMsg: '',
+        showDialog: false,
+        addToImgId: ''
       }
     },
     components: {
       Photos,
-      Edit
+      Edit,
+      addToCollection
     },
     methods: {
       success (nodesc) {
+        this.$Notice.config({
+          top: 100,
+          duration: 2
+        })
         this.$Notice.success({
           title: this.notifyMsg,
           desc: nodesc ? '' : ''
@@ -71,16 +81,67 @@
           desc: nodesc ? '' : ''
         })
       },
+      changePrivate (c) {
+        c.isPrivate = !c.isPrivate
+      },
+      showCovers (c) {
+        if (!c.showCover) {
+          this.$store.dispatch('likedPhoto', {image_id: c.image_id}).then(() => {
+            c.showCover = !c.showCover
+          })
+        } else {
+          c.showCover = !c.showCover
+        }
+      },
+      photoLike (photo) {
+        let data = {
+          image_id: photo.image_id,
+          like: this.alreadyLiked ? '0' : '1'
+        }
+        photoOp.photoLike(data, (res) => {
+          this.$store.dispatch('likedPhoto', {image_id: data.image_id}).then((res) => {
+            photo.total_likes = res.data.data.total_likes
+          })
+        })
+      },
+      closeCollection () {
+        this.showDialog = false
+      },
+      addToCollection (photo) {
+        this.showDialog = true
+        this.addToImgId = photo.image_id
+      },
+      addTo (collectionId) {
+        this.showDialog = false
+        let data = {
+          image_id: this.addToImgId,
+          collection_id: collectionId
+        }
+        photoOp.addToCollection(data, (res) => {
+          if (res.data.code === '0') {
+            this.notifyMsg = '成功将图片加入相册！'
+            this.success(true)
+          } else {
+            this.notifyMsg = '暂时无法将图片加入相册！'
+            this.error(true)
+          }
+        })
+      },
       gotoUserCenter () {
         this.$router.push({path: `/userCenter/${this.collectionInfo.owner_id}`})
       },
       closeBox () {
         this.showEdit = false
       },
-      successModify () {
-        this.showEdit = false
-        this.notifyMsg = '相册信息更新成功！'
-        this.success(true)
+      successModify (data) {
+        data.is_private = data.isPrivate ? 0 : 1
+        photoOp.updateCollection(data, (res) => {
+          if (res.data.code === '0') {
+            this.showEdit = false
+            this.notifyMsg = '相册信息更新成功！'
+            this.success(true)
+          }
+        })
       },
       successDelete () {
         this.notifyMsg = '成功删除相册！'
@@ -101,28 +162,20 @@
       editCollection () {
         this.showEdit = true
       },
-      getPhotos () {
+      getCollectionInfo () {
         let params = this.$route.params[0]
         this.collectionInfo.collection_id = params.split('/')[1]
-        let data = {
-          user_id: params.split('/')[0],
-          collection_id: params.split('/')[1],
-          pageNo: this.currentPageNo,
-          pageSize: this.currentPageSize
-        }
-        photoOp.getCollection.one(data, (res) => {
-          this.totalCount = res.data.data.totalCount
-          let lists = res.data.data.lists
-          this.collectionInfo.collection_owner = lists[0].collection_owner
-          this.collectionInfo.collection_name = lists[0].collection_name
-          this.collectionInfo.owner_email = lists[0].owner_email
-          this.collectionInfo.owner_id = lists[0].owner_id
-          this.collectionInfo.is_private = lists[0].is_private === '0'
-          this.collectionInfo.collection_desc = lists[0].collection_desc
-          if (!lists[0].owner_avatar) {
+        photoOp.getCollectionInfo({collection_id: params.split('/')[1]}, (res) => {
+          let results = res.data.data
+          this.collectionInfo.collection_owner = results.user_name
+          this.collectionInfo.collection_name = results.collection_name
+          this.collectionInfo.owner_id = results.user_id
+          this.collectionInfo.isPrivate = results.is_private === '0'
+          this.collectionInfo.collection_desc = results.collection_desc
+          if (!results.avatar) {
             this.collectionInfo.owner_avatar = require('@/assets/img/user_default.jpg')
           } else {
-            this.collectionInfo.owner_avatar = this.$store.state.urlBase + lists[0].owner_avatar +
+            this.collectionInfo.owner_avatar = this.$store.state.urlBase + results.avatar +
             this.$store.state.viewBase
           }
           if (this.collectionInfo.owner_id === this.info.user_id) {
@@ -136,8 +189,32 @@
               this.followMsg = '已关注'
             }
           }
+        })
+      },
+      getPhotos () {
+        let params = this.$route.params[0]
+        this.collectionInfo.collection_id = params.split('/')[1]
+        let data = {
+          user_id: params.split('/')[0],
+          collection_id: params.split('/')[1],
+          pageNo: this.currentPageNo,
+          pageSize: this.currentPageSize
+        }
+        photoOp.getCollection.one(data, (res) => {
+          this.photos.group_a = []
+          this.photos.group_b = []
+          this.photos.group_c = []
+          this.totalCount = res.data.data.totalCount
+          let lists = res.data.data.lists
           for (let i = 0; i < lists.length; i++) {
+            lists[i].showCover = false
+            lists[i].aliyun_name = lists[i].image_md5
             lists[i].image_md5 = this.$store.state.urlBase + lists[i].image_md5 + this.$store.state.viewBase
+            if (lists[i].avatar === 'null' || !lists[i].avatar) {
+              lists[i].avatar = require('@/assets/img/user_default.jpg')
+            } else {
+              lists[i].avatar = this.$store.state.urlBase + lists[i].avatar + this.$store.state.viewBase
+            }
             if (i % 3 === 0) {
               this.photos.group_a.push(lists[i])
             }
@@ -159,6 +236,7 @@
       }
       if (this.login) {
         this.$store.dispatch('getUserInfo').then(() => {
+          this.getCollectionInfo()
           this.getPhotos()
         })
       }
@@ -172,6 +250,9 @@
       },
       followings () {
         return this.$store.state.followings.split(',')
+      },
+      alreadyLiked () {
+        return this.$store.state.alreadyLiked
       }
     }
   }

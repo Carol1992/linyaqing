@@ -4,7 +4,8 @@
       <div class="image" v-for='photo in photos.group_a' 
       @mouseenter='showCovers(photo)'
       @mouseleave='showCovers(photo)'>
-        <Cover :photoInfo='photo' v-if='photo.showCover'></Cover>
+        <Cover :photoInfo='photo' v-if='photo.showCover' @photoLike='photoLike' 
+        @addToCollection='addToCollection'></Cover>
         <img :src='photo.image_md5' alt="">
       </div>
     </div>
@@ -12,7 +13,8 @@
       <div class="image" v-for='photo in photos.group_b' 
       @mouseenter='showCovers(photo)'
       @mouseleave='showCovers(photo)'>
-        <Cover :photoInfo='photo' v-if='photo.showCover'></Cover>
+        <Cover :photoInfo='photo' v-if='photo.showCover' @photoLike='photoLike' 
+        @addToCollection='addToCollection'></Cover>
         <img :src='photo.image_md5' alt="">
       </div>
     </div>
@@ -20,7 +22,8 @@
       <div class="image" v-for='photo in photos.group_c' 
       @mouseenter='showCovers(photo)'
       @mouseleave='showCovers(photo)'>
-        <Cover :photoInfo='photo' v-if='photo.showCover'></Cover>
+        <Cover :photoInfo='photo' v-if='photo.showCover' @photoLike='photoLike' 
+        @addToCollection='addToCollection'></Cover>
         <img :src='photo.image_md5' alt="">
       </div>
     </div>
@@ -43,6 +46,12 @@
     methods: {
       showCovers (c) {
         this.$emit('showCovers', c)
+      },
+      photoLike (photo) {
+        this.$emit('photoLike', photo)
+      },
+      addToCollection (photo) {
+        this.$emit('addToCollection', photo)
       }
     }
   }

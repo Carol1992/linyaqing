@@ -1,7 +1,10 @@
 <template>
   <div class="container">
     <div class="top">
-      <span class="likes" @click='photoLike'><Icon type="android-favorite"></Icon><span class="likes-nums">{{photoInfo.total_likes}}</span></span>
+      <span class="likes" 
+      :class='{likedLikes: alreadyLiked}' 
+      @click='photoLike(photoInfo)'><Icon type="android-favorite"></Icon><span class="likes-nums" 
+      :class='{likedNums: alreadyLiked}'> {{photoInfo.total_likes}}</span></span>
       <span class="add" @click='addToCollection'><Icon type="plus-round"></Icon>添加到相册</span>
     </div>
     <div class="bottom">
@@ -23,23 +26,10 @@
     props: ['photoInfo'],
     methods: {
       photoLike () {
-        // this.like = !this.like
-        // let data = {
-        //   image_id: this.photoInfo.image_id,
-        //   like: this.like ? '1' : '0'
-        // }
-        // photoOp.photoLike(data, (res) => {
-        //   console.log(res)
-        // })
+        this.$emit('photoLike', this.photoInfo)
       },
       addToCollection () {
-        let data = {
-          image_id: this.photoInfo.image_id,
-          collection_id: 83
-        }
-        photoOp.addToCollection(data, (res) => {
-          console.log(res)
-        })
+        this.$emit('addToCollection', this.photoInfo)
       },
       gotoUserCenter () {
         this.$router.push({path: `/userCenter/${this.photoInfo.user_id}`})
@@ -47,6 +37,11 @@
       downloadPic () {
         photoOp.downloadPhoto({filename: this.photoInfo.aliyun_name})
         // window.location.href = '/api/download/photo?filename=' + this.photoInfo.aliyun_name
+      }
+    },
+    computed: {
+      alreadyLiked () {
+        return this.$store.state.alreadyLiked
       }
     }
   }
@@ -70,29 +65,40 @@
   }
   .top .likes {
     color: #f15151;
-    font-size: 40px;
+    font-size: 18px;
     margin-right: 20px;
-    vertical-align: middle;
     cursor: pointer;
+    border-radius: 4px;
+    padding: 8px 8px;
+    background-color: #f1f1f1;
   }
   .top .likes:hover {
     color: #ef3737;
   }
+  .likes-nums {
+    color: #999;
+  }
+  .likedLikes{
+    background-color: #f15151 !important;
+    color: #fff !important;
+  }
+  .likedNums {
+    color: #fff !important;
+  }
   .top .add {
     font-size: 18px;
-    font-weight: bolder;
     border-radius: 4px;
     padding: 8px 8px;
-    background-color: #979797;
-    color: #fff;
+    background-color: #f1f1f1;
+    color: #999;
     cursor: pointer;
   }
   .top .add:hover {
-    background-color: #888;
+    color: #676767;
   }
   .bottom {
     position: absolute;
-    bottom: 20px;
+    bottom: 10px;
     width: 90%;
     left: 5%;
   }
@@ -100,7 +106,7 @@
     display: inline-block;
     float: left;
     color: #fff;
-    font-size: 22px;
+    font-size: 18px;
   }
   .users img {
     width: 50px;
@@ -122,15 +128,12 @@
     display: inline-block;
     float: right;
     color: #fff;
-    font-size: 40px;
+    font-size: 30px !important;
     cursor: pointer;
     font-weight: bolder;
   }
   .download:hover {
     color: #999;
   }
-  .likes-nums {
-    font-size: 16px !important;
-    color: #fff !important;
-  }
+
 </style>

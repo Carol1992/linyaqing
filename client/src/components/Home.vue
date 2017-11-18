@@ -9,10 +9,12 @@
       <span class="nav" :class="{activated: isActivated2}" @click='getNew'>最新</span>
       <span class="nav" v-if='login' :class="{activated: isActivated3}" @click='getFollowing'>关注</span>
     </div>
-    <Photos :photos="photos" @showCovers='showCovers'></Photos>
+    <Photos :photos="photos" @showCovers='showCovers' @photoLike='photoLike' 
+    @addToCollection='addToCollection'></Photos>
     <div class="noFollowing" v-if='noFollowing'>
       <span>目前没有关注任何人哦:）</span>
     </div>
+    <add-to-collection v-if='showDialog' @addTo='addTo' @closeCollection='closeCollection'></add-to-collection>
     <BackTop></BackTop>
   </div>
 </template>
@@ -20,10 +22,12 @@
 <script>
 import photosOp from '../../api/photos'
 import Photos from './photos/Photos'
+import addToCollection from './photos/addToCollection'
 export default {
   name: 'home',
   components: {
-    Photos
+    Photos,
+    addToCollection
   },
   data () {
     return {
@@ -39,7 +43,9 @@ export default {
         group_b: [],
         group_c: []
       },
-      noFollowing: false
+      noFollowing: false,
+      showDialog: false,
+      addToImgId: ''
     }
   },
   methods: {
@@ -69,7 +75,59 @@ export default {
       }
     },
     showCovers (c) {
-      c.showCover = !c.showCover
+      if (!c.showCover) {
+        this.$store.dispatch('likedPhoto', {image_id: c.image_id}).then(() => {
+          c.showCover = !c.showCover
+        })
+      } else {
+        c.showCover = !c.showCover
+      }
+    },
+    photoLike (photo) {
+      let data = {
+        image_id: photo.image_id,
+        like: this.alreadyLiked ? '0' : '1'
+      }
+      photosOp.photoLike(data, (res) => {
+        this.$store.dispatch('likedPhoto', {image_id: data.image_id}).then((res) => {
+          photo.total_likes = res.data.data.total_likes
+        })
+      })
+    },
+    closeCollection () {
+      this.showDialog = false
+    },
+    addToCollection (photo) {
+      this.showDialog = true
+      this.addToImgId = photo.image_id
+    },
+    addTo (collectionId) {
+      this.showDialog = false
+      let data = {
+        image_id: this.addToImgId,
+        collection_id: collectionId
+      }
+      photosOp.addToCollection(data, (res) => {
+        if (res.data.code === '0') {
+          this.notifyMsg = '成功将图片加入相册！'
+          this.success(true)
+        } else {
+          this.notifyMsg = '暂时无法将图片加入相册！'
+          this.error(true)
+        }
+      })
+    },
+    success (nodesc) {
+      this.$Notice.success({
+        title: this.notifyMsg,
+        desc: nodesc ? '' : ''
+      })
+    },
+    error (nodesc) {
+      this.$Notice.error({
+        title: this.notifyMsg,
+        desc: nodesc ? '' : ''
+      })
     },
     getHot () {
       this.isActivated = true
@@ -196,6 +254,9 @@ export default {
   computed: {
     login () {
       return this.$store.state.alreadyLogin
+    },
+    alreadyLiked () {
+      return this.$store.state.alreadyLiked
     }
   },
   mounted () {

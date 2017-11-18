@@ -352,8 +352,8 @@ router.all('/deleteCollection', verify_token, (req, res, next) => {
 		if(data.results.length === 0) {
 			return res.json(formater({code:'1', desc:'该相册不属于该用户！'}));
 		} else {
-			query('SELECT ic.image_id, i.image_md5 FROM image_collection ic, images i, collections c WHERE '+
-				'ic.image_id = i.image_id AND ic.collection_id = ? AND i.user_id = c.user_id', [collection_id])
+			query('SELECT ic.image_id, i.image_md5 FROM image_collection ic, images i WHERE '+
+				'ic.image_id = i.image_id AND ic.collection_id = ? AND i.user_id = ?', [collection_id, user_id])
 			.then(data => {
 				let results = data.results
 				let arr = []
@@ -658,8 +658,9 @@ router.all('/getList/user', (req, res, next) => {
 	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
 	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
-	let q2 = query('SELECT i.*, c.is_private, likes.total_likes FROM image_collection ic JOIN collections c '+
-		'ON ic.collection_id = c.collection_id JOIN images i ON ic.image_id = i.image_id LEFT OUTER JOIN '+
+	let q2 = query('SELECT i.*, u.user_name, u.image_md5 AS user_avatar, c.is_private, likes.total_likes '+
+		'FROM image_collection ic JOIN collections c ON ic.collection_id = c.collection_id '+
+		'JOIN images i ON ic.image_id = i.image_id JOIN users u ON i.user_id = u.user_id LEFT OUTER JOIN '+
 		'(SELECT l.image_id, COUNT(l.user_id) AS total_likes FROM image_likes l GROUP BY image_id) likes '+
 		'ON i.image_id = likes.image_id WHERE c.is_private = 1 AND i.user_id = ? GROUP BY ic.image_id '+
 		'ORDER BY likes.total_likes DESC', [request_user_id])
@@ -672,8 +673,9 @@ router.all('/getList/user', (req, res, next) => {
       req.api_user = decoded;
       console.log('_user_id: ', req.api_user.data.user_id);
       if (req.api_user.data.user_id == request_user_id) {
-      	q2 = query('SELECT i.*, c.is_private, likes.total_likes FROM image_collection ic JOIN collections c '+
-				'ON ic.collection_id = c.collection_id JOIN images i ON ic.image_id = i.image_id LEFT OUTER JOIN '+
+      	q2 = query('SELECT i.*, u.user_name, u.image_md5 AS user_avatar, c.is_private, likes.total_likes '+
+				'FROM image_collection ic JOIN collections c ON ic.collection_id = c.collection_id '+
+				'JOIN images i ON ic.image_id = i.image_id JOIN users u ON i.user_id = u.user_id LEFT OUTER JOIN '+
 				'(SELECT l.image_id, COUNT(l.user_id) AS total_likes FROM image_likes l GROUP BY image_id) likes '+
 				'ON i.image_id = likes.image_id WHERE i.user_id = ? GROUP BY ic.image_id '+
 				'ORDER BY likes.total_likes DESC', [request_user_id])
@@ -798,7 +800,7 @@ router.all('/getCollection/user', (req, res, next) => {
 	let q2 = query('SELECT u.user_id, u.user_name, u.image_md5 AS avatar, ic.collection_id, '+
 		'c.collection_name, c.collection_desc, c.is_private, ic.image_id, i.image_md5 FROM users u, '+
 		'image_collection ic, collections c, images i WHERE ic.collection_id = c.collection_id AND '+
-		'ic.image_id = i.image_id AND u.user_id = c.user_id AND i.user_id = ? AND c.is_private = 1 '+
+		'ic.image_id = i.image_id AND u.user_id = c.user_id AND u.user_id = ? AND c.is_private = 1 '+
 		'ORDER BY ic.collection_id DESC', [request_user_id]);
 	if (!request_user_id) {
 		return res.json(formater({code: '1', desc: 'id是必须的！'}))
@@ -812,7 +814,7 @@ router.all('/getCollection/user', (req, res, next) => {
       	q2 = query('SELECT u.user_id, u.user_name, u.image_md5 AS avatar, ic.collection_id, '+
       		'c.collection_name, c.is_private, ic.image_id, i.image_md5 FROM users u, '+
 				'image_collection ic, collections c, images i WHERE ic.collection_id = c.collection_id AND '+
-				'ic.image_id = i.image_id AND u.user_id = c.user_id AND i.user_id = ? '+
+				'ic.image_id = i.image_id AND u.user_id = c.user_id AND u.user_id = ? '+
 				'ORDER BY ic.collection_id DESC', [request_user_id]);
 	     }
     }
@@ -856,35 +858,63 @@ router.all('/getCollection/user', (req, res, next) => {
 		res.json(formater({code:'0', data:new_data}));
 	});
 });
+// 获取相册基本信息
+router.all('/getCollectionInfo', (req, res, next) => {
+	let collection_id = req.body.collection_id || req.query.collection_id
+	if (!collection_id) {
+		return res.json(formater({code: '1', desc: '相册id是必须的！'}))
+	}
+	query('SELECT c.*, u.user_id, u.user_name, u.email, u.image_md5 AS avatar FROM collections c ' +
+		'JOIN users u ON c.user_id = u.user_id AND c.collection_id = ?', [collection_id])
+	.then(data => {
+		res.json(formater({code:'0', data:data.results[0]}))
+	})
+})
+// 获取图片基本信息
+router.all('/getPhotoInfo', (req, res, next) => {
+	
+})
 // 获取每个图片集里面的图片(如果是私密的要验证用户)
 router.all('/getCollection/one', (req, res, next) => {
 	let _user = req.body;
+	let token = req.body.token || req.query.token || req.headers['x-access-token'] || '';
 	let user_id = _user.user_id || req.query.user_id
 	let collection_id = _user.collection_id || req.query.collection_id;
 	let pageNo = +_user.pageNo || +req.query.pageNo || 1;
 	let pageSize = +_user.pageSize || +req.query.pageSize || 50;
 	let _left = (pageNo - 1) * pageSize;
+	let verify_id = ''
+	if (!collection_id) {
+		return res.json(formater({code: '1', desc: '相册id是必须的！'}))
+	}
+	let q2 = query('SELECT i.image_id, i.display_location, i.location, i.created_time, '+
+	'i.image_md5, i.story_title, i.story_detail, u.user_id, u.user_name, '+
+	'u.image_md5 AS avatar, u.email AS email, '+
+	'c.user_id AS collection_owner_id, c.collection_id AS '+
+	'collectionId, c.collection_name, c.is_private, c.collection_desc, likes.total_likes FROM '+
+	'images i JOIN users u ON i.user_id = u.user_id JOIN image_collection ic ON '+
+	'i.image_id = ic.image_id JOIN collections c ON c.collection_id = ic.collection_id '+
+	'LEFT OUTER JOIN (SELECT l.image_id, COUNT(l.user_id) AS total_likes FROM '+
+  'image_likes l GROUP BY image_id) likes ON i.image_id = likes.image_id WHERE ic.collection_id = ?', 
+	[collection_id]);
+	jwt.verify(token, 'secret', function(err, decoded) {
+    if (!err) {
+      req.api_user = decoded;
+      verify_id = req.api_user.data.user_id
+    }
+  })
 	query('SELECT is_private, user_id FROM collections WHERE collection_id = ?', [collection_id])
 	.then(data => {
-		if (data.results[0].is_private == '0' && data.results[0].user_id != user_id) {
+		if (data.results[0].is_private == '0' && data.results[0].user_id != verify_id) {
 			return res.json(formater({code: '1', desc: '该私密相册不属于该用户，不能被访问！'}))
 		}
-		let q1 = query('SELECT COUNT(*) AS totalPage FROM (SELECT i.*, u.user_id AS owner_id, u.user_name AS '+
-			'collection_owner, u.image_md5 AS owner_avatar, u.email AS owner_email, c.collection_id AS collectionId, c.collection_name, c.is_private FROM '+
-			'images i, users u, image_collection ic, collections c WHERE c.user_id = u.user_id AND '+
-			'i.image_id = ic.image_id AND c.collection_id = ic.collection_id AND ic.collection_id = ?) a', [collection_id]);
-		let q2 = query('SELECT i.*, u.user_id AS owner_id, u.user_name AS '+
-			'collection_owner, u.image_md5 AS owner_avatar, u.email AS owner_email, c.collection_id AS '+
-			'collectionId, c.collection_name, c.is_private, c.collection_name FROM '+
-			'images i, users u, image_collection ic, collections c WHERE c.user_id = u.user_id AND '+
-			'i.image_id = ic.image_id AND c.collection_id = ic.collection_id AND ic.collection_id = ? LIMIT ?,?', [collection_id, _left, pageSize]);
-		Promise.all([q1, q2]).then(values => {
+		Promise.all([q2]).then(values => {
 			let new_data = {
 				pageNo: pageNo,
 				pageSize: pageSize,
-				totalPage: Math.ceil(values[0].results[0].totalPage / pageSize),
-				totalCount: values[0].results[0].totalPage,
-				lists: values[1].results
+				totalPage: Math.ceil(values[0].results.length / pageSize),
+				totalCount: values[0].results.length,
+				lists: values[0].results.slice(_left, _left+pageSize)
 			};
 			res.json(formater({code:'0', data:new_data}));
 		});
@@ -1567,7 +1597,10 @@ router.all('/alreadyLike', verify_token, (req, res, next) => {
 		if(data.results.length !== 0) {
 			alreadyLike = true
 		}
-		res.json(formater({code: '0', data:{alreadyLike: alreadyLike}}))
+		query('SELECT COUNT(*) AS total_likes FROM image_likes WHERE image_id = ?', [image_id])
+		.then(data => {
+			res.json(formater({code: '0', data:{alreadyLike: alreadyLike, total_likes: data.results[0].total_likes}}))
+		})
 	})
 })
 // 用户给图片点赞

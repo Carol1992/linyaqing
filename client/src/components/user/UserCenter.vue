@@ -18,7 +18,9 @@
         <span :class='{activated: isActivated3}' @click='getCollectionUser'>{{summary.collections}} 本相册</span>
       </div>
       <div class="photos">
-        <Photos :photos="photos" v-if='!isActivated3'></Photos>
+        <Photos :photos="photos" v-if='!isActivated3' 
+        @showCovers='showCovers2' @photoLike='photoLike' 
+        @addToCollection='addToCollection'></Photos>
         <Collections :collections='collections' v-if='isActivated3' @showCovers='showCovers'></Collections>
       </div>
       <div class="noData" v-if='noData'>
@@ -33,6 +35,7 @@
   import photoOp from '../../../api/photos'
   import Photos from '../photos/Photos'
   import Collections from '../photos/Collections'
+  import addToCollection from '../photos/addToCollection'
   export default {
     name: 'userCenter',
     data () {
@@ -57,12 +60,15 @@
         collections: [],
         noData: false,
         noDataMsg: '您还没有上传过照片:)',
-        isMe: false
+        isMe: false,
+        showDialog: false,
+        addToImgId: ''
       }
     },
     components: {
       Photos,
-      Collections
+      Collections,
+      addToCollection
     },
     methods: {
       clearData () {
@@ -111,7 +117,14 @@
           }
           this.noData = false
           for (let i = 0; i < lists.length; i++) {
+            lists[i].showCover = false
+            lists[i].aliyun_name = lists[i].image_md5
             lists[i].image_md5 = this.$store.state.urlBase + lists[i].image_md5 + this.$store.state.viewBase
+            if (lists[i].avatar === 'null' || !lists[i].avatar) {
+              lists[i].avatar = require('@/assets/img/user_default.jpg')
+            } else {
+              lists[i].avatar = this.$store.state.urlBase + lists[i].avatar + this.$store.state.viewBase
+            }
             if (i % 3 === 0) {
               this.photos.group_a.push(lists[i])
             }
@@ -141,7 +154,14 @@
           }
           this.noData = false
           for (let i = 0; i < lists.length; i++) {
+            lists[i].showCover = false
+            lists[i].aliyun_name = lists[i].image_md5
             lists[i].image_md5 = this.$store.state.urlBase + lists[i].image_md5 + this.$store.state.viewBase
+            if (lists[i].avatar === 'null' || !lists[i].avatar) {
+              lists[i].avatar = require('@/assets/img/user_default.jpg')
+            } else {
+              lists[i].avatar = this.$store.state.urlBase + lists[i].avatar + this.$store.state.viewBase
+            }
             if (i % 3 === 0) {
               this.photos.group_a.push(lists[i])
             }
@@ -184,6 +204,63 @@
       },
       showCovers (c) {
         c.showCover = !c.showCover
+      },
+      showCovers2 (c) {
+        if (!c.showCover) {
+          this.$store.dispatch('likedPhoto', {image_id: c.image_id}).then(() => {
+            c.showCover = !c.showCover
+          })
+        } else {
+          c.showCover = !c.showCover
+        }
+      },
+      photoLike (photo) {
+        let data = {
+          image_id: photo.image_id,
+          like: this.alreadyLiked ? '0' : '1'
+        }
+        photoOp.photoLike(data, (res) => {
+          this.$store.dispatch('likedPhoto', {image_id: data.image_id}).then((res) => {
+            photo.total_likes = res.data.data.total_likes
+          })
+        })
+      },
+      closeCollection () {
+        this.showDialog = false
+      },
+      addToCollection (photo) {
+        this.showDialog = true
+        this.addToImgId = photo.image_id
+      },
+      addTo (collectionId) {
+        this.showDialog = false
+        let data = {
+          image_id: this.addToImgId,
+          collection_id: collectionId
+        }
+        photoOp.addToCollection(data, (res) => {
+          if (res.data.code === '0') {
+            this.notifyMsg = '成功将图片加入相册！'
+            this.success(true)
+          } else {
+            this.notifyMsg = '暂时无法将图片加入相册！'
+            this.error(true)
+          }
+        })
+      },
+      getBasicData () {
+        let data = {
+          token: localStorage.token,
+          request_user_id: this.$route.params[0],
+          pageNo: this.currentPage2,
+          pageSize: this.pageSize
+        }
+        photoOp.getList.liked(data, (res) => {
+          this.summary.liked = res.data.data.totalCount
+        })
+        photoOp.getCollection.user(data, (res) => {
+          this.summary.collections = res.data.data.totalCount
+        })
       }
     },
     computed: {
@@ -195,6 +272,9 @@
       },
       ownerInfo () {
         return this.$store.state.ownerInfo
+      },
+      alreadyLiked () {
+        return this.$store.state.alreadyLiked
       }
     },
     mounted () {
@@ -213,8 +293,7 @@
         })
       }
       this.getList_user()
-      this.getList_liked()
-      this.getCollection_user()
+      this.getBasicData()
       this.$store.dispatch('getOwnerInfo', this.$route.params[0])
     }
   }

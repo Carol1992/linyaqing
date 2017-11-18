@@ -9,7 +9,7 @@
     </div>
     <div class="hideMore" v-if='!showMore'><span><Icon type="more"></Icon></span></div>
     <div class="more" v-if='showMore'>
-      <div class="collection" @click='gotoCollections' :class='{activated: headerInfo.isCollections}'>
+      <div class="mycollection" @click='gotoCollections' :class='{activated: headerInfo.isCollections}'>
         <span>相册</span>
       </div>
       <div class="store" @click='gotoStore' :class='{activated: headerInfo.isStore}'>
@@ -227,7 +227,7 @@
     text-align: center;
     cursor: pointer;
   }
-  .collection {
+  .mycollection {
     color: #999;
     font-weight: bolder;
   }
@@ -235,7 +235,7 @@
     color: #999;
     font-weight: bolder;
   }
-  .collection:hover, .store:hover {
+  .mycollection:hover, .store:hover {
     color:#111;
   }
   .user {

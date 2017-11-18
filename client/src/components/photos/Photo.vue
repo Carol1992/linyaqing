@@ -92,7 +92,7 @@
             <div class="collection" v-for='collection in userCollections' 
             @click='selectCollection($event, collection)'>
               <div class="collection-img">
-                <img :src='collection.images_list[0]' alt="">
+                <img :src='collection.images_list_new[0]' alt="">
               </div>
               <div class="collection-name">
                 <span>{{collection.collection_name}}</span>
@@ -224,7 +224,7 @@
             image = this.$store.state.urlBase + image + this.$store.state.viewBase
             newArr.push(image)
           }
-          l.images_list = newArr
+          l.images_list_new = newArr
           collections.push(l)
         }
         return collections

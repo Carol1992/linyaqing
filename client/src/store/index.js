@@ -26,7 +26,7 @@ const store = new Vuex.Store({
       user_name: '',
       image_md5: ''
     },
-    likeThePhoto: false
+    alreadyLiked: false
   },
   mutations: {
     UpdateEmailSettings (state, settings) {
@@ -64,8 +64,8 @@ const store = new Vuex.Store({
       state.ownerInfo.user_name = info.user_name
       state.ownerInfo.image_md5 = info.image_md5
     },
-    updatePhotoLike (state) {
-      state.likeThePhoto = !state.likeThePhoto
+    updatePhotoLike (state, flag) {
+      state.alreadyLiked = flag
     }
   },
   actions: {
@@ -113,6 +113,14 @@ const store = new Vuex.Store({
           info.image_md5 = state.urlBase + info.image_md5 + state.viewBase
         }
         commit('updateOwnerInfo', info)
+      })
+    },
+    likedPhoto ({commit, state}, info) {
+      return new Promise((resolve, reject) => {
+        photoOp.alreadyLike(info, (res) => {
+          commit('updatePhotoLike', res.data.data.alreadyLike)
+          resolve(res)
+        })
       })
     }
     // photoLike ({commit, state}, data) {

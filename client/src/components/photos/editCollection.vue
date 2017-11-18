@@ -16,12 +16,12 @@
         <textarea maxlength="300" v-model='collectionInfo.collection_desc'></textarea>
       </div>
       <div class="private">
-        <input type="checkbox" :checked='collectionInfo.is_private' 
-        @change='collectionInfo.is_private = !collectionInfo.is_private'>
+        <input type="checkbox" :checked='collectionInfo.isPrivate' 
+        @change='changePrivate(collectionInfo)'>
         <span>设置为私密相册</span>
         <span class="deleteCollection" @click='deleteCollection'>删除相册</span>
       </div>
-      <div class="submit" @click='submit'>
+      <div class="submit" @click='submit(collectionInfo)'>
         <input type="button" value="提交">
       </div>
     </div>
@@ -42,12 +42,11 @@
       cancel (e) {
         this.$emit('closeBox', e)
       },
-      submit (e) {
-        let data = this.collectionInfo
-        this.collectionInfo.is_private = this.collectionInfo.is_private ? 0 : 1
-        photoOp.updateCollection(data, (res) => {
-          this.$emit('successModify', e)
-        })
+      changePrivate (c) {
+        this.$emit('changePrivate', c)
+      },
+      submit (collectionInfo) {
+        this.$emit('updateCollectionInfo', collectionInfo)
       },
       deleteCollection (e) {
         let data = {

@@ -73,18 +73,12 @@ export default {
           this.currentPage2 ++
           this.getList_new().then(() => {
             $(window).bind('scroll', this.onScroll)
-            // setTimeout(() => {
-            //   $(window).bind('scroll', this.onScroll)
-            // }, 2000)
           })
         }
         if (this.isActivated3) {
           this.currentPage3 ++
           this.getList_following().then(() => {
             $(window).bind('scroll', this.onScroll)
-            // setTimeout(() => {
-            //   $(window).bind('scroll', this.onScroll)
-            // }, 2000)
           })
         }
       }
@@ -107,9 +101,13 @@ export default {
     },
     showCovers (c) {
       if (!c.showCover) {
-        this.$store.dispatch('likedPhoto', {image_id: c.image_id}).then(() => {
+        if (this.login) {
+          this.$store.dispatch('likedPhoto', {image_id: c.image_id}).then(() => {
+            c.showCover = !c.showCover
+          })
+        } else {
           c.showCover = !c.showCover
-        })
+        }
       } else {
         c.showCover = !c.showCover
       }
@@ -119,6 +117,7 @@ export default {
         image_id: photo.image_id,
         like: this.alreadyLiked ? '0' : '1'
       }
+      if (!this.login) return
       photosOp.photoLike(data, (res) => {
         if (res.data.code === '1') return
         this.$store.dispatch('likedPhoto', {image_id: data.image_id}).then((res) => {
@@ -325,6 +324,7 @@ export default {
       this.$store.dispatch('getUserInfo')
     }
     this.getHot()
+    $(window).unbind('scroll')
     this.$nextTick(function () {
       // window.addEventListener('scroll', this.onScroll)
       $(window).scroll(this.onScroll)

@@ -79,6 +79,7 @@
       }
       this.collections = []
       this.getCollection_all()
+      $(window).unbind('scroll')
       this.$nextTick(function () {
       // window.addEventListener('scroll', this.onScroll)
         $(window).scroll(this.onScroll)

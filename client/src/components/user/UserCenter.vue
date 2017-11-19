@@ -98,6 +98,7 @@
         this.isActivated2 = false
         this.isActivated3 = false
         this.clearData()
+        this.currentPage1 = 1
         this.getList_user()
       },
       getListLiked () {
@@ -105,6 +106,7 @@
         this.isActivated2 = true
         this.isActivated3 = false
         this.clearData()
+        this.currentPage2 = 1
         this.getList_liked()
       },
       getCollectionUser () {
@@ -112,6 +114,7 @@
         this.isActivated2 = false
         this.isActivated3 = true
         this.collections = []
+        this.currentPage3 = 1
         this.getCollection_user()
       },
       getList_user () {
@@ -245,9 +248,13 @@
       },
       showCovers2 (c) {
         if (!c.showCover) {
-          this.$store.dispatch('likedPhoto', {image_id: c.image_id}).then(() => {
+          if (this.login) {
+            this.$store.dispatch('likedPhoto', {image_id: c.image_id}).then(() => {
+              c.showCover = !c.showCover
+            })
+          } else {
             c.showCover = !c.showCover
-          })
+          }
         } else {
           c.showCover = !c.showCover
         }
@@ -257,6 +264,7 @@
           image_id: photo.image_id,
           like: this.alreadyLiked ? '0' : '1'
         }
+        if (!this.login) return
         photoOp.photoLike(data, (res) => {
           this.$store.dispatch('likedPhoto', {image_id: data.image_id}).then((res) => {
             photo.total_likes = res.data.data.total_likes
@@ -358,6 +366,7 @@
       this.getList_user()
       this.getBasicData()
       this.$store.dispatch('getOwnerInfo', this.$route.params[0])
+      $(window).unbind('scroll')
       this.$nextTick(function () {
       // window.addEventListener('scroll', this.onScroll)
         $(window).scroll(this.onScroll)

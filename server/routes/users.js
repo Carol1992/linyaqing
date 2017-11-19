@@ -81,37 +81,42 @@ router.post('/login', function(req, res, next) {
 	});
 });
 // 获取用户信息
-router.all('/getUserInfo', verify_token, (req, res, next) => {
-	let user_id = req.api_user.data.user_id
+router.all('/getUserInfo', (req, res, next) => {
+	let token = req.body.token || req.query.token || req.headers['x-access-token'] || '';
 	let search_user_id = req.body.user_id || req.query.user_id
-	if (search_user_id) {
+	jwt.verify(token, 'secret', function(err, decoded) {
+    if (!err) {
+      req.api_user = decoded;
+      let user_id = req.api_user.data.user_id
+      let q1 = query('SELECT * FROM users WHERE user_id = ?', [user_id]);
+			let q2 = query('SELECT settings_id FROM user_email WHERE user_id = ?', [user_id]);
+			let q3 = query('SELECT following_id FROM relationships WHERE user_id = ?', [user_id]);
+			let q4 = query('SELECT user_id AS follower_id FROM relationships WHERE following_id = ?', [user_id]);
+			Promise.all([q1, q2, q3, q4]).then(values => {
+				let settings = []
+				let followings = [] // 我的关注
+				let followers = [] // 我的粉丝
+				for(let s of values[1].results) {
+					settings.push(s.settings_id)
+				}
+				for(let f of values[2].results) {
+					followings.push(f.following_id)
+				}
+				for(let fr of values[3].results) {
+					followers.push(fr.follower_id)
+				}
+				values[0].results[0].email_settings = settings.toString()
+				values[0].results[0].followings = followings.toString()
+				values[0].results[0].followers = followers.toString()
+				res.json(formater({code:'0', data:values[0].results[0]}))
+			})
+    }
+  })
+	if (!token && search_user_id) {
 		user_id = search_user_id
 		query('SELECT user_name, email, image_md5, wechat, personal_site FROM users WHERE user_id = ?', [user_id])
 		.then(data => {
 			return res.json(formater({code:'0', data:data.results}))
-		})
-	} else {
-		let q1 = query('SELECT * FROM users WHERE user_id = ?', [user_id]);
-		let q2 = query('SELECT settings_id FROM user_email WHERE user_id = ?', [user_id]);
-		let q3 = query('SELECT following_id FROM relationships WHERE user_id = ?', [user_id]);
-		let q4 = query('SELECT user_id AS follower_id FROM relationships WHERE following_id = ?', [user_id]);
-		Promise.all([q1, q2, q3, q4]).then(values => {
-			let settings = []
-			let followings = [] // 我的关注
-			let followers = [] // 我的粉丝
-			for(let s of values[1].results) {
-				settings.push(s.settings_id)
-			}
-			for(let f of values[2].results) {
-				followings.push(f.following_id)
-			}
-			for(let fr of values[3].results) {
-				followers.push(fr.follower_id)
-			}
-			values[0].results[0].email_settings = settings.toString()
-			values[0].results[0].followings = followings.toString()
-			values[0].results[0].followers = followers.toString()
-			res.json(formater({code:'0', data:values[0].results[0]}))
 		})
 	}
 })
@@ -180,21 +185,32 @@ router.all('/updateUserAccount/delete', verify_token, (req, res, next) => {
 		user_id: req.api_user.data.user_id
 	};
 	query('SELECT i.image_md5, u.image_md5 AS avatar FROM images i, users u WHERE '+
-		'i.user_id = u.user_id AND i.user_id = ?', [post.user_id])
+		'i.user_id = u.user_id AND u.user_id = ?', [post.user_id])
 	.then(data => {
 		let results = data.results
 		let arr = []
-		if (results.length > 0) {
+		if (results.length === 0) {
+			query('SELECT u.image_md5 AS avatar FROM users u WHERE u.user_id = ?', [post.user_id])
+			.then(data2 => {
+				results = data2.results
+				arr.push(aliyun_folder + results[0].avatar)
+				co(function* () {
+				  var result = yield client.deleteMulti(arr)
+				}).catch(function (err) {
+				  console.log(err);
+				});
+			})
+		} else {
 			for (r of results) {
 				arr.push(aliyun_folder + r.image_md5)
 			}
+			arr.push(aliyun_folder + results[0].avatar)
+			co(function* () {
+			  var result = yield client.deleteMulti(arr)
+			}).catch(function (err) {
+			  console.log(err);
+			});
 		}
-		arr.push(aliyun_folder + results[0].avatar)
-		co(function* () {
-		  var result = yield client.deleteMulti(arr)
-		}).catch(function (err) {
-		  console.log(err);
-		});
 		query('DELETE FROM users WHERE user_id = ?', [post.user_id])
 		.then(function(data) {
 			if(data.results.affectedRows === 1) {
@@ -469,7 +485,7 @@ router.all('/getPhotographers', (req, res, next) => {
 		res.json(formater({code:'0', data: data.results}));
 	});
 });
-// TODO:关键字搜索
+// 关键字搜索
 router.all('/search', (req, res, next) => {
 	let _user = req.body;
 	let keyword = _user.keyword || req.query.keyword;
@@ -865,22 +881,36 @@ router.all('/addToCollection', verify_token, (req, res, next) => {
 		image_id: req.body.image_id || req.query.image_id,
 		collection_id: req.body.collection_id || req.query.collection_id
 	}
-	if (!post.image_id || !post.collection_id){
-		return res.json(formater({code: '1', desc:'需要图片id和相册id'}))
+	let collection_name = new Date().getFullYear() + '/' + new Date().getMonth() + '/' + 
+		new Date().getDate() + ' ' + new Date().getHours() + ':' + new Date().getMinutes() + 
+		':' + new Date().getSeconds()
+	if (!post.image_id){
+		return res.json(formater({code: '1', desc:'需要相册id'}))
 	}
-	query('SELECT collection_id FROM collections WHERE user_id = ? AND collection_id = ?', [user_id, post.collection_id])
-	.then(data => {
-		if (data.results.length === 0) {
-			return res.json(formater({code: '1', desc: '该相册不属于该用户！'}))
-		}
-		query('DELETE FROM image_collection WHERE image_id = ? AND collection_id = ?', [post.image_id, post.collection_id])
-		.then(data => {
+	if(!post.collection_id) {
+		query('INSERT INTO collections SET user_id = ?, collection_name = ?', [user_id, collection_name])
+	  .then(data => {
+			post.collection_id = data.results.insertId;
 			query('INSERT INTO image_collection SET ?', [post])
 			.then(data2 => {
 				res.json(formater({code: '0', desc:'成功将指定相片加入指定相册！'}))
 			})
+		});
+	} else {
+		query('SELECT collection_id FROM collections WHERE user_id = ? AND collection_id = ?', [user_id, post.collection_id])
+		.then(data => {
+			if (data.results.length === 0) {
+				return res.json(formater({code: '1', desc: '该相册不属于该用户！'}))
+			}
+			query('DELETE FROM image_collection WHERE image_id = ? AND collection_id = ?', [post.image_id, post.collection_id])
+			.then(data => {
+				query('INSERT INTO image_collection SET ?', [post])
+				.then(data2 => {
+					res.json(formater({code: '0', desc:'成功将指定相片加入指定相册！'}))
+				})
+			})
 		})
-	})
+	}
 })
 // 修改相册名称或简介或是否公开
 router.all('/updateCollection', verify_token, (req, res, next) => {
@@ -1071,6 +1101,7 @@ router.all('/download/photo', (req, res, next) => {
 // 用户是否给该图片点过赞
 router.all('/alreadyLike', verify_token, (req, res, next) => {
 	let user_id = req.api_user.data.user_id;
+	// let user_id = req.body.user_id || req.query.user_id || ''
 	let image_id = req.body.image_id;
 	if (!image_id) {
 		return res.json(formater({code: '1', desc: '请提供图片id'}))

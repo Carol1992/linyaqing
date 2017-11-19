@@ -26,27 +26,27 @@
       <div class="details detail-exif" v-if='isExif'>
         <span>从照片中获取的EXIF信息：</span>
         <div class="exif-info">
-          <span>Make and Model: </span>
+          <span>相机和型号: </span>
           <span>{{photoInfo.Make}} {{photoInfo.Model}}</span>
         </div>
         <div class="exif-info">
-          <span>DateTimeOriginal: </span>
+          <span>拍摄时间: </span>
           <span>{{photoInfo.DateTimeOriginal}}</span>
         </div>
         <div class="exif-info">
-          <span>Shutter Speed (s): </span>
+          <span>快门速度 (s): </span>
           <span>{{photoInfo.ShutterSpeedValue}}</span>
         </div>
         <div class="exif-info">
-          <span>Focal Length (mm): </span>
+          <span>镜头焦距 (mm): </span>
           <span>{{photoInfo.FocalLength}}</span>
         </div>
         <div class="exif-info">
-          <span>Aperture (ƒ): </span>
+          <span>镜头光圈 (ƒ): </span>
           <span>{{photoInfo.ApertureValue}}</span>
         </div>
         <div class="exif-info">
-          <span>ISO: </span>
+          <span>感光度: </span>
           <span>{{photoInfo.ISOSpeedRatings}}</span>
         </div>
       </div>

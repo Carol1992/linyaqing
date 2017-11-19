@@ -477,6 +477,7 @@
       if (this.login) {
         this.$store.dispatch('getUserInfo')
       }
+      $(window).unbind('scroll')
       this.$nextTick(function () {
       // window.addEventListener('scroll', this.onScroll)
         $(window).scroll(this.onScroll)

@@ -4,8 +4,8 @@
       <Icon type="camera" size="50"></Icon>
     </div>
     <div class="search">
-      <span><Icon type="ios-search-strong" size="30" color="#999"></Icon></span>
-      <input type="text" placeholder="输入关键字搜索图片" @focus='changeBorder' @blur='changeBorder2'>
+      <span @click='searchKeyword'><Icon type="ios-search-strong" size="30" color="#999"></Icon></span>
+      <input type="text" placeholder="输入关键字搜索图片或用户" @focus='changeBorder' @blur='changeBorder2' @keyup.enter='searchKeyword'>
     </div>
     <div class="hideMore" v-if='!showMore'><span><Icon type="more"></Icon></span></div>
     <div class="more" v-if='showMore'>
@@ -56,6 +56,9 @@
           title: this.notifyMsg,
           desc: nodesc ? '' : ''
         })
+      },
+      searchKeyword () {
+        console.log('hi')
       },
       goHome () {
         this.$store.commit('getHeaderInfo', {isStore: false, isCollections: false})

@@ -34,7 +34,6 @@ module.exports = {
 		});
 	},
 	getUserInfo (data, callback) {
-		data.token = localStorage.token
 		axios.post('/api/getUserInfo', data)
 		.then(function (response) {
 		  callback(response)

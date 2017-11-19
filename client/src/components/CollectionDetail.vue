@@ -8,8 +8,8 @@
       <div class="collection_owner">
         <img :src='collectionInfo.owner_avatar' alt="" @click='gotoUserCenter'>
         <span class="name" @click='gotoUserCenter'>{{collectionInfo.collection_owner}}</span>
-        <span class='follow' v-if='notMe && !followed' @click='followMe'><Icon type="person-add"></Icon> 关注</span>
-        <span class='follow followed' v-if='notMe && followed' @click='notFollowMe'><Icon type="person"></Icon> 取消关注</span>
+        <span class='follow' v-if='notMe && !followed && login' @click='followMe'><Icon type="person-add"></Icon> 关注</span>
+        <span class='follow followed' v-if='notMe && followed && login' @click='notFollowMe'><Icon type="person"></Icon> 取消关注</span>
       </div>
     </div>
     <div class="photos">
@@ -83,9 +83,13 @@
       },
       showCovers (c) {
         if (!c.showCover) {
-          this.$store.dispatch('likedPhoto', {image_id: c.image_id}).then(() => {
+          if (this.login) {
+            this.$store.dispatch('likedPhoto', {image_id: c.image_id}).then(() => {
+              c.showCover = !c.showCover
+            })
+          } else {
             c.showCover = !c.showCover
-          })
+          }
         } else {
           c.showCover = !c.showCover
         }
@@ -95,6 +99,7 @@
           image_id: photo.image_id,
           like: this.alreadyLiked ? '0' : '1'
         }
+        if (!this.login) return
         photoOp.photoLike(data, (res) => {
           this.$store.dispatch('likedPhoto', {image_id: data.image_id}).then((res) => {
             photo.total_likes = res.data.data.total_likes
@@ -264,18 +269,20 @@
         this.$store.commit('isLogin', false)
       }
       if (this.login) {
-        this.$store.dispatch('getUserInfo').then(() => {
-          this.photos.group_a = []
-          this.photos.group_b = []
-          this.photos.group_c = []
-          this.getCollectionInfo()
-          this.getPhotos()
-        })
+        this.$store.dispatch('getUserInfo')
       }
-      this.$nextTick(function () {
-      // window.addEventListener('scroll', this.onScroll)
+      this.photos.group_a = []
+      this.photos.group_b = []
+      this.photos.group_c = []
+      this.getCollectionInfo()
+      $(window).unbind('scroll')
+      this.getPhotos().then(() => {
         $(window).scroll(this.onScroll)
       })
+      // this.$nextTick(function () {
+      // // window.addEventListener('scroll', this.onScroll)
+      //   $(window).scroll(this.onScroll)
+      // })
     },
     computed: {
       info () {

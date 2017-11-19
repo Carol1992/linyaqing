@@ -43,18 +43,15 @@ export default new Router({
     {
       path: '/userCenter/*',
       name: 'userCenter',
-      component: UserCenter,
-      meta: {
-        requireAuth: true
-      }
+      component: UserCenter
     },
     {
       path: '/userProfile/*',
       name: 'userProfile',
-      component: UserProfile,
-      meta: {
-        requireAuth: true
-      }
+      component: UserProfile
+      // meta: {
+      //   requireAuth: true
+      // }
     },
     {
       path: '/addPhoto',

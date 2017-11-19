@@ -5,7 +5,7 @@
       :class='{likedLikes: alreadyLiked}' 
       @click='photoLike(photoInfo)'><Icon type="android-favorite"></Icon><span class="likes-nums" 
       :class='{likedNums: alreadyLiked}'> {{photoInfo.total_likes}}</span></span>
-      <span class="add" @click='addToCollection'><Icon type="plus-round"></Icon>添加到相册</span>
+      <span v-if='login' class="add" @click='addToCollection'><Icon type="plus-round"></Icon>添加到相册</span>
     </div>
     <div class="bottom">
       <div class="users">
@@ -40,6 +40,9 @@
       }
     },
     computed: {
+      login () {
+        return this.$store.state.alreadyLogin
+      },
       alreadyLiked () {
         return this.$store.state.alreadyLiked
       }
@@ -66,7 +69,6 @@
   .top .likes {
     color: #f15151;
     font-size: 18px;
-    margin-right: 20px;
     cursor: pointer;
     border-radius: 4px;
     padding: 8px 8px;
@@ -92,6 +94,7 @@
     background-color: #f1f1f1;
     color: #999;
     cursor: pointer;
+    margin-left: 20px;
   }
   .top .add:hover {
     color: #676767;
@@ -106,15 +109,15 @@
     display: inline-block;
     float: left;
     color: #fff;
-    font-size: 18px;
+    font-size: 16px;
   }
   .users img {
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     overflow: hidden;
     vertical-align: middle;
-    margin-right: 10px;
+    margin-right: 5px;
     cursor: pointer;
   }
   .users span {

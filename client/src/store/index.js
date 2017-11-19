@@ -71,7 +71,7 @@ const store = new Vuex.Store({
   actions: {
     getUserInfo ({ commit, state }) {
       return new Promise((resolve, reject) => {
-        userOp.getUserInfo({}, (res) => {
+        userOp.getUserInfo({token: localStorage.token}, (res) => {
           let info = res.data.data
           info.saveName = info.image_md5
           if (info.image_md5 === 'null' || !info.image_md5) {

@@ -262,7 +262,7 @@
             this.error(true)
             return
           }
-          this.getList_user()
+          this.getList()
           this.notifyMsg = '图片删除成功！'
           this.success(true)
         })

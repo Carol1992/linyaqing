@@ -1,9 +1,9 @@
 <template>
   <div class="container">
+    <div class="loginForm">
     <div class="home" @click="goHome">
       <Icon type="camera" size="70"></Icon>
     </div>
-    <div class="loginForm">
       <div class="login">
         <span>欢迎回来</span>
       </div>
@@ -92,15 +92,14 @@
   .home {
     width: 100px;
     margin: auto;
-    margin-top: 100px;
     text-align: center;
     cursor: pointer;
   }
   .loginForm {
     position: fixed;
     width: 530px;
-    height: 400px;
-    top: calc(50% - 200px);
+    height: 420px;
+    top: calc(50% - 250px);
     left: calc(50% - 265px);
   }
   .login {
@@ -156,8 +155,8 @@
   @media screen and (max-width: 809px) {
     .loginForm {
       width: 96%;
-      height: 400px;
-      top: calc(50% - 200px);
+      height: 420px;
+      top: calc(50% - 250px);
       left: 2%;
     }
   }

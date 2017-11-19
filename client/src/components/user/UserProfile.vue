@@ -197,7 +197,7 @@
         password_confirmed: '',
         imgUrl: '',
         currentPage1: 1,
-        pageSize: 20,
+        pageSize: 20000,
         photos: [],
         noData: false,
         loading: false,
@@ -478,10 +478,6 @@
         this.$store.dispatch('getUserInfo')
       }
       $(window).unbind('scroll')
-      this.$nextTick(function () {
-      // window.addEventListener('scroll', this.onScroll)
-        $(window).scroll(this.onScroll)
-      })
     }
   }
 </script>
@@ -589,6 +585,7 @@
   .submit{
     margin-top: 30px;
     text-align: center;
+    margin-bottom: 30px;
   }
   .submit >input {
     background-color: #000;
@@ -730,6 +727,12 @@
     .myavatar > img {
       width: 120px;
       height: 120px;
+    }
+    .container {
+      margin-top: 100px;
+    }
+    .details > div {
+      height: 42px;
     }
   }
   @media screen and (max-width: 1280px){

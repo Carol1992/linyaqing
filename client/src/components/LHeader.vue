@@ -5,10 +5,10 @@
     </div>
     <div class="search">
       <span @click='searchKeyword'><Icon type="ios-search-strong" size="30" color="#999"></Icon></span>
-      <input type="text" placeholder="输入关键字搜索图片或用户" @focus='changeBorder' @blur='changeBorder2' @keyup.enter='searchKeyword'>
+      <input type="text" placeholder="搜索图片或用户" @focus='changeBorder' @blur='changeBorder2' @keyup.enter='searchKeyword'>
     </div>
-    <div class="hideMore" v-if='!showMore'><span><Icon type="more"></Icon></span></div>
-    <div class="more" v-if='showMore'>
+    <div class="hideMore" v-show='!showMore' @click='showItems'><span><Icon type="more"></Icon></span></div>
+    <div class="more" v-show='showMore'>
       <div class="mycollection" @click='gotoCollections' :class='{activated: headerInfo.isCollections}'>
         <span>相册</span>
       </div>
@@ -29,19 +29,30 @@
     <div class="loadingCover" v-if="showLoading">
       <Spin size="large" fix class='loadIcon'></Spin>
     </div>
+    <more-link v-if='clickShowMore' @closeBox='closeBox' 
+    @gotoCollections='gotoCollections' 
+    @gotoStore='gotoStore' 
+    @uploadPhoto='uploadPhoto' 
+    @gotoUserCenter='gotoUserCenter' 
+    @gotoLogin='tryLogin'></more-link>
   </div>
 </template>
 
 <script>
   import aliyunOp from '../../api/aliyun'
   import {mapState} from 'vuex'
+  import MoreLink from './More'
   var EXIF = require('exif-js')
   export default {
     name: 'Lheader',
+    components: {
+      MoreLink
+    },
     data () {
       return {
         showMore: true,
-        showLoading: false
+        showLoading: false,
+        clickShowMore: false
       }
     },
     methods: {
@@ -56,6 +67,12 @@
           title: this.notifyMsg,
           desc: nodesc ? '' : ''
         })
+      },
+      closeBox () {
+        this.clickShowMore = false
+      },
+      showItems () {
+        this.clickShowMore = true
       },
       searchKeyword () {
         console.log('hi')
@@ -73,6 +90,7 @@
         e.target.style.backgroundColor = '#f1f1f1'
       },
       tryLogin () {
+        this.clickShowMore = false
         this.$store.commit('getHeaderInfo', {isStore: false, isCollections: false})
         this.$router.push('/login')
       },
@@ -84,10 +102,12 @@
         }
       },
       gotoUserCenter () {
+        this.clickShowMore = false
         this.$store.commit('getHeaderInfo', {isStore: false, isCollections: false})
         this.$router.push({path: `/userCenter/${this.info.user_id}`})
       },
       gotoCollections () {
+        this.clickShowMore = false
         this.$store.commit('getHeaderInfo', {isStore: false, isCollections: true})
         this.$router.push('/collections')
       },
@@ -97,6 +117,7 @@
         this.success(true)
       },
       uploadPhoto () {
+        this.clickShowMore = false
         if (!this.login) {
           this.$router.push('/login')
           return
@@ -293,6 +314,11 @@
   }
   .hideMore {
     float: right;
+    cursor: pointer;
+    color: #626262;
+  }
+  .hideMore:hover {
+    color: #111;
   }
   .loginUser {
     border-radius: 50%;
@@ -313,6 +339,9 @@
     }
     .more {
       width: 40%;
+    }
+    .search > input {
+      font-size: 16px;
     }
   }
   @media screen and (max-width: 1280px) and (min-width: 810px){

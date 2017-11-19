@@ -2,7 +2,7 @@
   <div class="container">
     <div class="intro">
       <div class="collection_name">
-        {{collectionInfo.collection_name}} <Icon type="locked" v-if='collectionInfo.isPrivate' class='private-lock'></Icon>
+        <span class="cName">{{collectionInfo.collection_name}} <Icon type="locked" v-if='collectionInfo.isPrivate' class='private-lock'></Icon></span>
         <span class="edit" v-if='!notMe' @click='editCollection'><Icon type="edit"></Icon> 编辑</span>
       </div>
       <div class="collection_owner">
@@ -20,6 +20,7 @@
     <Edit v-if='showEdit' :collectionInfo='collectionInfo' @closeBox='closeBox' 
     @updateCollectionInfo='successModify' @deleteCollection='successDelete' @changePrivate='changePrivate'></Edit>
     <add-to-collection v-if='showDialog' @addTo='addTo' @closeCollection='closeCollection'></add-to-collection>
+    <BackTop></BackTop>
   </div>
 </template>
 
@@ -374,6 +375,10 @@
   .private-lock {
     font-size: 20px;
   }
+  .cName {
+    display: inline-block;
+    max-width: calc(100% - 100px);
+  }
   .edit {
     font-size: 18px;
     display: inline-block;
@@ -383,6 +388,7 @@
     padding: 2px 5px;
     cursor: pointer;
     color: #999;
+    width: 75px;
   }
   .edit:hover {
     border-color: #111;
@@ -390,12 +396,12 @@
   }
   @media screen and (max-width: 809px) {
     .collection_name {
-      font-size: 28px;
+      font-size: 24px;
     }
-    .edit {
+    /*.edit {
       margin-left: 0;
       display: block;
       margin-top: 10px;
-    }
+    }*/
   }
 </style>

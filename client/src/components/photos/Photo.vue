@@ -441,6 +441,7 @@
     .exif-info {
       width: 90%;
       margin: auto;
+      height: 40px;
     }
     .next span{
       width: 80px;
@@ -450,9 +451,13 @@
     }
     .tags > div {
       font-size: 18px;
+      margin-right: 0px;
     }
     .select-collection {
       max-height: 300px;
+    }
+    .inputLocation > input {
+      width: 70%;
     }
   }
 </style>

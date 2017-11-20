@@ -10,6 +10,7 @@ import UserProfile from '@/components/user/UserProfile'
 import Photo from '@/components/photos/Photo'
 import Collections from '@/components/CollectionHome'
 import Collection from '@/components/CollectionDetail'
+import Search from '@/components/SearchHome'
 
 Vue.use(Router)
 
@@ -70,6 +71,11 @@ export default new Router({
       path: '/collection/*',
       name: 'collection',
       component: Collection
+    },
+    {
+      path: '/search/*',
+      name: 'search',
+      component: Search
     }
   ]
 })

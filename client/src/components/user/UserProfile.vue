@@ -180,7 +180,6 @@
   import userOp from '../../../api/user'
   import aliyunOp from '../../../api/aliyun'
   import photoOp from '../../../api/photos'
-  import $ from 'jquery'
   export default {
     name: 'userProfile',
     data () {
@@ -449,16 +448,16 @@
           fd.append('file', file, saveName)
           this.saveImgToAliyun(fd, file, host_user, startsWith, saveName)
         })
-      },
-      onScroll () {
-        if ($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
-          $(window).unbind('scroll')
-          this.currentPage1 ++
-          this.getList_user().then(() => {
-            $(window).bind('scroll', this.onScroll)
-          })
-        }
       }
+      // onScroll () {
+      //   if ($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
+      //     $(window).unbind('scroll')
+      //     this.currentPage1 ++
+      //     this.getList_user().then(() => {
+      //       $(window).bind('scroll', this.onScroll)
+      //     })
+      //   }
+      // }
     },
     computed: {
       info () {
@@ -477,7 +476,6 @@
       if (this.login) {
         this.$store.dispatch('getUserInfo')
       }
-      $(window).unbind('scroll')
     }
   }
 </script>

@@ -489,21 +489,60 @@ router.all('/getPhotographers', (req, res, next) => {
 router.all('/search', (req, res, next) => {
 	let _user = req.body;
 	let keyword = _user.keyword || req.query.keyword;
-	let q1 = query('SELECT COUNT(DISTINCT user_id) AS all_users, COUNT(DISTINCT image_id) AS all_images, ' + 
-		'COUNT(DISTINCT collection_id) AS all_collections ' + 
-		'FROM images WHERE image_tags LIKE "%' + keyword + '%"', '');
-	let q2 = query('SELECT images.image_id, images.image_md5, images.image_tags, ' + 
-		'users.user_id, users.user_name, ' + 'users.image_md5 FROM images, users ' + 
-		'WHERE images.user_id = users.user_id AND images.image_tags LIKE "%' + 
-		keyword + '%"' , '');
-	Promise.all([q1, q2]).then(values => {
+	if (!keyword) return res.json(formater({code:'1', desc: '请输入关键词！'}));
+	let q1 = query('SELECT i.*, u.user_name, u.image_md5 AS avatar, u.email, c.is_private, '+
+		'likes.total_likes FROM image_collection ic JOIN collections c ON '+
+		'ic.collection_id = c.collection_id JOIN images i ON ic.image_id = i.image_id '+
+		'JOIN users u ON i.user_id = u.user_id LEFT OUTER JOIN (SELECT l.image_id, COUNT(l.user_id) '+
+		'AS total_likes FROM image_likes l GROUP BY image_id) likes ON '+
+		'i.image_id = likes.image_id WHERE c.is_private = 1 AND i.image_tags '+
+		'LIKE "%' + keyword + '%" OR i.story_title LIKE "%' + keyword + '%"', '')
+	let q2 = query('SELECT user_id, user_name, image_md5, bio FROM users WHERE user_name LIKE ' +
+		'"%' + keyword + '%"', '')
+	let q3 = query('SELECT u.user_id, u.user_name, u.image_md5 AS avatar, ic.collection_id, '+
+		'c.collection_name, ic.image_id, i.image_md5 FROM users u, image_collection ic, '+
+		'collections c, images i WHERE ic.collection_id = c.collection_id AND ic.image_id = i.image_id '+
+		'AND u.user_id = c.user_id AND c.is_private = 1 AND c.collection_name '+
+		'LIKE "%' + keyword + '%" ORDER BY ic.collection_id DESC')
+	Promise.all([q1, q2, q3]).then(values => {
+		let collections = values[2].results
+		let newCollections = []
+		let hashTable = {};
+		let newArr = [];
+		if (collections.length > 0) {
+	    for (let c1 of collections) {
+	    	let newCollection = {}
+	    	newCollection.collection_id = c1.collection_id
+	    	newCollection.collection_name = c1.collection_name
+	    	newCollection.user_id = c1.user_id
+	    	newCollection.user_name = c1.user_name
+	    	newCollection.avatar = c1.avatar
+	    	newCollection.images_list = []
+	    	for (let c2 of collections) {
+	    		if (newCollection.collection_id === c2.collection_id) {
+	    			newCollection.images_list.push(c2.image_md5)
+	    		}
+	    	}
+	    	newCollections.push(newCollection)
+	    }
+		  for(let nc of newCollections) {
+		    if(!hashTable[nc.collection_id]) {
+		      hashTable[nc.collection_id] = true;
+		      newArr.push(nc);
+		    }
+		  }
+		}
 		let response = {
 			basic_info: {
-				photos: values[0].results[0].all_images,
-				collections: values[0].results[0].all_collections,
-				users: values[0].results[0].all_users
+				photos: values[0].results.length,
+				collections: newArr.length,
+				users: values[1].results.length
 			},
-			lists: values[1].results
+			lists: {
+				photos: values[0].results,
+				collections: newArr,
+				users: values[1].results
+			}
 		};
 		res.json(formater({code:'0', data:response}));
 	});

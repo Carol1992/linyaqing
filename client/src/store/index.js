@@ -26,7 +26,19 @@ const store = new Vuex.Store({
       user_name: '',
       image_md5: ''
     },
-    alreadyLiked: false
+    alreadyLiked: false,
+    keywordData: {
+      basic_info: {
+        photos: 0,
+        collections: 0,
+        users: 0
+      },
+      lists: {
+        photos: '',
+        collections: '',
+        users: ''
+      }
+    }
   },
   mutations: {
     UpdateEmailSettings (state, settings) {
@@ -66,12 +78,53 @@ const store = new Vuex.Store({
     },
     updatePhotoLike (state, flag) {
       state.alreadyLiked = flag
+    },
+    updateKeywordData (state, info) {
+      state.keywordData.basic_info.photos = info.basic_info.photos
+      state.keywordData.basic_info.collections = info.basic_info.collections
+      state.keywordData.basic_info.users = info.basic_info.users
+      let photos = info.lists.photos
+      let collections = info.lists.collections
+      let users = info.lists.users
+      for (let photo of photos) {
+        photo.aliyun_name = photo.image_md5
+        photo.image_md5 = state.urlBase + photo.image_md5 + state.viewBase
+        photo.showCover = false
+        if (photo.avatar === 'null' || !photo.avatar) {
+          photo.avatar = require('@/assets/img/user_default.jpg')
+        } else {
+          photo.avatar = state.urlBase + photo.avatar + state.viewBase
+        }
+      }
+      for (let collection of collections) {
+        collection.showCover = false
+        let newArr = []
+        for (let image of collection.images_list) {
+          image = state.urlBase + image + state.viewBase
+          newArr.push(image)
+        }
+        collection.images_list = newArr
+      }
+      for (let user of users) {
+        if (user.image_md5 === 'null' || !user.image_md5) {
+          user.image_md5 = require('@/assets/img/user_default.jpg')
+        } else {
+          user.image_md5 = state.urlBase + user.image_md5 + state.viewBase
+        }
+        user.showCover = false
+      }
+      state.keywordData.lists.photos = info.lists.photos
+      state.keywordData.lists.collections = info.lists.collections
+      state.keywordData.lists.users = info.lists.users
     }
   },
   actions: {
     getUserInfo ({ commit, state }) {
       return new Promise((resolve, reject) => {
         userOp.getUserInfo({token: localStorage.token}, (res) => {
+          if (res.data.code === '1') {
+            return
+          }
           let info = res.data.data
           info.saveName = info.image_md5
           if (info.image_md5 === 'null' || !info.image_md5) {
@@ -97,6 +150,9 @@ const store = new Vuex.Store({
         pageSize: 18000
       }
       photoOp.getCollection.user(data, (res) => {
+        if (res.data.code === '1') {
+          return
+        }
         let collections = res.data.data.lists
         commit('updateUserCollections', collections)
       })
@@ -118,20 +174,25 @@ const store = new Vuex.Store({
     likedPhoto ({commit, state}, info) {
       return new Promise((resolve, reject) => {
         photoOp.alreadyLike(info, (res) => {
+          if (res.data.code === '1') {
+            return
+          }
           commit('updatePhotoLike', res.data.data.alreadyLike)
           resolve(res)
         })
       })
+    },
+    searchKeyword ({commit, state}, info) {
+      return new Promise((resolve, reject) => {
+        photoOp.search(info, (res) => {
+          if (res.data.code === '1') {
+            return
+          }
+          commit('updateKeywordData', res.data.data)
+          resolve()
+        })
+      })
     }
-    // photoLike ({commit, state}, data) {
-    //   let data = {
-    //     image_id: data.image_id,
-    //     like: this.like ? '1' : '0'
-    //   }
-    //   photoOp.photoLike(data, (res) => {
-    //     console.log(res)
-    //   })
-    // }
   },
   getters: {}
 })

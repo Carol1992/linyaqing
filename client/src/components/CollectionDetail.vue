@@ -29,7 +29,6 @@
   import Photos from './photos/Photos'
   import Edit from './photos/editCollection'
   import addToCollection from './photos/addToCollection'
-  import $ from 'jquery'
   export default {
     name: 'CollectionDetail',
     data () {
@@ -252,16 +251,16 @@
             resolve()
           })
         })
-      },
-      onScroll () {
-        if ($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
-          $(window).unbind('scroll')
-          this.currentPageNo ++
-          this.getPhotos().then(() => {
-            $(window).bind('scroll', this.onScroll)
-          })
-        }
       }
+      // onScroll () {
+      //   if ($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
+      //     $(window).unbind('scroll')
+      //     this.currentPageNo ++
+      //     this.getPhotos().then(() => {
+      //       $(window).bind('scroll', this.onScroll)
+      //     })
+      //   }
+      // }
     },
     mounted () {
       if (localStorage.token) {

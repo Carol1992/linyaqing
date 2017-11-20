@@ -23,7 +23,6 @@
 import photosOp from '../../api/photos'
 import Photos from './photos/Photos'
 import addToCollection from './photos/addToCollection'
-import $ from 'jquery'
 export default {
   name: 'home',
   components: {
@@ -50,53 +49,53 @@ export default {
     }
   },
   methods: {
-    onScroll () {
-      // let documentHeight = document.body.clientHeight
-      // let pos = 0
-      // if (document.body.clientWidth < 809) {
-      //   pos = documentHeight * 0.5
-      // } else {
-      //   pos = documentHeight * 0.7
-      // }
-      if ($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
-        $(window).unbind('scroll')
-        if (this.isActivated) {
-          this.currentPage1 ++
-          this.getList_hot().then(() => {
-            $(window).bind('scroll', this.onScroll)
-            // setTimeout(() => {
-            //   $(window).bind('scroll', this.onScroll)
-            // }, 2000)
-          })
-        }
-        if (this.isActivated2) {
-          this.currentPage2 ++
-          this.getList_new().then(() => {
-            $(window).bind('scroll', this.onScroll)
-          })
-        }
-        if (this.isActivated3) {
-          this.currentPage3 ++
-          this.getList_following().then(() => {
-            $(window).bind('scroll', this.onScroll)
-          })
-        }
-      }
-      // if (window.scrollY > pos) {
-      //   if (this.isActivated) {
-      //     this.currentPage1 ++
-      //     this.getList_hot()
-      //   }
-      //   if (this.isActivated2) {
-      //     this.currentPage2 ++
-      //     this.getList_new()
-      //   }
-      //   if (this.isActivated3) {
-      //     this.currentPage3 ++
-      //     this.getList_following()
-      //   }
-      // }
-    },
+    // onScroll () {
+    //   // let documentHeight = document.body.clientHeight
+    //   // let pos = 0
+    //   // if (document.body.clientWidth < 809) {
+    //   //   pos = documentHeight * 0.5
+    //   // } else {
+    //   //   pos = documentHeight * 0.7
+    //   // }
+    //   if ($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
+    //     $(window).unbind('scroll')
+    //     if (this.isActivated) {
+    //       this.currentPage1 ++
+    //       this.getList_hot().then(() => {
+    //         $(window).bind('scroll', this.onScroll)
+    //         // setTimeout(() => {
+    //         //   $(window).bind('scroll', this.onScroll)
+    //         // }, 2000)
+    //       })
+    //     }
+    //     if (this.isActivated2) {
+    //       this.currentPage2 ++
+    //       this.getList_new().then(() => {
+    //         $(window).bind('scroll', this.onScroll)
+    //       })
+    //     }
+    //     if (this.isActivated3) {
+    //       this.currentPage3 ++
+    //       this.getList_following().then(() => {
+    //         $(window).bind('scroll', this.onScroll)
+    //       })
+    //     }
+    //   }
+    //   // if (window.scrollY > pos) {
+    //   //   if (this.isActivated) {
+    //   //     this.currentPage1 ++
+    //   //     this.getList_hot()
+    //   //   }
+    //   //   if (this.isActivated2) {
+    //   //     this.currentPage2 ++
+    //   //     this.getList_new()
+    //   //   }
+    //   //   if (this.isActivated3) {
+    //   //     this.currentPage3 ++
+    //   //     this.getList_following()
+    //   //   }
+    //   // }
+    // },
     showCovers (c) {
       if (!c.showCover) {
         if (this.login) {

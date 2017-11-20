@@ -5,7 +5,7 @@
     </div>
     <div class="search">
       <span @click='searchKeyword'><Icon type="ios-search-strong" size="30" color="#999"></Icon></span>
-      <input type="text" placeholder="搜索图片或用户" @focus='changeBorder' @blur='changeBorder2' @keyup.enter='searchKeyword'>
+      <input type="text" placeholder="搜索图片或用户" v-model='keyword' @focus='changeBorder' @blur='changeBorder2' @keyup.enter='searchKeyword'>
     </div>
     <div class="hideMore" v-show='!showMore' @click='showItems'><span><Icon type="more"></Icon></span></div>
     <div class="more" v-show='showMore'>
@@ -52,7 +52,8 @@
       return {
         showMore: true,
         showLoading: false,
-        clickShowMore: false
+        clickShowMore: false,
+        keyword: ''
       }
     },
     methods: {
@@ -75,7 +76,9 @@
         this.clickShowMore = true
       },
       searchKeyword () {
-        console.log('hi')
+        this.$store.dispatch('searchKeyword', {keyword: this.keyword}).then(() => {
+          this.$router.push({path: `/search/${this.keyword}`})
+        })
       },
       goHome () {
         this.$store.commit('getHeaderInfo', {isStore: false, isCollections: false})

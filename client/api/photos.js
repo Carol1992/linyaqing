@@ -231,12 +231,12 @@ module.exports = {
 			});	
 		},
 	},
-	search () {
+	search (data, callback) {
 		axios.post('/api/search', {
-			keyword:'carol'
+			keyword:data.keyword
 		})
 		.then(function (response) {
-		  console.log(response)
+		  callback(response)
 		})
 		.catch(function (error) {
 		  console.log(error)

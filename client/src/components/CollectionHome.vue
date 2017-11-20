@@ -12,7 +12,6 @@
 <script>
   import photoOp from '../../api/photos'
   import Collections from './photos/Collections'
-  import $ from 'jquery'
   export default {
     name: 'collection_home',
     components: {
@@ -26,15 +25,15 @@
       }
     },
     methods: {
-      onScroll () {
-        if ($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
-          $(window).unbind('scroll')
-          this.currentPageNo ++
-          this.getCollection_all().then(() => {
-            $(window).bind('scroll', this.onScroll)
-          })
-        }
-      },
+      // onScroll () {
+      //   if ($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
+      //     $(window).unbind('scroll')
+      //     this.currentPageNo ++
+      //     this.getCollection_all().then(() => {
+      //       $(window).bind('scroll', this.onScroll)
+      //     })
+      //   }
+      // },
       showCovers (c) {
         c.showCover = !c.showCover
       },

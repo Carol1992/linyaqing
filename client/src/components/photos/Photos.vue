@@ -77,7 +77,7 @@
   .image {
     margin-bottom: 4.5%;
     width: 100%;
-    background-color: #f5f5f5;
+    background-color: #ddd;
     position: relative;
   }
   .imageCover {

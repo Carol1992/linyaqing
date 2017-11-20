@@ -1,27 +1,20 @@
 <template>
   <div class="container">
-    <div class="top">
-      <div class="user">
-        <div class="avatar">
-          <img :src='ownerInfo.image_md5' alt="">
-        </div>
-        <div class="name">
-          <span>{{ownerInfo.user_name}}</span>
-          <span class="more" @click='gotoProfile' v-if='isMe'><span>账户设置</span></span>
-        </div>
-      </div>
+    <div class="introduction">
+      <h1>Sharing Life</h1>
+      <h3>图片分享，免费下载，好友互赞，记录生活点点滴滴。</h3>
     </div>
     <div class="bottom">
       <div class="choices">
-        <span :class='{activated: isActivated1}' @click='getListUser'>{{summary.photos}} 张照片</span>
-        <span :class='{activated: isActivated2}' @click='getListLiked'>{{summary.liked}} 张赞过的照片</span>
-        <span :class='{activated: isActivated3}' @click='getCollectionUser'>{{summary.collections}} 本相册</span>
+        <span :class='{activated: isActivated1}' @click='getPhotos'>{{keywordData.basic_info.photos}} 张照片</span>
+        <span :class='{activated: isActivated2}' @click='getCollections'>{{keywordData.basic_info.collections}} 本相册</span>
+        <span :class='{activated: isActivated3}' @click='getUsers'>{{keywordData.basic_info.users}} 个用户</span>
       </div>
       <div class="photos">
-        <Photos :photos="photos" v-if='!isActivated3' 
+        <Photos :photos="photos" v-if='isActivated1' 
         @showCovers='showCovers2' @photoLike='photoLike' 
         @addToCollection='addToCollection'></Photos>
-        <Collections :collections='collections' v-if='isActivated3' @showCovers='showCovers'></Collections>
+        <Collections :collections='collections' v-if='isActivated2' @showCovers='showCovers'></Collections>
       </div>
       <div class="noData" v-if='noData'>
         <span>{{noDataMsg}}</span>
@@ -33,12 +26,12 @@
 </template>
 
 <script>
-  import photoOp from '../../../api/photos'
-  import Photos from '../photos/Photos'
-  import Collections from '../photos/Collections'
-  import addToCollection from '../photos/addToCollection'
+  import photoOp from '../../api/photos'
+  import Photos from './photos/Photos'
+  import Collections from './photos/Collections'
+  import addToCollection from './photos/addToCollection'
   export default {
-    name: 'userCenter',
+    name: 'SearchHome',
     data () {
       return {
         summary: {
@@ -60,10 +53,11 @@
         pageSize: 20000,
         collections: [],
         noData: false,
-        noDataMsg: '您还没有上传过照片:)',
+        noDataMsg: '没有该关键字的相关照片:)',
         isMe: false,
         showDialog: false,
-        addToImgId: ''
+        addToImgId: '',
+        users: []
       }
     },
     components: {
@@ -84,37 +78,38 @@
           desc: nodesc ? '' : ''
         })
       },
-      clearData () {
-        this.photos.group_a = []
-        this.photos.group_b = []
-        this.photos.group_c = []
-      },
-      gotoProfile () {
-        this.$router.push({path: `/userProfile/${this.info.user_name}`})
-      },
-      getListUser () {
+      getPhotos () {
         this.isActivated1 = true
         this.isActivated2 = false
         this.isActivated3 = false
-        this.clearData()
-        this.currentPage1 = 1
-        this.getList_user()
+        if (this.photos.group_a.length === 0 && this.photos.group_b.length === 0 && this.photos.group_c.length === 0) {
+          this.noData = true
+          this.noDataMsg = '没有该关键字相关的照片哦:)'
+          return
+        }
+        this.noData = false
       },
-      getListLiked () {
+      getCollections () {
         this.isActivated1 = false
         this.isActivated2 = true
         this.isActivated3 = false
-        this.clearData()
-        this.currentPage2 = 1
-        this.getList_liked()
+        if (this.collections.length === 0) {
+          this.noData = true
+          this.noDataMsg = '没有该关键字相关的相册:)'
+        } else {
+          this.noData = false
+        }
       },
-      getCollectionUser () {
+      getUsers () {
         this.isActivated1 = false
         this.isActivated2 = false
         this.isActivated3 = true
-        this.collections = []
-        this.currentPage3 = 1
-        this.getCollection_user()
+        if (this.users.length === 0) {
+          this.noData = true
+          this.noDataMsg = '没有该关键字相关的用户:)'
+        } else {
+          this.noData = false
+        }
       },
       getList_user () {
         let data = {
@@ -292,46 +287,7 @@
             this.error(true)
           }
         })
-      },
-      getBasicData () {
-        let data = {
-          token: localStorage.token,
-          request_user_id: this.$route.params[0],
-          pageNo: this.currentPage2,
-          pageSize: this.pageSize
-        }
-        photoOp.getList.liked(data, (res) => {
-          if (res.data.code === '1') return
-          this.summary.liked = res.data.data.totalCounts
-        })
-        photoOp.getCollection.user(data, (res) => {
-          if (res.data.code === '1') return
-          this.summary.collections = res.data.data.totalCounts
-        })
       }
-      // onScroll () {
-      //   if ($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
-      //     $(window).unbind('scroll')
-      //     if (this.isActivated1) {
-      //       this.currentPage1 ++
-      //       this.getList_user().then(() => {
-      //         $(window).bind('scroll', this.onScroll)
-      //       })
-      //     }
-      //     if (this.isActivated2) {
-      //       this.currentPage2 ++
-      //       this.getList_liked().then(() => {
-      //         $(window).bind('scroll', this.onScroll)
-      //       })
-      //     }
-      //     if (this.isActivated3) {
-      //       this.currentPage3 ++
-      //       this.getCollection_user().then(() => {
-      //         $(window).bind('scroll', this.onScroll)
-      //       })
-      //     }
-      //   }
-      // }
     },
     computed: {
       info () {
@@ -340,11 +296,23 @@
       login () {
         return this.$store.state.alreadyLogin
       },
-      ownerInfo () {
-        return this.$store.state.ownerInfo
-      },
-      alreadyLiked () {
-        return this.$store.state.alreadyLiked
+      keywordData () {
+        let data = this.$store.state.keywordData
+        this.collections = data.lists.collections
+        this.users = data.lists.users
+        let lists = data.lists.photos
+        for (let i = 0; i < lists.length; i++) {
+          if (i % 3 === 0) {
+            this.photos.group_a.push(lists[i])
+          }
+          if ((i - 1) % 3 === 0) {
+            this.photos.group_b.push(lists[i])
+          }
+          if ((i - 2) % 3 === 0) {
+            this.photos.group_c.push(lists[i])
+          }
+        }
+        return data
       }
     },
     mounted () {
@@ -354,56 +322,24 @@
         this.$store.commit('isLogin', false)
       }
       if (this.login) {
-        this.$store.dispatch('getUserInfo').then(() => {
-          if (this.info.user_id === +this.$route.params[0]) {
-            this.isMe = true
-          } else {
-            this.isMe = false
-          }
-        })
+        this.$store.dispatch('getUserInfo')
       }
-      this.getList_user()
-      this.getBasicData()
-      this.$store.dispatch('getOwnerInfo', this.$route.params[0])
     }
   }
 </script>
 
 <style scoped>
-  .top {
-   margin-top: 130px;
-   text-align: center;
-  }
-  .avatar {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    overflow: hidden;
+  .introduction {
+    width: 90%;
     margin: auto;
+    margin-top: 100px;
+    margin-bottom: 70px;
   }
-  .avatar img {
-    width: 150px;
-    height: 150px;
+  .introduction h1 {
+    font-size: 46px;
   }
-  .name {
-    font-size: 36px;
-    margin-top: 15px;
-    font-weight: bolder;
-  }
-  .more {
-    font-size: 16px;
-    position: absolute;
-    margin-left: 20px;
-    margin-top: 20px;
-    display: inline-block;
-    width: 100px;
-    cursor: pointer;
-    color: #979797;
-    text-decoration: underline;
-    font-style: italic;
-  }
-  .more:hover {
-    color:#111;
+  .introduction h3 {
+    font-size: 18px;
   }
   .bottom {
     width: 100%;
@@ -435,25 +371,8 @@
     font-size: 18px;
   }
   @media screen and (max-width: 809px) {
-    .top {
-      margin-top: 110px;
-    }
-    .avatar {
-      width: 120px;
-      height: 120px;
-    }
-    .avatar img {
-      width: 120px;
-      height: 120px;
-    }
-    .name {
-      font-size: 30px;
-    }
     .choices > span {
       font-size: 18px;
-    }
-    .more{
-      margin-top: 15px;
     }
   }
 </style>

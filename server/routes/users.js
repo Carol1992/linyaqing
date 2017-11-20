@@ -497,8 +497,13 @@ router.all('/search', (req, res, next) => {
 		'AS total_likes FROM image_likes l GROUP BY image_id) likes ON '+
 		'i.image_id = likes.image_id WHERE c.is_private = 1 AND i.image_tags '+
 		'LIKE "%' + keyword + '%" OR i.story_title LIKE "%' + keyword + '%"', '')
-	let q2 = query('SELECT user_id, user_name, image_md5, bio FROM users WHERE user_name LIKE ' +
-		'"%' + keyword + '%"', '')
+	let q2 = query('SELECT u.user_id, u.user_name, u.image_md5 AS avatar, u.bio, c.collection_nums, '+
+		'i.image_nums, lk.likes FROM (SELECT user_id, COUNT(collection_id) AS collection_nums '+
+		'FROM collections GROUP BY user_id) c JOIN (SELECT user_id, COUNT(image_id) AS image_nums '+
+		'FROM images GROUP BY user_id) i ON c.user_id = i.user_id JOIN (SELECT i.user_id, '+
+		'COUNT(l.user_id) AS likes FROM image_likes l JOIN images i ON i.image_id = l.image_id '+
+		'GROUP BY i.user_id) lk ON lk.user_id = i.user_id RIGHT OUTER JOIN users u ON '+
+		'c.user_id = u.user_id WHERE u.user_name LIKE "%' + keyword + '%" ORDER BY lk.likes DESC', '')
 	let q3 = query('SELECT u.user_id, u.user_name, u.image_md5 AS avatar, ic.collection_id, '+
 		'c.collection_name, ic.image_id, i.image_md5 FROM users u, image_collection ic, '+
 		'collections c, images i WHERE ic.collection_id = c.collection_id AND ic.image_id = i.image_id '+

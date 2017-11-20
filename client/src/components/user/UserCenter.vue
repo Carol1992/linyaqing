@@ -60,7 +60,7 @@
         pageSize: 20000,
         collections: [],
         noData: false,
-        noDataMsg: '您还没有上传过照片:)',
+        noDataMsg: '还没有上传过照片:)',
         isMe: false,
         showDialog: false,
         addToImgId: ''
@@ -153,7 +153,7 @@
             }
             if (this.photos.group_a.length === 0 && this.photos.group_b.length === 0 && this.photos.group_c.length === 0) {
               this.noData = true
-              this.noDataMsg = '您还没有上传过照片哦:)'
+              this.noDataMsg = '还没有上传过照片哦:)'
               return
             }
             this.noData = false
@@ -198,7 +198,7 @@
             }
             if (this.photos.group_a.length === 0 && this.photos.group_b.length === 0 && this.photos.group_c.length === 0) {
               this.noData = true
-              this.noDataMsg = '您还没有赞过任何一张照片:)'
+              this.noDataMsg = '还没有赞过任何一张照片:)'
               return
             }
             this.noData = false
@@ -234,7 +234,7 @@
             }
             if (this.collections.length === 0) {
               this.noData = true
-              this.noDataMsg = '您还没有新建过相册:)'
+              this.noDataMsg = '还没有新建过相册:)'
               return
             }
             this.noData = false

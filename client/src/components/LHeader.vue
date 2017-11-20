@@ -76,9 +76,7 @@
         this.clickShowMore = true
       },
       searchKeyword () {
-        this.$store.dispatch('searchKeyword', {keyword: this.keyword}).then(() => {
-          this.$router.push({path: `/search/${this.keyword}`})
-        })
+        this.$router.push({path: `/search/${this.keyword}`})
       },
       goHome () {
         this.$store.commit('getHeaderInfo', {isStore: false, isCollections: false})

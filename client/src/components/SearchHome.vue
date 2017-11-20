@@ -15,6 +15,34 @@
         @showCovers='showCovers2' @photoLike='photoLike' 
         @addToCollection='addToCollection'></Photos>
         <Collections :collections='collections' v-if='isActivated2' @showCovers='showCovers'></Collections>
+        <div class="users" v-if='isActivated3'>
+          <div class="user" v-for='user in users'>
+            <div class="content" @click='gotoUserCenter(user)'>
+              <div class="user-left">
+                <div class="left-top">
+                  <img v-lazy='user.image_md5' alt="">
+                </div>
+              </div>
+              <div class="user-right">
+                <div class="name-underline">{{user.user_name}}</div>
+                <div class="user-details">
+                  <div class="photoNums">
+                    <span><Icon type="images"></Icon></span>
+                    <span>{{user.image_nums}}</span>
+                  </div>
+                  <div class="collectionNums">
+                    <span><Icon type="ios-albums"></Icon></span>
+                    <span>{{user.collection_nums}}</span>
+                  </div>
+                  <div class="likesNums">
+                    <span><Icon type="android-favorite"></Icon></span>
+                    <span>{{user.likes}}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="noData" v-if='noData'>
         <span>{{noDataMsg}}</span>
@@ -78,16 +106,13 @@
           desc: nodesc ? '' : ''
         })
       },
+      gotoUserCenter (user) {
+        this.$router.push({path: `/userCenter/${user.user_id}`})
+      },
       getPhotos () {
         this.isActivated1 = true
         this.isActivated2 = false
         this.isActivated3 = false
-        if (this.photos.group_a.length === 0 && this.photos.group_b.length === 0 && this.photos.group_c.length === 0) {
-          this.noData = true
-          this.noDataMsg = '没有该关键字相关的照片哦:)'
-          return
-        }
-        this.noData = false
       },
       getCollections () {
         this.isActivated1 = false
@@ -110,132 +135,6 @@
         } else {
           this.noData = false
         }
-      },
-      getList_user () {
-        let data = {
-          token: localStorage.token,
-          request_user_id: this.$route.params[0],
-          pageNo: this.currentPage1,
-          pageSize: this.pageSize
-        }
-        return new Promise((resolve, reject) => {
-          photoOp.getList.user(data, (res) => {
-            if (res.data.code === '1') {
-              this.notifyMsg = '获取最新图片列表失败！'
-              this.error(true)
-              return
-            }
-            this.summary.photos = res.data.data.totalCounts
-            let lists = res.data.data.lists
-            for (let i = 0; i < lists.length; i++) {
-              lists[i].showCover = false
-              lists[i].aliyun_name = lists[i].image_md5
-              lists[i].image_md5 = this.$store.state.urlBase + lists[i].image_md5 + this.$store.state.viewBase
-              if (lists[i].avatar === 'null' || !lists[i].avatar) {
-                lists[i].avatar = require('@/assets/img/user_default.jpg')
-              } else {
-                lists[i].avatar = this.$store.state.urlBase + lists[i].avatar + this.$store.state.viewBase
-              }
-              if (i % 3 === 0) {
-                this.photos.group_a.push(lists[i])
-              }
-              if ((i - 1) % 3 === 0) {
-                this.photos.group_b.push(lists[i])
-              }
-              if ((i - 2) % 3 === 0) {
-                this.photos.group_c.push(lists[i])
-              }
-            }
-            if (this.photos.group_a.length === 0 && this.photos.group_b.length === 0 && this.photos.group_c.length === 0) {
-              this.noData = true
-              this.noDataMsg = '您还没有上传过照片哦:)'
-              return
-            }
-            this.noData = false
-            resolve()
-          })
-        })
-      },
-      getList_liked () {
-        let data = {
-          token: localStorage.token,
-          request_user_id: this.$route.params[0],
-          pageNo: this.currentPage2,
-          pageSize: this.pageSize
-        }
-        return new Promise((resolve, reject) => {
-          photoOp.getList.liked(data, (res) => {
-            if (res.data.code === '1') {
-              this.notifyMsg = '获取最新图片列表失败！'
-              this.error(true)
-              return
-            }
-            this.summary.liked = res.data.data.totalCounts
-            let lists = res.data.data.lists
-            for (let i = 0; i < lists.length; i++) {
-              lists[i].showCover = false
-              lists[i].aliyun_name = lists[i].image_md5
-              lists[i].image_md5 = this.$store.state.urlBase + lists[i].image_md5 + this.$store.state.viewBase
-              if (lists[i].avatar === 'null' || !lists[i].avatar) {
-                lists[i].avatar = require('@/assets/img/user_default.jpg')
-              } else {
-                lists[i].avatar = this.$store.state.urlBase + lists[i].avatar + this.$store.state.viewBase
-              }
-              if (i % 3 === 0) {
-                this.photos.group_a.push(lists[i])
-              }
-              if ((i - 1) % 3 === 0) {
-                this.photos.group_b.push(lists[i])
-              }
-              if ((i - 2) % 3 === 0) {
-                this.photos.group_c.push(lists[i])
-              }
-            }
-            if (this.photos.group_a.length === 0 && this.photos.group_b.length === 0 && this.photos.group_c.length === 0) {
-              this.noData = true
-              this.noDataMsg = '您还没有赞过任何一张照片:)'
-              return
-            }
-            this.noData = false
-            resolve()
-          })
-        })
-      },
-      getCollection_user () {
-        let data = {
-          token: localStorage.token,
-          request_user_id: this.$route.params[0],
-          pageNo: this.currentPage3,
-          pageSize: this.pageSize
-        }
-        return new Promise((resolve, reject) => {
-          photoOp.getCollection.user(data, (res) => {
-            if (res.data.code === '1') {
-              this.notifyMsg = '获取最新图片列表失败！'
-              this.error(true)
-              return
-            }
-            this.summary.collections = res.data.data.totalCounts
-            let lists = res.data.data.lists
-            for (let l of lists) {
-              let newArr = []
-              for (let image of l.images_list) {
-                image = this.$store.state.urlBase + image + this.$store.state.viewBase
-                newArr.push(image)
-              }
-              l.showCover = false
-              l.images_list = newArr
-              this.collections.push(l)
-            }
-            if (this.collections.length === 0) {
-              this.noData = true
-              this.noDataMsg = '您还没有新建过相册:)'
-              return
-            }
-            this.noData = false
-            resolve()
-          })
-        })
       },
       showCovers (c) {
         c.showCover = !c.showCover
@@ -297,6 +196,11 @@
         return this.$store.state.alreadyLogin
       },
       keywordData () {
+        this.photos.group_a = []
+        this.photos.group_b = []
+        this.photos.group_c = []
+        this.collections = []
+        this.users = []
         let data = this.$store.state.keywordData
         this.collections = data.lists.collections
         this.users = data.lists.users
@@ -312,6 +216,12 @@
             this.photos.group_c.push(lists[i])
           }
         }
+        if (this.photos.group_a.length === 0 && this.photos.group_b.length === 0 && this.photos.group_c.length === 0) {
+          this.noData = true
+          this.noDataMsg = '没有该关键字相关的照片哦:)'
+        } else {
+          this.noData = false
+        }
         return data
       }
     },
@@ -324,6 +234,7 @@
       if (this.login) {
         this.$store.dispatch('getUserInfo')
       }
+      this.$store.dispatch('searchKeyword', {keyword: this.$route.params[0]})
     }
   }
 </script>
@@ -370,9 +281,90 @@
     line-height: 200px;
     font-size: 18px;
   }
+  .left-top img {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    overflow: hidden;
+    vertical-align: text-top;
+  }
+  .users {
+    width: 94%;
+    margin: auto;
+  }
+  .user{
+    width: 25%;
+    display: inline-block;
+    padding: 30px 2%;
+    height: 200px;
+  }
+  .content {
+    border: 1px solid #999;
+    border-radius: 5px;
+    height: 100%;
+    padding: 25px 2%;
+    cursor: pointer;
+  }
+  .content:hover {
+    border-color: #111;
+    background-color: #f9f9f9;
+  }
+  .user-left {
+    display: inline-block;
+    margin-right: 5%;
+  }
+  .user-right {
+    display: inline-block;
+    height: 100%;
+    width: calc(93% - 90px);
+    text-align: center;
+  }
+  .name-underline {
+    font-size: 18px;
+    font-weight: bold;
+    text-decoration: underline;
+    color: #626262;
+  }
+  .name-underline:hover {
+    color: #111;
+  }
+  .user-details {
+    margin-top: 20px;
+  }
+  .user-details > div {
+    display: inline-block;
+    float: left;
+    width: 33.3%;
+    text-align: center;
+  }
+  .user-details span {
+    font-size: 25px;
+    display: block;
+  }
+  .user-details span:nth-child(2) {
+    font-size: 12px;
+    font-weight: bold;
+  }
+  .likesNums span:nth-child(1) {
+    color: #f15151;
+  }
+  .photoNums span:nth-child(1) {
+    color: #00CC99;
+  }
+  .collectionNums span:nth-child(1) {
+    color: #3399FF;
+  }
   @media screen and (max-width: 809px) {
     .choices > span {
       font-size: 18px;
+    }
+    .user {
+      width: 100%
+    }
+  }
+  @media screen and (max-width: 1480px) and (min-width: 810px) {
+    .user {
+      width: 50%
     }
   }
 </style>

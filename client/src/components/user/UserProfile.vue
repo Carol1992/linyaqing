@@ -96,7 +96,7 @@
       </div>
       <div class="ifPhoto" v-if='isPhoto'>
         <div class="noData" v-if='noData'>
-          <span>您还没有上传过照片:)</span>
+          <span>还没有上传过照片:)</span>
         </div>
         <div class="image-edit" v-for='photo in photos'>
           <div class="left-image">

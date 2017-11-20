@@ -38,7 +38,7 @@ export default {
       currentPage1: 1,
       currentPage2: 1,
       currentPage3: 1,
-      pageSize: 20,
+      pageSize: 20000,
       photos: {
         group_a: [],
         group_b: [],
@@ -86,12 +86,10 @@ export default {
       //   if (this.isActivated) {
       //     this.currentPage1 ++
       //     this.getList_hot()
-      //     return
       //   }
       //   if (this.isActivated2) {
       //     this.currentPage2 ++
       //     this.getList_new()
-      //     return
       //   }
       //   if (this.isActivated3) {
       //     this.currentPage3 ++
@@ -324,11 +322,9 @@ export default {
       this.$store.dispatch('getUserInfo')
     }
     this.getHot()
-    $(window).unbind('scroll')
-    this.$nextTick(function () {
-      // window.addEventListener('scroll', this.onScroll)
-      $(window).scroll(this.onScroll)
-    })
+    // $(window).unbind('scroll')
+    // window.addEventListener('scroll', this.onScroll)
+    // $(window).scroll(this.onScroll)
   }
 }
 </script>

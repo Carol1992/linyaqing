@@ -8,10 +8,18 @@ import VueAxios from 'vue-axios'
 import iView from 'iview'
 import '../my-theme/index.less'
 import store from './store/index.js'
+import VueLazyload from 'vue-lazyload'
 
 Vue.config.debug = true // debug
 Vue.use(VueAxios, axios)
 Vue.use(iView)
+Vue.use(VueLazyload)
+// Vue.use(VueLazyload, {
+//   preLoad: 1.3,
+//   error: 'dist/error.png',
+//   loading: 'dist/loading.gif',
+//   attempt: 1
+// })
 
 Vue.config.productionTip = false
 

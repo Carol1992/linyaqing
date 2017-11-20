@@ -58,7 +58,7 @@
         currentPage1: 1,
         currentPage2: 1,
         currentPage3: 1,
-        pageSize: 3,
+        pageSize: 20000,
         collections: [],
         noData: false,
         noDataMsg: '您还没有上传过照片:)',
@@ -366,11 +366,6 @@
       this.getList_user()
       this.getBasicData()
       this.$store.dispatch('getOwnerInfo', this.$route.params[0])
-      $(window).unbind('scroll')
-      this.$nextTick(function () {
-      // window.addEventListener('scroll', this.onScroll)
-        $(window).scroll(this.onScroll)
-      })
     }
   }
 </script>

@@ -22,7 +22,7 @@
       return {
         collections: [],
         currentPageNo: 1,
-        pageSize: 20
+        pageSize: 20000
       }
     },
     methods: {
@@ -79,11 +79,6 @@
       }
       this.collections = []
       this.getCollection_all()
-      $(window).unbind('scroll')
-      this.$nextTick(function () {
-      // window.addEventListener('scroll', this.onScroll)
-        $(window).scroll(this.onScroll)
-      })
     }
   }
 </script>

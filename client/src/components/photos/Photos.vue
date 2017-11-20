@@ -6,7 +6,7 @@
       @mouseleave='showCovers(photo)'>
         <Cover :photoInfo='photo' v-if='photo.showCover' @photoLike='photoLike' 
         @addToCollection='addToCollection'></Cover>
-        <img :src='photo.image_md5' alt="">
+        <img v-lazy='photo.image_md5' alt="">
       </div>
     </div>
     <div class="images middle">
@@ -15,7 +15,7 @@
       @mouseleave='showCovers(photo)'>
         <Cover :photoInfo='photo' v-if='photo.showCover' @photoLike='photoLike' 
         @addToCollection='addToCollection'></Cover>
-        <img :src='photo.image_md5' alt="">
+        <img v-lazy='photo.image_md5' alt="">
       </div>
     </div>
     <div class="images right">
@@ -24,7 +24,7 @@
       @mouseleave='showCovers(photo)'>
         <Cover :photoInfo='photo' v-if='photo.showCover' @photoLike='photoLike' 
         @addToCollection='addToCollection'></Cover>
-        <img :src='photo.image_md5' alt="">
+        <img v-lazy='photo.image_md5' alt="">
       </div>
     </div>
   </div>

@@ -41,7 +41,7 @@
         },
         totalCount: '',
         currentPageNo: 1,
-        currentPageSize: 20,
+        currentPageSize: 20000,
         notMe: false,
         followMsg: ' 关注',
         followed: false,
@@ -276,14 +276,7 @@
       this.photos.group_b = []
       this.photos.group_c = []
       this.getCollectionInfo()
-      $(window).unbind('scroll')
-      this.getPhotos().then(() => {
-        $(window).scroll(this.onScroll)
-      })
-      // this.$nextTick(function () {
-      // // window.addEventListener('scroll', this.onScroll)
-      //   $(window).scroll(this.onScroll)
-      // })
+      this.getPhotos()
     },
     computed: {
       info () {

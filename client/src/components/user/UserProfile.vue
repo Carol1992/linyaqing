@@ -100,7 +100,7 @@
         </div>
         <div class="image-edit" v-for='photo in photos'>
           <div class="left-image">
-            <img :src='photo.image_md5_new' alt="">
+            <img v-lazy='photo.image_md5_new' alt="">
             <Icon type="load-c" class="demo-spin-icon-load" v-if='loading2'></Icon>
           </div>
           <div class="image-detail">

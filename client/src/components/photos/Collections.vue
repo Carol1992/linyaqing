@@ -7,15 +7,15 @@
       @click='getPhotos(collection)'>
         <div class="cover" v-if='collection.showCover'></div>
         <div class="left">
-          <img :src='collection.images_list[0]' alt="">
+          <img v-lazy='collection.images_list[0]' alt="">
         </div>
         <div class="right">
           <div class="right-top">
-            <img :src='collection.images_list[1]' alt="" 
+            <img v-lazy='collection.images_list[1]' alt="" 
             v-if='collection.images_list.length >= 2'>
           </div>
           <div class="right-bottom">
-            <img :src='collection.images_list[2]' alt="" 
+            <img v-lazy='collection.images_list[2]' alt="" 
             v-if='collection.images_list.length >= 3'>
           </div>
         </div>

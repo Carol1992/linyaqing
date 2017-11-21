@@ -3,17 +3,6 @@ let router = express.Router();
 // 连接到数据库
 let formater = require('../database/format');
 let query = require('../database/connection');
-// 邮箱
-var nodemailer  = require('nodemailer');
-var mailTransport = nodemailer.createTransport({
-    host : 'smtp.mxhichina.com',
-    secure: true, // 使用SSL方式（安全方式，防止被窃取信息
-    port: 465,
-    auth : {
-        user : 'lq@linyaqing.com',
-        pass : 'LYQlyq0928'
-    },
-});
 // 密码加密
 let crypto = require('crypto');
 // 登录用户token管理
@@ -30,6 +19,17 @@ var client = new OSS({
   accessKeyId: my_secret.accessKeyId,
   accessKeySecret: my_secret.accessKeySecret,
   bucket: my_secret.bucket
+});
+// 邮箱
+var nodemailer  = require('nodemailer');
+var mailTransport = nodemailer.createTransport({
+    host : 'smtp.mxhichina.com',
+    secure: true, // 使用SSL方式（安全方式，防止被窃取信息
+    port: 465,
+    auth : {
+        user: my_secret.email.user,
+        pass: my_secret.email.pass
+    },
 });
 // 处理表单上传
 var formidable = require('formidable');

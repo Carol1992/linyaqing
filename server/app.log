@@ -10934,3 +10934,4 @@
 [2017-11-21T15:45:41.822] [INFO] http - ::ffff:127.0.0.1 - - "POST /getList/hot HTTP/1.1" 200 11541 "http://localhost:8000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36"
 [2017-11-21T15:45:46.840] [INFO] http - ::ffff:127.0.0.1 - - "POST /getUserInfo HTTP/1.1" 200 544 "http://localhost:8000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36"
 [2017-11-21T15:45:46.843] [INFO] http - ::ffff:127.0.0.1 - - "POST /getList/hot HTTP/1.1" 200 11541 "http://localhost:8000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36"
+[2017-11-21T16:07:54.120] [INFO] http - ::1 - - "POST /send HTTP/1.1" 200 326 "" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36"

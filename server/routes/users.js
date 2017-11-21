@@ -3,6 +3,17 @@ let router = express.Router();
 // 连接到数据库
 let formater = require('../database/format');
 let query = require('../database/connection');
+// 邮箱
+var nodemailer  = require('nodemailer');
+var mailTransport = nodemailer.createTransport({
+    host : 'smtp.mxhichina.com',
+    secure: true, // 使用SSL方式（安全方式，防止被窃取信息
+    port: 465,
+    auth : {
+        user : 'lq@linyaqing.com',
+        pass : 'LYQlyq0928'
+    },
+});
 // 密码加密
 let crypto = require('crypto');
 // 登录用户token管理
@@ -23,6 +34,52 @@ var client = new OSS({
 // 处理表单上传
 var formidable = require('formidable');
 var util = require('util');
+router.all('/test', (req, res, next) => {
+	res.send(__dirname)
+})
+// 发送邮件
+router.all('/send', function(req, res, next) {
+  var options = {
+    from: '"林晴" <lq@linyaqing.com>',
+    to: '1689597038@qq.com, yottalynn@gmail.com',
+    cc: '1689597038@qq.com',    //抄送
+    // bcc         : ''    //密送
+    subject: '一封来自Node Mailer的邮件',
+    text: '一封来自Node Mailer的邮件',
+    html: '<h1>你好</h1><br/><img src="cid: lq@linyaqing.com"/><br/><img src="cid:lq@linyaqing.top"/>',
+    attachments: [{
+      filename: 'image.png',
+      content: new Buffer(
+          'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAABlBMVEUAAAD/' +
+              '//+l2Z/dAAAAM0lEQVR4nGP4/5/h/1+G/58ZDrAz3D/McH8yw83NDDeNGe4U' +
+              'g9C9zwz3gVLMDA/A6P9/AFGGFyjOXZtQAAAAAElFTkSuQmCC',
+          'base64'
+      ),
+      cid: 'lq@linyaqing.top' // should be as unique as possible
+    },
+    {
+      filename: 'cat.jpg',
+      path: 'public/cat.jpg',
+      cid: 'lq@linyaqing.com' // should be as unique as possible
+    },
+    {
+        filename: 'notes.txt',
+        content: 'Some notes about this e-mail',
+        contentType: 'text/plain' // optional, would be detected from the filename
+    }
+    ]
+  };
+  mailTransport.sendMail(options, function(err, msg){
+    if(err){
+        console.log(err);
+        res.send(err)
+    }
+    else {
+        console.log(msg);
+        res.send(msg)
+    }
+  });
+});
 // 用户注册
 router.post('/register', function(req, res, next) {
 	let _user = req.body;
@@ -43,6 +100,38 @@ router.post('/register', function(req, res, next) {
 			query('INSERT INTO users SET ?', [post])
 			.then(data => {
 				res.json(formater({code:'0', desc:'注册成功！', data:{user_id:data.results.insertId}}))
+				var options = {
+			    from: '"林晴" <lq@linyaqing.com>',
+			    to: post.email,
+			    cc: '1689597038@qq.com',    //抄送
+			    // bcc         : ''    //密送
+			    subject: '欢迎注册SharingLife!',
+			    //text: '',
+			    html: '<h1>你好!欢迎注册。</h1><br/>'+
+			    '<h3>有些功能未完善，多多包涵，如下：</h3>'+
+			    '<p>1. 注册欢迎信很简陋，还没有设计好模板，望谅:)</p>'+
+			    '<p>2. 找回密码的页面还没有挂上去，忘记密码请直接回复该邮件:)</p>'+
+			    '<p>3. Store的页面还没有实现，后台端口写得七七八八了，主要是我还没想好具体的操作方式:(</p>'+
+			    '<p>4. 操作中遇到问题可以回复该邮件，或微信联系我：18826417583</p>'+
+			    '<br/><img src="123"/>',
+			    attachments: [
+			    {
+			      filename: 'cat.jpg',
+			      path: 'public/cat.jpg',
+			      cid: '123' // should be as unique as possible
+			    }
+			    ]
+			  };
+			  mailTransport.sendMail(options, function(err, msg){
+			    if(err){
+			        console.log(err);
+			        res.send(err)
+			    }
+			    else {
+			        console.log(msg);
+			        res.send(msg)
+			    }
+			  });
 			})
 		}
 	});
@@ -501,7 +590,7 @@ router.all('/search', (req, res, next) => {
 		'i.image_nums, lk.likes FROM (SELECT user_id, COUNT(collection_id) AS collection_nums '+
 		'FROM collections GROUP BY user_id) c JOIN (SELECT user_id, COUNT(image_id) AS image_nums '+
 		'FROM images GROUP BY user_id) i ON c.user_id = i.user_id JOIN (SELECT i.user_id, '+
-		'COUNT(l.user_id) AS likes FROM image_likes l JOIN images i ON i.image_id = l.image_id '+
+		'COUNT(l.user_id) AS likes FROM image_likes l RIGHT OUTER JOIN images i ON i.image_id = l.image_id '+
 		'GROUP BY i.user_id) lk ON lk.user_id = i.user_id RIGHT OUTER JOIN users u ON '+
 		'c.user_id = u.user_id WHERE u.user_name LIKE "%' + keyword + '%" ORDER BY lk.likes DESC', '')
 	let q3 = query('SELECT u.user_id, u.user_name, u.image_md5 AS avatar, ic.collection_id, '+
@@ -1203,6 +1292,7 @@ router.post('/photoLike', verify_token, (req, res, next) => {
 		})
 	})
 });
+
 
 /********* 下一期开发(start) **********/
 // 上传商品图片到服务器

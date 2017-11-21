@@ -22,6 +22,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 // 接口路由
 app.use(users);
+app.use('/static', express.static('public'))
 
 // error handler
 // app.use(function(err, req, res, next) {

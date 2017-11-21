@@ -106,10 +106,10 @@ const store = new Vuex.Store({
         collection.images_list = newArr
       }
       for (let user of users) {
-        if (user.image_md5 === 'null' || !user.image_md5) {
-          user.image_md5 = require('@/assets/img/user_default.jpg')
+        if (user.avatar === 'null' || !user.avatar) {
+          user.avatar = require('@/assets/img/user_default.jpg')
         } else {
-          user.image_md5 = state.urlBase + user.image_md5 + state.viewBase
+          user.avatar = state.urlBase + user.avatar + state.viewBase
         }
         user.showCover = false
       }

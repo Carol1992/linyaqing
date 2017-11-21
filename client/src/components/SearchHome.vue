@@ -20,7 +20,7 @@
             <div class="content" @click='gotoUserCenter(user)'>
               <div class="user-left">
                 <div class="left-top">
-                  <img v-lazy='user.image_md5' alt="">
+                  <img v-lazy='user.avatar' alt="">
                 </div>
               </div>
               <div class="user-right">
@@ -307,7 +307,6 @@
   }
   .content:hover {
     border-color: #111;
-    background-color: #f9f9f9;
   }
   .user-left {
     display: inline-block;

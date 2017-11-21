@@ -21,6 +21,20 @@ export default {
     key () {
       return this.$route.name !== undefined ? this.$route.name + +new Date() : this.$route + +new Date()
     }
+  },
+  mounted () {
+    var ws = new WebSocket('ws://localhost:3001')
+    ws.onopen = function (evt) {
+      console.log('Connection open ...')
+      ws.send('hi')
+    }
+    ws.onmessage = function (evt) {
+      console.log(JSON.parse(evt.data))
+      ws.close()
+    }
+    ws.onclose = function (evt) {
+      console.log('Connection closed.')
+    }
   }
 }
 </script>

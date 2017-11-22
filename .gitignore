@@ -15,4 +15,4 @@ client/yarn-error.log*
 
 # aliyun
 server/routes/secret.js
-server/database/connection.js
+server/database/db_info.js

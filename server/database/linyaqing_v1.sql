@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50719
 File Encoding         : 65001
 
-Date: 2017-11-16 22:23:01
+Date: 2017-11-22 11:31:06
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -33,7 +33,7 @@ CREATE TABLE `applications` (
   KEY `fk_applications_users1_idx` (`users_user_id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `applications_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8 COMMENT='用户关联到网站的应用';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户关联到网站的应用';
 
 -- ----------------------------
 -- Records of applications
@@ -125,25 +125,44 @@ INSERT INTO `categories` VALUES ('23', '工作', null);
 DROP TABLE IF EXISTS `collections`;
 CREATE TABLE `collections` (
   `collection_id` int(9) NOT NULL AUTO_INCREMENT,
-  `collection_name` varchar(45) DEFAULT '',
+  `collection_name` varchar(45) DEFAULT NULL,
   `collection_image_md5` varchar(255) DEFAULT '',
   `created_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `is_private` char(1) DEFAULT '0' COMMENT '是否私有：0：是，1：否',
   `collection_desc` varchar(255) DEFAULT NULL,
   `user_id` int(9) DEFAULT NULL,
   PRIMARY KEY (`collection_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=83 DEFAULT CHARSET=utf8 COMMENT='图片集合';
+) ENGINE=InnoDB AUTO_INCREMENT=110 DEFAULT CHARSET=utf8 COMMENT='图片集合';
 
 -- ----------------------------
 -- Records of collections
 -- ----------------------------
 INSERT INTO `collections` VALUES ('75', '缅甸胶漂电站', '', '2017-11-16 20:24:36', '1', null, '34');
 INSERT INTO `collections` VALUES ('76', '和同事在海边玩', '', '2017-11-16 20:25:22', '0', null, '34');
-INSERT INTO `collections` VALUES ('77', '2017/10/16 21:18:21', '', '2017-11-16 21:18:21', '0', null, '35');
-INSERT INTO `collections` VALUES ('78', '2017/10/16 21:26:46', '', '2017-11-16 21:26:46', '0', null, '36');
-INSERT INTO `collections` VALUES ('79', '2017/10/16 21:34:55', '', '2017-11-16 21:34:55', '0', null, '37');
-INSERT INTO `collections` VALUES ('81', '自拍', '', '2017-11-16 21:52:32', '1', null, '37');
-INSERT INTO `collections` VALUES ('82', '2017/10/16 22:4:59', '', '2017-11-16 22:05:24', '1', null, '38');
+INSERT INTO `collections` VALUES ('77', '公司聚会', '', '2017-11-19 10:03:44', '0', null, '35');
+INSERT INTO `collections` VALUES ('78', '公司party', '', '2017-11-19 10:03:52', '0', null, '36');
+INSERT INTO `collections` VALUES ('79', '家人自拍', '', '2017-11-19 10:03:59', '1', null, '37');
+INSERT INTO `collections` VALUES ('81', '自拍自拍自拍自', '', '2017-11-19 15:11:00', '1', null, '37');
+INSERT INTO `collections` VALUES ('82', '缅甸电站', '', '2017-11-19 10:04:06', '1', null, '38');
+INSERT INTO `collections` VALUES ('85', '风景与仰光', '', '2017-11-19 10:04:17', '0', null, '39');
+INSERT INTO `collections` VALUES ('86', '阳光和向日葵', '', '2017-11-19 10:04:30', '0', null, '39');
+INSERT INTO `collections` VALUES ('87', '猫狗', '', '2017-11-19 10:04:41', '0', null, '39');
+INSERT INTO `collections` VALUES ('92', '宠物', '', '2017-11-19 10:04:50', '1', null, '39');
+INSERT INTO `collections` VALUES ('93', '猫', '', '2017-11-19 10:04:56', '1', null, '39');
+INSERT INTO `collections` VALUES ('94', '狗', '', '2017-11-19 10:04:59', '1', null, '40');
+INSERT INTO `collections` VALUES ('97', '1992', '', '2017-11-19 10:05:27', '1', null, '42');
+INSERT INTO `collections` VALUES ('98', '1992', '', '2017-11-19 10:05:31', '1', null, '42');
+INSERT INTO `collections` VALUES ('99', '天空', '', '2017-11-19 10:40:57', '0', null, '42');
+INSERT INTO `collections` VALUES ('100', '2017/10/19 11:33:56', '', '2017-11-19 11:33:56', '0', null, '45');
+INSERT INTO `collections` VALUES ('101', '2017/10/19 12:23:51', '', '2017-11-19 15:11:07', '1', null, '37');
+INSERT INTO `collections` VALUES ('102', '2017/10/19 14:55:15', '', '2017-11-19 14:55:15', '0', null, '47');
+INSERT INTO `collections` VALUES ('103', '2017/10/19 15:10:39', '', '2017-11-19 15:10:50', '1', null, '37');
+INSERT INTO `collections` VALUES ('104', '2017/10/19 15:18:36', '', '2017-11-19 15:18:42', '1', null, '39');
+INSERT INTO `collections` VALUES ('105', '2017/10/19 15:19:28', '', '2017-11-19 15:20:07', '1', null, '39');
+INSERT INTO `collections` VALUES ('106', '2017/10/19 15:19:53', '', '2017-11-19 15:19:59', '1', null, '39');
+INSERT INTO `collections` VALUES ('107', '2017/10/19 15:32:59', '', '2017-11-19 15:32:59', '0', null, '39');
+INSERT INTO `collections` VALUES ('108', '2017/10/21 18:36:49', '', '2017-11-21 18:36:49', '0', null, '49');
+INSERT INTO `collections` VALUES ('109', '2017/10/21 18:37:4', '', '2017-11-21 18:37:04', '0', null, '49');
 
 -- ----------------------------
 -- Table structure for `comments`
@@ -235,6 +254,8 @@ CREATE TABLE `images` (
   `user_id` int(9) DEFAULT NULL COMMENT '图片上传者的id',
   `created_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '图片创建的时间',
   `image_tags` varchar(90) DEFAULT '' COMMENT '图片的标签',
+  `story_title` varchar(45) DEFAULT '' COMMENT '照片名称',
+  `story_detail` varchar(255) DEFAULT '' COMMENT '照片故事',
   `enough_tags` char(1) DEFAULT '1' COMMENT '是否有足够的标签（5个）\n0：是\n1：否',
   `make` varchar(45) DEFAULT '' COMMENT '相机品牌',
   `model` varchar(45) DEFAULT '' COMMENT '相机型号',
@@ -243,8 +264,6 @@ CREATE TABLE `images` (
   `dateTimeOriginal` varchar(45) DEFAULT 'CURRENT_TIMESTAMP',
   `iso` varchar(45) DEFAULT '' COMMENT '感光度',
   `shutterSpeed` varchar(45) DEFAULT '' COMMENT '快门速度',
-  `story_title` varchar(45) DEFAULT '' COMMENT '照片名称',
-  `story_detail` varchar(255) DEFAULT '' COMMENT '照片故事',
   `location` varchar(45) DEFAULT '' COMMENT '拍摄地址',
   `display_location` char(1) DEFAULT '0' COMMENT '0:展示\n1:不展示',
   `liked` smallint(5) DEFAULT '0',
@@ -255,18 +274,41 @@ CREATE TABLE `images` (
   KEY `collection_id` (`collection_id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `images_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=194 DEFAULT CHARSET=utf8 COMMENT='单张图片';
+) ENGINE=InnoDB AUTO_INCREMENT=236 DEFAULT CHARSET=utf8 COMMENT='单张图片';
 
 -- ----------------------------
 -- Records of images
 -- ----------------------------
-INSERT INTO `images` VALUES ('187', '1510840015938.JPG', '37', '2017-11-16 21:42:04', null, '1', 'Apple', 'iPhone 6s Plus', '2.65', '2.2750071245369052', '2017:06:24 08:29:36', '80', '4.058893515764426', null, null, null, '0', '0', '80', null);
-INSERT INTO `images` VALUES ('188', '1510840032069.JPG', '37', '2017-11-16 21:42:18', null, '1', 'Apple', 'iPhone 6s Plus', '2.65', '2.2750071245369052', '2017:06:03 06:42:04', '80', '4.058893515764426', null, null, null, '0', '0', '80', null);
-INSERT INTO `images` VALUES ('189', '1510840584912.JPG', '37', '2017-11-16 21:51:37', '自拍', '1', 'Apple', 'iPhone 6s Plus', '2.65', '2.2750071245369052', '2017:04:17 21:43:25', '250', '4.321928460342146', null, null, null, '0', '0', '81', null);
-INSERT INTO `images` VALUES ('190', '1510840602628.JPG', '37', '2017-11-16 21:51:49', null, '1', 'Apple', 'iPhone8,2', null, null, '2017:07:19 21:03:58', null, null, null, null, null, '0', '0', '81', null);
-INSERT INTO `images` VALUES ('191', '1510840618515.JPG', '37', '2017-11-16 21:52:05', null, '1', null, null, null, null, null, null, null, null, null, null, '0', '0', '81', null);
-INSERT INTO `images` VALUES ('192', '1510841391145.jpg', '38', '2017-11-16 22:04:59', null, '1', 'XIAOMI', 'MI4', '3.9', '1.69', '2016:10:02 07:19:24', '100', '11.367', null, null, null, '0', '0', '82', null);
-INSERT INTO `images` VALUES ('193', '1510841408476.jpg', '38', '2017-11-16 22:05:16', null, '1', 'XIAOMI', 'MI4', '3.9', '1.69', '2016:10:04 17:55:21', '100', '9.181', null, null, null, '0', '0', '82', null);
+INSERT INTO `images` VALUES ('187', '1510840015938.JPG', '37', '2017-11-19 10:22:17', '自拍', '我的自拍', '自拍', '1', 'Apple', 'iPhone 6s Plus', '2.65', '2.2750071245369052', '2017:06:24 08:29:36', '80', '4.058893515764426', '深圳', '0', '0', '80', null);
+INSERT INTO `images` VALUES ('188', '1510840032069.JPG', '37', '2017-11-19 10:22:19', '狗', '我的狗', '狗', '1', 'Apple', 'iPhone 6s Plus', '2.65', '2.2750071245369052', '2017:06:03 06:42:04', '80', '4.058893515764426', '深圳', '0', '0', '80', null);
+INSERT INTO `images` VALUES ('189', '1510840584912.JPG', '37', '2017-11-19 10:22:23', '自拍', '我的猫', '猫猫', '1', 'Apple', 'iPhone 6s Plus', '2.65', '2.2750071245369052', '2017:04:17 21:43:25', '250', '4.321928460342146', '缅甸', '0', '0', '81', null);
+INSERT INTO `images` VALUES ('190', '1510840602628.JPG', '37', '2017-11-19 10:22:26', '猫', '太阳', '太阳', '1', 'Apple', 'iPhone8,2', null, null, '2017:07:19 21:03:58', null, null, '缅甸', '0', '0', '81', null);
+INSERT INTO `images` VALUES ('191', '1510840618515.JPG', '37', '2017-11-19 10:22:29', '太阳,风景', '猫', '公司鬼鬼鬼鬼鬼鬼', '1', null, null, null, null, null, null, null, '北京', '0', '0', '81', null);
+INSERT INTO `images` VALUES ('193', '1510841408476.jpg', '38', '2017-11-19 10:22:33', '猫', '猫', '公司猫猫猫猫猫猫猫', '1', 'XIAOMI', 'MI4', '3.9', '1.69', '2016:10:04 17:55:21', '100', '9.181', '北京', '0', '0', '82', null);
+INSERT INTO `images` VALUES ('211', '1510996592696.JPG', '42', '2017-11-19 10:22:45', '猫', '公司', '缅甸古古怪怪', '1', 'Apple', 'iPhone8,2', null, null, '2017:07:19 21:03:58', null, null, '天津', '0', '0', '95', null);
+INSERT INTO `images` VALUES ('212', '1510997320069.JPG', '42', '2017-11-19 10:22:50', '狗', '狗狗', '公司计算机系', '1', 'Apple', 'iPhone8,2', null, null, '2017:07:19 21:03:58', null, null, '湖南', '0', '0', '96', null);
+INSERT INTO `images` VALUES ('213', '1510999979197.jpg', '42', '2017-11-19 10:23:01', '1992', '1992', '1992', '1', 'XIAOMI1992', 'MI41992', '3.91992', '1.691992', '2016:10:01 08:35:231992', '1001992', '11.0161992', '揭阳', null, '0', '97', null);
+INSERT INTO `images` VALUES ('214', '1511000001163.jpg', '42', '2017-11-19 10:22:55', '缅甸', '仰光缅甸', '1992', '1', 'XIAOMI', 'MI4', '3.9', '1.69', '2016:10:02 07:19:32', '100', '11.702', '深圳', '0', '0', '98', null);
+INSERT INTO `images` VALUES ('215', '1511011765057.jpg', '42', '2017-11-19 10:21:49', '缅甸', '早晨', '1992', '1', 'XIAOMI', 'MI4', '3.9', '1.69', '2016:10:02 07:17:31', '100', '11.181', '缅甸', '0', '0', '99', null);
+INSERT INTO `images` VALUES ('216', '1511012800057.jpg', '42', '2017-11-19 10:23:15', '缅甸,胶漂,公司', '缅甸', '1992', '1', 'XIAOMI', 'MI4', '3.9', '1.69', '2016:10:05 14:38:55', '100', '12.33', '浙江', '0', '0', '99', null);
+INSERT INTO `images` VALUES ('217', '1511012841499.jpg', '42', '2017-11-19 10:23:19', '公司', '公司', '1992', '1', 'XIAOMI', 'MI4', '3.9', '1.69', '2016:10:05 14:42:35', '100', '12.64', '湖北', '0', '0', '98', null);
+INSERT INTO `images` VALUES ('218', '1511012875367.jpg', '42', '2017-11-19 10:23:22', '自拍,公司', '公司', '1992', '1', 'XIAOMI', 'MI4', '3.9', '1.69', '2016:10:05 14:42:29', '100', '11.903', '海南', '0', '0', '99', null);
+INSERT INTO `images` VALUES ('219', '1511058140494.jpg', '42', '2017-11-19 10:23:31', '海', '海', '海边深圳', '1', 'XIAOMI', 'MI4', '3.9', '1.69', '2016:10:05 14:45:45', '100', '12.243', '广东海南', '0', '0', '97', null);
+INSERT INTO `images` VALUES ('220', '1511059373979.jpg', '42', '2017-11-19 10:40:43', '天空', '天空', '天空', '1', 'XIAOMI', 'MI4', '3.9', '1.69', '2016:10:06 09:06:10', '100', '10.523', null, '0', '0', '99', null);
+INSERT INTO `images` VALUES ('222', '1511068215481.jpg', '37', '2017-11-22 10:20:43', null, '缅甸', null, '1', 'XIAOMI', 'MI4', '2.6133', '1.69', '2016:10:06 17:17:47', '100', '7.241', null, null, '0', '81', null);
+INSERT INTO `images` VALUES ('223', '1511073234339.jpg', '37', '2017-11-20 12:39:42', null, '缅甸', null, '1', 'XIAOMI', 'MI4', '3.9', '1.69', '2016:10:02 07:32:20', '100', '8.912', null, '0', '0', '81', null);
+INSERT INTO `images` VALUES ('224', '1511074808619.jpg', '47', '2017-11-20 12:39:45', null, '缅甸', null, '1', 'XIAOMIsssss', 'MI4', '3.9', '1.69', '2016:10:01 08:35:23', '100', '11.016', null, null, '0', '102', null);
+INSERT INTO `images` VALUES ('225', '1511075705813.JPG', '37', '2017-11-19 15:10:39', '缅甸大金塔', '缅甸大金塔', '缅甸大金塔', '1', 'SAMSUNG', 'WB30F/WB31F/WB32F\0\0\0\0\0\0\0\0\0\0\0\0', '9.6', '4.27', '2016:10:06 19:37:28', '640', '3.25', '缅甸', '0', '0', '103', null);
+INSERT INTO `images` VALUES ('226', '1511076208487.jpg', '39', '2017-11-20 12:39:47', null, '缅甸', null, '1', 'XIAOMI', 'MI4', '3.9', '1.69', '2016:10:05 14:38:50', '100', '12.523', null, '0', '0', '104', null);
+INSERT INTO `images` VALUES ('227', '1511076254272.JPG', '39', '2017-11-20 12:39:50', '毕业照', '缅甸', null, '1', 'SAMSUNG', 'WB30F/WB31F/WB32F\0\0\0\0\0\0\0\0\0\0\0\0', '13.2', '4.58', '2015:04:24 16:49:21', '120', '5.62', null, '0', '0', '105', null);
+INSERT INTO `images` VALUES ('228', '1511076279379.JPG', '39', '2017-11-19 15:19:53', '毕业照合照', null, null, '1', 'SAMSUNG', 'WB30F/WB31F/WB32F\0\0\0\0\0\0\0\0\0\0\0\0', '13.2', '4.58', '2015:04:24 12:24:55', '80', '8.5', null, '0', '0', '106', null);
+INSERT INTO `images` VALUES ('229', '1511076343840.JPG', '39', '2017-11-19 15:20:54', null, null, null, '1', 'SAMSUNG', 'WB30F/WB31F/WB32F\0\0\0\0\0\0\0\0\0\0\0\0', '4.3', '3.26', '2015:04:24 10:56:53', '80', '8', null, '0', '0', '106', null);
+INSERT INTO `images` VALUES ('230', '1511076368159.JPG', '39', '2017-11-19 15:21:18', null, null, null, '1', 'SAMSUNG', 'WB30F/WB31F/WB32F\0\0\0\0\0\0\0\0\0\0\0\0', '4.3', '3.26', '2015:04:24 09:33:42', '80', '8.18', null, '0', '0', '106', null);
+INSERT INTO `images` VALUES ('231', '1511076390015.JPG', '39', '2017-11-19 15:21:39', null, null, null, '1', 'SAMSUNG', 'WB30F/WB31F/WB32F\0\0\0\0\0\0\0\0\0\0\0\0', '17.9', '4.86', '2015:04:24 16:49:51', '200', '5.68', null, '0', '0', '105', null);
+INSERT INTO `images` VALUES ('232', '1511076421063.jpg', '39', '2017-11-19 15:22:18', null, null, null, '1', 'XIAOMI', 'MI4', '3.9', '1.69', '2016:10:05 14:45:47', '100', '12.161', null, '0', '0', '104', null);
+INSERT INTO `images` VALUES ('233', '1511076461287.jpg', '39', '2017-11-19 15:22:59', null, null, null, '1', 'XIAOMI', 'MI4', '3.9', '1.69', '2016:10:05 14:42:24', '100', '11.977', null, '0', '0', '104', null);
+INSERT INTO `images` VALUES ('234', '1511076544049.JPG', '39', '2017-11-19 15:24:14', null, null, null, '1', 'SAMSUNG', 'WB30F/WB31F/WB32F\0\0\0\0\0\0\0\0\0\0\0\0', '17.9', '4.86', '2015:04:24 11:54:28', '80', '7.56', null, '0', '0', '105', null);
+INSERT INTO `images` VALUES ('235', '1511260991095.jpg', '49', '2017-11-21 18:38:35', null, null, null, '1', 'XIAOMI', 'MI4', '3.9', '1.69', '2016:10:04 17:57:52', '100', '8.498', null, '0', '0', '108', null);
 
 -- ----------------------------
 -- Table structure for `image_collection`
@@ -286,10 +328,35 @@ CREATE TABLE `image_collection` (
 -- Records of image_collection
 -- ----------------------------
 INSERT INTO `image_collection` VALUES ('189', '81', '2017-11-16 21:51:37');
+INSERT INTO `image_collection` VALUES ('189', '97', '2017-11-18 20:48:54');
 INSERT INTO `image_collection` VALUES ('190', '81', '2017-11-16 21:51:49');
+INSERT INTO `image_collection` VALUES ('190', '101', '2017-11-19 12:23:51');
 INSERT INTO `image_collection` VALUES ('191', '81', '2017-11-16 21:52:05');
-INSERT INTO `image_collection` VALUES ('192', '82', '2017-11-16 22:04:59');
 INSERT INTO `image_collection` VALUES ('193', '82', '2017-11-16 22:05:16');
+INSERT INTO `image_collection` VALUES ('213', '97', '2017-11-18 20:48:46');
+INSERT INTO `image_collection` VALUES ('214', '98', '2017-11-18 18:08:28');
+INSERT INTO `image_collection` VALUES ('215', '99', '2017-11-18 21:24:56');
+INSERT INTO `image_collection` VALUES ('216', '99', '2017-11-18 21:41:53');
+INSERT INTO `image_collection` VALUES ('217', '98', '2017-11-18 21:42:33');
+INSERT INTO `image_collection` VALUES ('218', '99', '2017-11-18 21:43:03');
+INSERT INTO `image_collection` VALUES ('219', '97', '2017-11-19 10:17:54');
+INSERT INTO `image_collection` VALUES ('220', '99', '2017-11-19 10:40:43');
+INSERT INTO `image_collection` VALUES ('222', '81', '2017-11-19 13:07:19');
+INSERT INTO `image_collection` VALUES ('223', '81', '2017-11-19 14:32:03');
+INSERT INTO `image_collection` VALUES ('224', '102', '2017-11-19 14:55:15');
+INSERT INTO `image_collection` VALUES ('225', '103', '2017-11-19 15:10:39');
+INSERT INTO `image_collection` VALUES ('225', '108', '2017-11-21 18:36:49');
+INSERT INTO `image_collection` VALUES ('225', '109', '2017-11-21 18:37:04');
+INSERT INTO `image_collection` VALUES ('226', '104', '2017-11-19 15:18:36');
+INSERT INTO `image_collection` VALUES ('227', '105', '2017-11-19 15:19:28');
+INSERT INTO `image_collection` VALUES ('228', '106', '2017-11-19 15:19:53');
+INSERT INTO `image_collection` VALUES ('229', '106', '2017-11-19 15:20:54');
+INSERT INTO `image_collection` VALUES ('230', '106', '2017-11-19 15:21:18');
+INSERT INTO `image_collection` VALUES ('231', '105', '2017-11-19 15:21:39');
+INSERT INTO `image_collection` VALUES ('232', '104', '2017-11-19 15:22:18');
+INSERT INTO `image_collection` VALUES ('233', '104', '2017-11-19 15:22:59');
+INSERT INTO `image_collection` VALUES ('234', '105', '2017-11-19 15:24:14');
+INSERT INTO `image_collection` VALUES ('235', '108', '2017-11-21 18:38:35');
 
 -- ----------------------------
 -- Table structure for `image_likes`
@@ -300,14 +367,44 @@ CREATE TABLE `image_likes` (
   `user_id` int(9) NOT NULL,
   `created_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`image_id`,`user_id`),
-  KEY `image_likes_ibfk_1` (`user_id`),
-  CONSTRAINT `image_likes_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user_email` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `image_likes_ibfk_2` FOREIGN KEY (`image_id`) REFERENCES `images` (`image_id`) ON DELETE CASCADE ON UPDATE CASCADE
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `image_likes_ibfk_2` FOREIGN KEY (`image_id`) REFERENCES `images` (`image_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `image_likes_ibfk_3` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of image_likes
 -- ----------------------------
+INSERT INTO `image_likes` VALUES ('189', '42', '2017-11-18 18:52:24');
+INSERT INTO `image_likes` VALUES ('190', '39', '2017-11-18 13:47:24');
+INSERT INTO `image_likes` VALUES ('191', '42', '2017-11-18 18:52:32');
+INSERT INTO `image_likes` VALUES ('193', '37', '2017-11-19 15:11:33');
+INSERT INTO `image_likes` VALUES ('193', '38', '2017-11-19 15:13:49');
+INSERT INTO `image_likes` VALUES ('193', '39', '2017-11-18 10:26:08');
+INSERT INTO `image_likes` VALUES ('193', '42', '2017-11-18 18:52:31');
+INSERT INTO `image_likes` VALUES ('213', '37', '2017-11-19 11:16:29');
+INSERT INTO `image_likes` VALUES ('213', '38', '2017-11-19 15:14:16');
+INSERT INTO `image_likes` VALUES ('213', '42', '2017-11-18 19:27:50');
+INSERT INTO `image_likes` VALUES ('214', '37', '2017-11-19 11:16:18');
+INSERT INTO `image_likes` VALUES ('214', '38', '2017-11-19 15:14:01');
+INSERT INTO `image_likes` VALUES ('214', '39', '2017-11-19 15:15:41');
+INSERT INTO `image_likes` VALUES ('214', '42', '2017-11-18 18:52:34');
+INSERT INTO `image_likes` VALUES ('214', '49', '2017-11-21 21:25:15');
+INSERT INTO `image_likes` VALUES ('216', '39', '2017-11-20 17:33:43');
+INSERT INTO `image_likes` VALUES ('217', '37', '2017-11-19 15:11:40');
+INSERT INTO `image_likes` VALUES ('217', '39', '2017-11-19 15:15:38');
+INSERT INTO `image_likes` VALUES ('218', '39', '2017-11-20 20:38:50');
+INSERT INTO `image_likes` VALUES ('219', '37', '2017-11-19 15:11:43');
+INSERT INTO `image_likes` VALUES ('219', '39', '2017-11-19 15:16:13');
+INSERT INTO `image_likes` VALUES ('222', '37', '2017-11-19 15:12:40');
+INSERT INTO `image_likes` VALUES ('222', '38', '2017-11-19 15:13:52');
+INSERT INTO `image_likes` VALUES ('222', '39', '2017-11-19 15:14:58');
+INSERT INTO `image_likes` VALUES ('222', '49', '2017-11-21 18:35:55');
+INSERT INTO `image_likes` VALUES ('224', '47', '2017-11-19 14:58:59');
+INSERT INTO `image_likes` VALUES ('225', '37', '2017-11-19 15:13:23');
+INSERT INTO `image_likes` VALUES ('225', '38', '2017-11-19 15:14:00');
+INSERT INTO `image_likes` VALUES ('225', '39', '2017-11-19 15:15:12');
+INSERT INTO `image_likes` VALUES ('227', '49', '2017-11-21 18:37:58');
 
 -- ----------------------------
 -- Table structure for `inventories`
@@ -325,7 +422,7 @@ CREATE TABLE `inventories` (
   PRIMARY KEY (`id`),
   KEY `product_id` (`product_id`),
   CONSTRAINT `inventories_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of inventories
@@ -345,7 +442,7 @@ CREATE TABLE `orders` (
   KEY `delivery_id` (`delivery_id`),
   CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `orders_ibfk_2` FOREIGN KEY (`delivery_id`) REFERENCES `deliveries` (`delivery_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of orders
@@ -406,7 +503,7 @@ CREATE TABLE `products` (
   PRIMARY KEY (`product_id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `products_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8 COMMENT='商品列表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='商品列表';
 
 -- ----------------------------
 -- Records of products
@@ -446,8 +543,13 @@ CREATE TABLE `relationships` (
 -- ----------------------------
 -- Records of relationships
 -- ----------------------------
+INSERT INTO `relationships` VALUES ('37', '38', null, '2017-11-19 12:11:09');
+INSERT INTO `relationships` VALUES ('37', '42', null, '2017-11-19 12:16:24');
 INSERT INTO `relationships` VALUES ('38', '37', null, '2017-11-16 21:53:22');
-INSERT INTO `relationships` VALUES ('39', '37', null, '2017-11-16 22:10:14');
+INSERT INTO `relationships` VALUES ('39', '38', null, '2017-11-18 10:21:14');
+INSERT INTO `relationships` VALUES ('39', '42', null, '2017-11-19 15:17:46');
+INSERT INTO `relationships` VALUES ('42', '39', null, '2017-11-18 21:03:18');
+INSERT INTO `relationships` VALUES ('49', '37', null, '2017-11-21 18:36:28');
 
 -- ----------------------------
 -- Table structure for `store_images`
@@ -506,14 +608,19 @@ CREATE TABLE `users` (
   `consignee` varchar(45) DEFAULT '',
   `consignee_phone` char(13) DEFAULT '',
   PRIMARY KEY (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8 COMMENT='存储注册用户的相关信息';
+) ENGINE=InnoDB AUTO_INCREMENT=50 DEFAULT CHARSET=utf8 COMMENT='存储注册用户的相关信息';
 
 -- ----------------------------
 -- Records of users
 -- ----------------------------
-INSERT INTO `users` VALUES ('37', '1', '1', 'admin', '', 'admin@qq.com', '46f94c8de14fb36680850768ff1b7f2a', '', '', '', '', '', '', '', '', '2017-11-16 21:34:44', '', '', '', '', '', '', '', '');
-INSERT INTO `users` VALUES ('38', '1', '1', 'tester', '', 'tester@qq.com', '46f94c8de14fb36680850768ff1b7f2a', '', '', '', '', '', '', '', '', '2017-11-16 21:53:12', '', '', '', '', '', '', '', '');
-INSERT INTO `users` VALUES ('39', '1', '1', 'tester2', '', 'tester2@qq.com', '46f94c8de14fb36680850768ff1b7f2a', '', '', '', '', '', '', '', '', '2017-11-16 22:05:56', '', '', '', '', '', '', '', '');
+INSERT INTO `users` VALUES ('37', '1', '1', '阿猫123qwe', '', 'admin@qq.com', '46f94c8de14fb36680850768ff1b7f2a', '', '', '', '1511064368339', '', '', '', '我是前端开发工程师，卡还多久啊很快就好噶好的高科技韩国', '2017-11-20 20:31:12', '', '', '', '', '', '', '', '');
+INSERT INTO `users` VALUES ('38', '1', '1', '阿狗自拍', '', 'tester@qq.com', '46f94c8de14fb36680850768ff1b7f2a', '', '', '', '', '', '', '', '我空间说说大家大家还记得好久放假', '2017-11-20 20:31:17', '', '', '', '', '', '', '', '');
+INSERT INTO `users` VALUES ('39', '1', '1', '我的公司', '', 'tester2@qq.com', '46f94c8de14fb36680850768ff1b7f2a', '', '', '', '1510880264709', '', '', '', '速度，买点面包吃NBC成本，目标', '2017-11-20 20:31:21', '', '', '', '', '', '', '', '');
+INSERT INTO `users` VALUES ('41', '1', '1', '缅甸电站123qwe', '', 'm@gmail.com', 'hh', '', '', '', '', '', '', '', '就看我和客户解决好几个', '2017-11-20 20:31:24', '', '', '', '', '', '', '', '');
+INSERT INTO `users` VALUES ('42', '1', '1', '自拍达人', '', 'linqing@qq.com', '62c8ad0a15d9d1ca38d5dee762a16e01', '', '', '', '1510994978358', '', '', '', '进度计划计划计划', '2017-11-20 20:31:27', '', '', '', '', '', '', '', '');
+INSERT INTO `users` VALUES ('46', '1', '1', '123qwe', '', 'tt@qq.com', '46f94c8de14fb36680850768ff1b7f2a', '', '', '', '', '', '', '', '都不会，门禁', '2017-11-20 20:31:30', '', '', '', '', '', '', '', '');
+INSERT INTO `users` VALUES ('47', '1', '1', '123qwe', '', 'tt2@qq.com', '46f94c8de14fb36680850768ff1b7f2a', '', '', '', '1511075021765', '', '', '', '就问看清洁空气好看人家俩人日艺人如何规划计划和付款', '2017-11-20 20:31:35', '', '', '', '', '', '', '', '');
+INSERT INTO `users` VALUES ('49', '1', '1', '林晴', '', 'yottalynn@gmail.com', '46f94c8de14fb36680850768ff1b7f2a', '', '', '', '1511261060353', '', '', '', '', '2017-11-21 18:39:23', '', '', '', '', '', '', '', '');
 
 -- ----------------------------
 -- Table structure for `user_category`
@@ -558,3 +665,15 @@ CREATE TABLE `user_email` (
 -- ----------------------------
 -- Records of user_email
 -- ----------------------------
+INSERT INTO `user_email` VALUES ('37', '1', null, null, '2017-11-22 10:20:47');
+INSERT INTO `user_email` VALUES ('42', '1', null, null, '2017-11-18 16:49:33');
+INSERT INTO `user_email` VALUES ('37', '2', null, null, '2017-11-22 10:20:47');
+INSERT INTO `user_email` VALUES ('42', '2', null, null, '2017-11-18 16:49:33');
+INSERT INTO `user_email` VALUES ('37', '3', null, null, '2017-11-22 10:20:47');
+INSERT INTO `user_email` VALUES ('42', '3', null, null, '2017-11-18 16:49:33');
+INSERT INTO `user_email` VALUES ('37', '4', null, null, '2017-11-22 10:20:47');
+INSERT INTO `user_email` VALUES ('42', '4', null, null, '2017-11-18 16:49:33');
+INSERT INTO `user_email` VALUES ('37', '5', null, null, '2017-11-22 10:20:47');
+INSERT INTO `user_email` VALUES ('42', '5', null, null, '2017-11-18 16:49:33');
+INSERT INTO `user_email` VALUES ('37', '6', null, null, '2017-11-22 10:20:47');
+INSERT INTO `user_email` VALUES ('42', '6', null, null, '2017-11-18 16:49:33');

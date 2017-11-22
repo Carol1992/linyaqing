@@ -9,7 +9,7 @@ module.exports = {
     })
   },
   uploadPhotoToAliyun (formData, callback) {
-    axios.post('/api/uploadPhotoToAliyun', {
+    axios.post('/uploadPhotoToAliyun', {
       token:localStorage.token,
       processData: false,
       contentType: false,
@@ -23,7 +23,7 @@ module.exports = {
     });
   },
   uploadProductImageToAliyun (formData, callback) {
-    axios.post('/api/uploadProductImageToAliyun', {
+    axios.post('/uploadProductImageToAliyun', {
       token:localStorage.token,
       processData: false,
       contentType: false,
@@ -37,7 +37,7 @@ module.exports = {
     });
   },
   getAliyunKey (callback) {
-    axios.post('/api/getAliyunKey', {
+    axios.post('/getAliyunKey', {
       token:localStorage.token
     })
     .then(function (response) {

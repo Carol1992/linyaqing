@@ -1,7 +1,7 @@
 module.exports = {
 	register (data, callback) {
 		var md5 = require('md5')
-		axios.post('/api/register', {
+		axios.post('/register', {
 			user_name: data.user_name,
 			email: data.email,
 			password: md5(data.password)
@@ -15,7 +15,7 @@ module.exports = {
 	},
 	login (data, callback) {
 		var md5 = require('md5')
-		axios.post('/api/login', {
+		axios.post('/login', {
 			email: data.email,
 			password: md5(data.password)
 		})
@@ -34,7 +34,7 @@ module.exports = {
 		});
 	},
 	getUserInfo (data, callback) {
-		axios.post('/api/getUserInfo', data)
+		axios.post('/getUserInfo', data)
 		.then(function (response) {
 		  callback(response)
 		})
@@ -44,7 +44,7 @@ module.exports = {
 	},
 	updateUserAccount: {
 		info (data, callback) {
-			axios.post('/api/updateUserAccount/info', data)
+			axios.post('/updateUserAccount/info', data)
 			.then(function (response) {
 			  callback(response)
 			})
@@ -54,7 +54,7 @@ module.exports = {
 		},
 		password (data, callback) {
 			var md5 = require('md5')
-			axios.post('/api/updateUserAccount/password', {
+			axios.post('/updateUserAccount/password', {
 				token:localStorage.token,
 				password:md5(data.password)
 			})
@@ -66,7 +66,7 @@ module.exports = {
 			});
 		},
 		delete (callback) {
-			axios.post('/api/updateUserAccount/delete', {
+			axios.post('/updateUserAccount/delete', {
 				token:localStorage.token
 			})
 			.then(function (response) {
@@ -77,7 +77,7 @@ module.exports = {
 			});
 		},
 		emailSettings (data, callback) {
-			axios.post('/api/updateUserAccount/emailSettings', {
+			axios.post('/updateUserAccount/emailSettings', {
 				token:localStorage.token,
 				email_settings: data
 			})
@@ -89,7 +89,7 @@ module.exports = {
 			});
 		},
 		avatar (data, callback) {
-			axios.post('/api/updateUserAccount/avatar', {
+			axios.post('/updateUserAccount/avatar', {
 				token:localStorage.token,
 				image_md5:data.saveName,
 				saveName: data.oldSaveName,
@@ -103,7 +103,7 @@ module.exports = {
 			});
 		},
 		developer (data, callback) {
-			axios.post('/api/updateUserAccount/developer', {
+			axios.post('/updateUserAccount/developer', {
 				token:localStorage.token,
 				url: data.url,
 				description: data.desc 
@@ -116,7 +116,7 @@ module.exports = {
 			});
 		},
 		delivery () {
-			axios.post('/api/updateUserAccount/delivery', {
+			axios.post('/updateUserAccount/delivery', {
 				token:localStorage.token,
 				delivery_id:'',//不传或为空则默认为新建收货地址，有则为更改该条收货信息
 				delivery_address:'1866蓝湾半岛',
@@ -135,7 +135,7 @@ module.exports = {
 		}
 	},
 	getUserApplication () {
-		axios.post('/api/getUserApplication', {
+		axios.post('/getUserApplication', {
 			token:localStorage.token,
 			pageNo:1,
 			pageSize:5
@@ -148,7 +148,7 @@ module.exports = {
 		});
 	},
 	addNewApp () {
-		axios.post('/api/addNewApp', {
+		axios.post('/addNewApp', {
 			token:localStorage.token,
 			app_name: 'my_first_app',
 			app_desc: '我的第一个应用，展示hello world',
@@ -163,7 +163,7 @@ module.exports = {
 		});
 	},
 	getUntagedPhoto () {
-		axios.post('/api/getUntagedPhoto', {})
+		axios.post('/getUntagedPhoto', {})
 		.then(function (response) {
 		  console.log(response)
 		})
@@ -172,7 +172,7 @@ module.exports = {
 		});
 	},
 	updatePhotoTag () {
-		axios.post('/api/updatePhotoTag', {
+		axios.post('/updatePhotoTag', {
 			image_id:'7',
 			tag:'carol,lynn,jsjsjs'
 		})

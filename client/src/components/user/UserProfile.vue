@@ -411,7 +411,7 @@
             return
           }
           this.$store.dispatch('getUserInfo')
-          this.notifyMsg = '邮件提醒设置成功！'
+          this.notifyMsg = '邮件提醒设置成功，但推送功能暂未实现:)'
           this.success(true)
         })
       },

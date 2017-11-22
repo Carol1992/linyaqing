@@ -1,6 +1,6 @@
 module.exports = {
 	getCategories () {
-		axios.post('/api/getCategories', {})
+		axios.post('/getCategories', {})
 		.then(function (response) {
 		  console.log(response)
 		})
@@ -9,7 +9,7 @@ module.exports = {
 		});	
 	},
 	updateUserCategories () {
-		axios.post('/api/updateUserCategories', {
+		axios.post('/updateUserCategories', {
 			token:localStorage.token,
 			categories:'1,2,3,4'
 		})
@@ -21,7 +21,7 @@ module.exports = {
 		});	
 	},
 	getPhotographers () {
-		axios.post('/api/getPhotographers', {})
+		axios.post('/getPhotographers', {})
 		.then(function (response) {
 		  console.log(response)
 		})
@@ -30,7 +30,7 @@ module.exports = {
 		});	
 	},
 	updatePhotographers (data, callback) {
-		axios.post('/api/updatePhotographers/add', {
+		axios.post('/updatePhotographers/add', {
 			token:localStorage.token,
 			followings:data.followings
 		})
@@ -42,7 +42,7 @@ module.exports = {
 		});	
 	},
 	updatePhotographers_rm (data, callback) {
-		axios.post('/api/updatePhotographers/rm', {
+		axios.post('/updatePhotographers/rm', {
 			token:localStorage.token,
 			following_id:data.following_id
 		})
@@ -54,7 +54,7 @@ module.exports = {
 		});	
 	},
 	uploadUserPhoto (data, callback) {
-		axios.post('/api/uploadUserPhoto', {
+		axios.post('/uploadUserPhoto', {
 			token:localStorage.token,
 			image_md5:data.image_md5,
 			image_tags:data.image_tags,
@@ -80,7 +80,7 @@ module.exports = {
 	},
 	updatePhoto (data, callback) {
 		data.token = localStorage.token
-		axios.post('/api/updatePhoto', data)
+		axios.post('/updatePhoto', data)
 		.then(function (response) {
 		  callback(response)
 		})
@@ -89,7 +89,7 @@ module.exports = {
 		});
 	},
 	deleteUserPhoto (data, callback) {
-		axios.post('/api/deleteUserPhoto', {
+		axios.post('/deleteUserPhoto', {
 			token:localStorage.token,
 			image_id: data.image_id
 		})
@@ -101,7 +101,7 @@ module.exports = {
 		});
 	},
 	deleteCollection (data, callback) {
-		axios.post('/api/deleteCollection', {
+		axios.post('/deleteCollection', {
 			token:localStorage.token,
 			collection_id: data.collection_id
 		})
@@ -113,13 +113,13 @@ module.exports = {
 		});
 	},
 	downloadPhoto (data) {
-		axios.get('/api/download/photo', {
+		axios.get('/download/photo', {
 			params: {
 				filename: data.filename
 			}
 		})
 		.then(function (response) {
-		  window.location.href = '/api/download/photo?filename=' + data.filename
+		  window.location.href = '/download/photo?filename=' + data.filename
 		})
 		.catch(function (error) {
 		  console.log(error)
@@ -127,7 +127,7 @@ module.exports = {
 	},
 	getCollection: {
 		all (data, callback) {
-			axios.post('/api/getCollection/all', data)
+			axios.post('/getCollection/all', data)
 			.then(function (response) {
 			  callback(response)
 			})
@@ -136,7 +136,7 @@ module.exports = {
 			});	
 		},
 		user (data, callback) {
-			axios.post('/api/getCollection/user', data)
+			axios.post('/getCollection/user', data)
 			.then(function (response) {
 			  callback(response)
 			})
@@ -146,7 +146,7 @@ module.exports = {
 		},
 		one (data, callback) {
 			data.token = localStorage.token
-			axios.post('/api/getCollection/one', data)
+			axios.post('/getCollection/one', data)
 			.then(function (response) {
 			  callback(response)
 			})
@@ -157,7 +157,7 @@ module.exports = {
 	},
 	updateCollection (data, callback) {
 		data.token = localStorage.token
-		axios.post('/api/updateCollection', data)
+		axios.post('/updateCollection', data)
 		.then(function (response) {
 		  callback(response)
 		})
@@ -167,7 +167,7 @@ module.exports = {
 	},
 	addToCollection (data, callback) {
 		data.token = localStorage.token
-		axios.post('/api/addToCollection', data)
+		axios.post('/addToCollection', data)
 		.then(function (response) {
 		  callback(response)
 		})
@@ -176,7 +176,7 @@ module.exports = {
 		});	
 	},
 	getCollectionInfo (data, callback) {
-		axios.post('/api/getCollectionInfo', data)
+		axios.post('/getCollectionInfo', data)
 		.then(function (response) {
 		  callback(response)
 		})
@@ -186,7 +186,7 @@ module.exports = {
 	},
 	getList: {
 		new (data, callback) {
-			axios.post('/api/getList/new', data)
+			axios.post('/getList/new', data)
 			.then(function (response) {
 			  callback(response)
 			})
@@ -195,7 +195,7 @@ module.exports = {
 			});	
 		},
 		hot (data, callback) {
-			axios.post('/api/getList/hot', data)
+			axios.post('/getList/hot', data)
 			.then(function (response) {
 			  callback(response)
 			})
@@ -204,7 +204,7 @@ module.exports = {
 			});	
 		},
 		following (data, callback) {
-			axios.post('/api/getList/following', data)
+			axios.post('/getList/following', data)
 			.then(function (response) {
 			  callback(response)
 			})
@@ -213,7 +213,7 @@ module.exports = {
 			});	
 		},
 		liked (data, callback) {
-			axios.post('/api/getList/liked', data)
+			axios.post('/getList/liked', data)
 			.then(function (response) {
 			  callback(response)
 			})
@@ -222,7 +222,7 @@ module.exports = {
 			});	
 		},
 		user (data, callback) {
-			axios.post('/api/getList/user', data)
+			axios.post('/getList/user', data)
 			.then(function (response) {
 			  callback(response)
 			})
@@ -232,7 +232,7 @@ module.exports = {
 		},
 	},
 	search (data, callback) {
-		axios.post('/api/search', {
+		axios.post('/search', {
 			keyword:data.keyword
 		})
 		.then(function (response) {
@@ -243,7 +243,7 @@ module.exports = {
 		});	
 	},
 	photoLike (data, callback) {
-		axios.post('/api/photoLike', {
+		axios.post('/photoLike', {
 			token: localStorage.token,
 			image_id: data.image_id,
 			like: data.like // 1代表喜欢该图片，0取消该喜欢
@@ -256,7 +256,7 @@ module.exports = {
 		});	
 	},
 	alreadyLike (data, callback) {
-		axios.post('/api/alreadyLike', {
+		axios.post('/alreadyLike', {
 			token: localStorage.token,
 			image_id: data.image_id
 		})

@@ -1,7 +1,7 @@
 module.exports = {
 	getProducts: {
 		new () {
-			axios.post('/api/getProducts/new', {
+			axios.post('/getProducts/new', {
 				pageNo:1,
 				pageSize:3
 			})
@@ -13,7 +13,7 @@ module.exports = {
 			});
 		},
 		hot () {
-			axios.post('/api/getProducts/hot', {
+			axios.post('/getProducts/hot', {
 				pageNo:1,
 				pageSize:3
 			})
@@ -25,7 +25,7 @@ module.exports = {
 			});
 		},
 		all () {
-			axios.post('/api/getProducts/all', {
+			axios.post('/getProducts/all', {
 				pageNo:1,
 				pageSize:3
 			})
@@ -37,7 +37,7 @@ module.exports = {
 			});
 		},
 		self () {
-			axios.post('/api/getProducts/self', {
+			axios.post('/getProducts/self', {
 				pageNo:1,
 				pageSize:3
 			})
@@ -50,7 +50,7 @@ module.exports = {
 		}
 	},
 	addToCart () {
-		axios.post('/api/addToCart', {
+		axios.post('/addToCart', {
 			token: localStorage.token, // 如果是非登录用户将商品放入购物车，则用localStorage在本地记住就好
 			product_id: 2,
 			quantity: 20 //如果是删减则传负数，比如用户删减了2件，则传-2
@@ -63,7 +63,7 @@ module.exports = {
 		});
 	},
 	getProductsInCart () {
-		axios.post('/api/getProductsInCart', {
+		axios.post('/getProductsInCart', {
 			token:localStorage.token,
 			pageNo:1,
 			pageSize:3
@@ -76,7 +76,7 @@ module.exports = {
 		});
 	},
 	getProductDetails () {
-		axios.post('/api/getProductDetails', {
+		axios.post('/getProductDetails', {
 			product_id: 1
 		})
 		.then(function (response) {
@@ -87,7 +87,7 @@ module.exports = {
 		});
 	},
 	getAllImages () {
-		axios.post('/api/getAllImages', {
+		axios.post('/getAllImages', {
 			product_id:'1'
 		})
 		.then(function (response) {
@@ -98,7 +98,7 @@ module.exports = {
 		});	
 	},	
 	uploadProducts () {
-		axios.post('/api/uploadProducts', {
+		axios.post('/uploadProducts', {
 			token:localStorage.token,
 			product_md5:'http://my-image-carol.oss-cn-beijing.aliyuncs.com/1509425429031.jpeg',
 			product_name:'pic-1',
@@ -114,7 +114,7 @@ module.exports = {
 		});	
 	},
 	addProductImages () {
-		axios.post('/api/addProductImages', {
+		axios.post('/addProductImages', {
 			token:localStorage.token,
 			product_id:8,
 			image_name:'pic-2',
@@ -129,7 +129,7 @@ module.exports = {
 		});	
 	},
 	removeFromCart () {
-		axios.post('/api/removeFromCart', {
+		axios.post('/removeFromCart', {
 			token:localStorage.token,
 			product_id:1
 		})
@@ -141,7 +141,7 @@ module.exports = {
 		});	
 	},
 	getDeliveryAddress () {
-		axios.post('/api/getDeliveryAddress', {
+		axios.post('/getDeliveryAddress', {
 			token:localStorage.token,
 			pageNo:1,
 			pageSize:3
@@ -154,7 +154,7 @@ module.exports = {
 		});	
 	},
 	changeStocks () {
-		axios.post('/api/changeStocks', {
+		axios.post('/changeStocks', {
 			token:localStorage.token,
 			product_id:1,
 			stocks:1000,
@@ -173,7 +173,7 @@ module.exports = {
 		});	
 	},
 	placeOrder () {
-		axios.post('/api/placeOrder', {
+		axios.post('/placeOrder', {
 			token:localStorage.token,
 			delivery_id:1,
 			orders: [

@@ -9,6 +9,7 @@ import iView from 'iview'
 import '../my-theme/index.less'
 import store from './store/index.js'
 import VueLazyload from 'vue-lazyload'
+import apiConfig from '../config/api.config'
 
 Vue.config.debug = true // debug
 Vue.use(VueAxios, axios)
@@ -43,6 +44,7 @@ router.beforeEach((to, from, next) => {
   }
 })
 
+axios.defaults.baseURL = apiConfig.baseUrl
 // http response 拦截器
 axios.interceptors.response.use(
   response => {

@@ -24,13 +24,31 @@ var client = new OSS({
 var nodemailer  = require('nodemailer');
 var mailTransport = nodemailer.createTransport({
     host : 'smtp.mxhichina.com',
-    secure: true, // 使用SSL方式（安全方式，防止被窃取信息
+    secure: true, // 使用SSL方式（安全方式，防止被窃取信息)
     port: 465,
     auth : {
         user: my_secret.email.user,
         pass: my_secret.email.pass
     },
 });
+// websocket 推送消息给用户：点赞、关注、评论、私信、购买
+var ws = require("nodejs-websocket");
+var server = ws.createServer(function (conn) {
+  console.log("New connection")
+  let data = {
+    name:'carol',
+    email:'linqing@qq.com',
+    bio:'hello world'
+  }
+  conn.send(JSON.stringify(data))
+  conn.on("text", function (str) {
+      console.log("Received "+str)
+      conn.sendText(str.toUpperCase()+"!!!")
+  })
+  conn.on("close", function (code, reason) {
+      console.log("Connection closed")
+  })
+}).listen(3001)
 // 处理表单上传
 var formidable = require('formidable');
 var util = require('util');

@@ -13,8 +13,9 @@ $ cd client
 $ npm install
 $ npm run dev
 
-// 线上访问(未部署)
-http://linyaqing.com
+// 线上访问(已部署)
+<a href=''>
+[SharingLife](http://linyaqing.com)
 ```
 
 1. 登录密码的加密方式采用MD5加密

@@ -1,9 +1,11 @@
 var mysql=require("mysql");
+var db = require("./db_info")
 var pool = mysql.createPool({
-  host     : 'localhost',
-  user     : 'carol',
-  password : 'carol',
-  database : 'linyaqing'
+  host     : db.host,
+  user     : db.user,
+  password : db.password,
+  port: db.port,
+  database : db.database
 });
 
 module.exports=function(sql, data){

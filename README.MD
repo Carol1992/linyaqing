@@ -1,4 +1,7 @@
--1. 如何运行
+线上访问(已部署)
+[SharingLife](http://linyaqing.com)
+
+如何运行
 ```js
 // 阿里云oss的accessKeyId和accessKeySecret，这是我的图片存储方案。
 // 不选择这种方案的话，可以更改routes/users.js中的两个api接口：uploadPhotoToAliyun, uploadProductImageToAliyun
@@ -14,9 +17,7 @@ $ npm install
 $ npm run dev
 ```
 
-0.线上访问(已部署)
-[SharingLife](http://linyaqing.com)
-
+思考：
 1. 登录密码的加密方式采用MD5加密
 2. 确定接口数据格式，即书写API文档
 3. 写接口并测试，给出测试文档

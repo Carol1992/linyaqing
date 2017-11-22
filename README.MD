@@ -14,7 +14,6 @@ $ npm install
 $ npm run dev
 
 // 线上访问(已部署)
-<a href=''>
 [SharingLife](http://linyaqing.com)
 ```
 
